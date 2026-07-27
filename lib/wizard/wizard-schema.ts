@@ -1,8 +1,8 @@
-﻿// ---------------------------------------------------------------
+// ---------------------------------------------------------------
 // lib/wizard/wizard-schema.ts
 // Schema declarativo del wizard legal.
 // Define cada paso, sus opciones, dependencias y validaciones.
-// Framework-agnostic � solo datos, sin logica de negocio.
+// Framework-agnostic ? solo datos, sin logica de negocio.
 // Compatible con los componentes CardsField y NumericField de honorio.
 //
 // Milestone 1: schema completo del flujo clasico.
@@ -11,6 +11,7 @@
 // ---------------------------------------------------------------
 
 import type { CardOption, Explanation, Answers } from '@/lib/legal/types'
+export type { Answers }
 
 // ---- Tipos del schema ----
 
@@ -50,7 +51,7 @@ export interface NumericStepDef extends BaseStepDef {
   max: number
   step: number
   default: number
-  presets: number[]
+  presets?: number[]
   format: (value: number) => string
 }
 
@@ -81,7 +82,7 @@ export const TIPOS_PROCESO: CardOption[] = [
   {
     id: 'ejecutivo',
     label: 'Juicio ejecutivo',
-    description: 'Ejecucion de titulos ejecutivos (pagar�s, cheques, etc.).',
+    description: 'Ejecucion de titulos ejecutivos (pagar?s, cheques, etc.).',
     hint: 'Art. 34',
   },
   {
@@ -366,9 +367,8 @@ export const LEGAL_STEPS: WizardStepDef[] = [
     prefix: '$',
     min: 50000,
     max: 200000,
-    step: 100,
+    step: 1,
     default: 92482,
-    presets: [70000, 92482, 100000, 120000],
     format: pesos,
     explicacion: {
       brief: 'Seleccione la opcion que corresponda al caso.',
@@ -446,10 +446,10 @@ export const LEGAL_STEPS: WizardStepDef[] = [
     prefix: '$',
     min: 0,
     max: 999999999999,
-    step: 1000,
+    step: 1,
     default: 0,
-    presets: [500000, 1000000, 5000000, 10000000],
     format: pesos,
+    condition: (answers) => answers.tipoProceso !== 'exhorto',
     explicacion: {
       brief: 'Seleccione la opcion que corresponda al caso.',
       expanded: 'Esta informacion se utiliza para el calculo arancelario.',

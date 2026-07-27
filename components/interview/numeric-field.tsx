@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useEffect, useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
@@ -28,11 +28,9 @@ export function NumericField({ step, value, onChange }: NumericFieldProps) {
       setDraft(value.toLocaleString('es-AR'))
       return
     }
-    const next = clamp(Math.round(parsed / step.step) * step.step, step.min, step.max)
+    const next = clamp(parsed, step.min, step.max)
     onChange(next)
   }
-
-  const pct = step.max > step.min ? ((value - step.min) / (step.max - step.min)) * 100 : 0
 
   return (
     <div className="max-w-lg">
@@ -70,57 +68,6 @@ export function NumericField({ step, value, onChange }: NumericFieldProps) {
       <p className="mt-2 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
         {step.unidad}
       </p>
-
-      <div className="mt-8">
-        <div className="relative h-9">
-          <div className="absolute inset-x-0 top-1/2 h-1 -translate-y-1/2 rounded-full bg-border" />
-          <div
-            className="absolute top-1/2 h-1 -translate-y-1/2 rounded-full bg-foreground"
-            style={{ width: `${pct}%` }}
-          />
-          <div
-            className="absolute top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-background bg-foreground shadow-[0_2px_8px_-2px_rgba(0,0,0,0.4)]"
-            style={{ left: `${pct}%` }}
-            aria-hidden="true"
-          />
-          <input
-            type="range"
-            min={step.min}
-            max={step.max}
-            step={step.step}
-            value={value}
-            onChange={(e) => onChange(Number(e.target.value))}
-            aria-label={`${step.pregunta} slider`}
-            className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-          />
-        </div>
-        <div className="mt-1 flex justify-between font-mono text-[10px] uppercase tracking-wider text-muted-foreground/70">
-          <span>{step.format(step.min)}</span>
-          <span>{step.format(step.max)}</span>
-        </div>
-      </div>
-
-      <div className="mt-6 flex flex-wrap gap-2">
-        {step.presets.map((preset) => {
-          const active = preset === value
-          return (
-            <button
-              key={preset}
-              type="button"
-              onClick={() => onChange(preset)}
-              aria-pressed={active}
-              className={cn(
-                'rounded-full border px-3.5 py-1.5 font-mono text-[12px] tabular-nums transition-all duration-200',
-                active
-                  ? 'border-foreground/25 bg-foreground text-background'
-                  : 'border-border bg-card text-muted-foreground hover:border-foreground/20 hover:text-foreground',
-              )}
-            >
-              {step.format(preset)}
-            </button>
-          )
-        })}
-      </div>
     </div>
   )
 }

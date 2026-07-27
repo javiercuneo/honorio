@@ -15,6 +15,8 @@ import type {
   GrupoResult,
   MinimosModo,
 } from './types'
+import { buildCalculationResult } from './calculate'
+import { renderLegacyHTML } from './render-legacy'
 
 // ---- Helpers de tipo ----
 function g(): any {
@@ -150,7 +152,14 @@ export function calcularFinalHTML(): string {
   }
 
   try {
-    g().calcularFinal()
+    const state = g().wizardState as WizardState
+    if (state?.tipoProceso === 'exhorto') {
+      console.log('[DIAG] exhorto: usando buildCalculationResult + renderLegacyHTML')
+      const result = buildCalculationResult(state)
+      container!.innerHTML = renderLegacyHTML(result)
+    } else {
+      g().calcularFinal()
+    }
     console.log('calcularFinal() ejecutado sin excepcion')
   } catch (e) {
     console.error('[DIAG] EXCEPCION dentro de calcularFinal():', e)
