@@ -10,7 +10,7 @@
 // Milestone 2: implementacion progresiva caso por caso.
 // ---------------------------------------------------------------
 
-import type { WizardState, CalculoResultado, EscalaResult, Transformacion, Rango } from './types'
+import type { WizardState, CalculoResultado, EscalaResult, Transformacion, Rango, Partidor } from './types'
 
 // ---- Registry de procesos ----
 // Cada proceso registra su funcion build.
@@ -518,6 +518,78 @@ export function calcularAuxiliares(baseEnUMA: number, valorUMA: number): Rango {
     maxUMA,
     minPesos: minUMA * valorUMA,
     maxPesos: maxUMA * valorUMA,
+  }
+}
+
+// ================================================================
+// SEGUNDA INSTANCIA Y PARTIDOR
+// ================================================================
+
+/**
+ * Resultado de segunda instancia para un rol especifico.
+ */
+export interface SegundaInstanciaRol {
+  minimo: Rango
+  maximo: Rango
+  revocada: Rango
+}
+
+/**
+ * Resultado completo de segunda instancia para los tres roles.
+ */
+export interface SegundaInstanciaResult {
+  patrocinante: SegundaInstanciaRol
+  apoderado: SegundaInstanciaRol
+  procurador: SegundaInstanciaRol
+}
+
+/**
+ * Calcula los honorarios de segunda instancia (art. 30).
+ *
+ * Minimo: 30% de primera instancia
+ * Maximo: 35% de primera instancia
+ * Maximo con sentencia revocada: 40% de primera instancia
+ */
+export function calcularSegundaInstancia(
+  minPatro: number,
+  maxPatro: number,
+  minApo: number,
+  maxApo: number,
+  minProc: number,
+  maxProc: number,
+  valorUMA: number,
+): SegundaInstanciaResult {
+  const buildRol = (min: number, max: number): SegundaInstanciaRol => ({
+    minimo: { minUMA: min * 0.30, maxUMA: min * 0.30, minPesos: min * 0.30 * valorUMA, maxPesos: min * 0.30 * valorUMA },
+    maximo: { minUMA: max * 0.35, maxUMA: max * 0.35, minPesos: max * 0.35 * valorUMA, maxPesos: max * 0.35 * valorUMA },
+    revocada: { minUMA: max * 0.40, maxUMA: max * 0.40, minPesos: max * 0.40 * valorUMA, maxPesos: max * 0.40 * valorUMA },
+  })
+
+  return {
+    patrocinante: buildRol(minPatro, maxPatro),
+    apoderado: buildRol(minApo, maxApo),
+    procurador: buildRol(minProc, maxProc),
+  }
+}
+
+/**
+ * Calcula los honorarios del partidor (art. 35 ultima parte).
+ * Solo aplica para procesos de sucesion.
+ *
+ * Minimo: 2% de la base
+ * Maximo: 3% de la base
+ */
+export function calcularPartidor(basePesos: number, valorUMA: number): Partidor | null {
+  if (!basePesos || basePesos <= 0) return null
+  const minPesos = basePesos * 0.02
+  const maxPesos = basePesos * 0.03
+  return {
+    minPorcentaje: 2,
+    maxPorcentaje: 3,
+    minUMA: minPesos / valorUMA,
+    maxUMA: maxPesos / valorUMA,
+    minPesos,
+    maxPesos,
   }
 }
 
