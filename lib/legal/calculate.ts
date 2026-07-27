@@ -1,4 +1,4 @@
-// ---------------------------------------------------------------
+﻿// ---------------------------------------------------------------
 // lib/legal/calculate.ts
 // Motor juridico puro: calcula honorarios sin side effects.
 // Unico punto de entrada: buildCalculationResult(state)
@@ -10,32 +10,130 @@
 // Milestone 2: implementacion progresiva caso por caso.
 // ---------------------------------------------------------------
 
-import type { WizardState, CalculoResultado } from './types'
+import type { WizardState, CalculoResultado, EscalaResult } from './types'
+
+// ---- Registry de procesos ----
+// Cada proceso registra su funcion build.
+// Para agregar un proceso nuevo: implementar buildXxx() y registrar aqui.
+export type ProcessBuilder = (state: WizardState) => CalculoResultado
+
+export const PROCESS_REGISTRY: Record<string, ProcessBuilder> = {
+  exhorto: buildExhorto,
+  incidente: buildIncidente,
+}
+
+// ================================================================
+// BLOQUES REUTILIZABLES
+// ================================================================
+
+/**
+ * Calcula la escala arancelaria progresiva del art. 21.
+ * Funcion puramente matematica: NO conoce procesos, NO genera
+ * transformaciones, NO produce HTML.
+ *
+ * Implementa las 7 escalas progresivas con acumulacion de maximos
+ * del grado inmediato anterior (interpretacion literal del art. 21).
+ *
+ * @param basePesos - Base regulatoria en pesos
+ * @param valorUMA  - Valor de la UMA vigente
+ * @returns EscalaResult con los mismos campos que calcularEscalaBase()
+ *          del legacy, o null si los parametros son invalidos.
+ */
+export function calcularEscala(basePesos: number, valorUMA: number): EscalaResult | null {
+  if (!basePesos || !valorUMA || valorUMA <= 0) return null
+
+  const baseEnUMA = basePesos / valorUMA
+  let minComp: number, maxComp: number, tituloEscala: string
+  let minPorc: number, maxPorc: number
+  let maximoEscalaAnterior = 0
+  let limiteAnterior = 0
+
+  if (baseEnUMA <= 15) {
+    tituloEscala = '1\u00aa escala (hasta 15 UMA): 22% a 33%'
+    minComp = baseEnUMA * 0.22
+    maxComp = baseEnUMA * 0.33
+    minPorc = 22; maxPorc = 33
+  } else if (baseEnUMA <= 45) {
+    tituloEscala = '2\u00aa escala (16-45 UMA): 20% a 26%'
+    minComp = (baseEnUMA - 15) * 0.20 + 4.95
+    maxComp = (baseEnUMA - 15) * 0.26 + 4.95
+    minPorc = 20; maxPorc = 26
+    maximoEscalaAnterior = 4.95
+    limiteAnterior = 15
+  } else if (baseEnUMA <= 90) {
+    tituloEscala = '3\u00aa escala (46-90 UMA): 18% a 24%'
+    minComp = (baseEnUMA - 45) * 0.18 + 11.7
+    maxComp = (baseEnUMA - 45) * 0.24 + 11.7
+    minPorc = 18; maxPorc = 24
+    maximoEscalaAnterior = 11.7
+    limiteAnterior = 45
+  } else if (baseEnUMA <= 150) {
+    tituloEscala = '4\u00aa escala (91-150 UMA): 17% a 22%'
+    minComp = (baseEnUMA - 90) * 0.17 + 21.6
+    maxComp = (baseEnUMA - 90) * 0.22 + 21.6
+    minPorc = 17; maxPorc = 22
+    maximoEscalaAnterior = 21.6
+    limiteAnterior = 90
+  } else if (baseEnUMA <= 450) {
+    tituloEscala = '5\u00aa escala (151-450 UMA): 15% a 20%'
+    minComp = (baseEnUMA - 150) * 0.15 + 33
+    maxComp = (baseEnUMA - 150) * 0.20 + 33
+    minPorc = 15; maxPorc = 20
+    maximoEscalaAnterior = 33
+    limiteAnterior = 150
+  } else if (baseEnUMA <= 750) {
+    tituloEscala = '6\u00aa escala (451-750 UMA): 13% a 17%'
+    minComp = (baseEnUMA - 450) * 0.13 + 90
+    maxComp = (baseEnUMA - 450) * 0.17 + 90
+    minPorc = 13; maxPorc = 17
+    maximoEscalaAnterior = 90
+    limiteAnterior = 450
+  } else {
+    tituloEscala = '7\u00aa escala (+750 UMA): 12% a 15%'
+    minComp = (baseEnUMA - 750) * 0.12 + 127.5
+    maxComp = (baseEnUMA - 750) * 0.15 + 127.5
+    minPorc = 12; maxPorc = 15
+    maximoEscalaAnterior = 127.5
+    limiteAnterior = 750
+  }
+
+  const auxMin = baseEnUMA * 0.05
+  const auxMax = baseEnUMA * 0.10
+  const etapaUnMin = minComp / 3
+  const etapaUnMax = maxComp / 3
+  const etapaDosMin = minComp * 2 / 3
+  const etapaDosMax = maxComp * 2 / 3
+
+  return {
+    tituloEscala,
+    baseEnUMA,
+    minPorc,
+    maxPorc,
+    maximoEscalaAnterior,
+    limiteAnterior,
+    patrocinante: {
+      full: { min: minComp, max: maxComp },
+      uno: { min: etapaUnMin, max: etapaUnMax },
+      dos: { min: etapaDosMin, max: etapaDosMax },
+    },
+    apoderado: {
+      full: { min: minComp * 1.4, max: maxComp * 1.4 },
+      uno: { min: etapaUnMin * 1.4, max: etapaUnMax * 1.4 },
+      dos: { min: etapaDosMin * 1.4, max: etapaDosMax * 1.4 },
+    },
+    auxMin,
+    auxMax,
+  }
+}
 
 /**
  * Construye el resultado estructurado del calculo de honorarios.
  * Entry point unico: delega internamente segun el tipo de proceso.
  */
 export function buildCalculationResult(state: WizardState): CalculoResultado {
-  const tipo = state.tipoProceso
-
-  switch (tipo) {
-    case 'exhorto':
-      return buildExhorto(state)
-    case 'incidente':
-      return buildIncidente(state)
-    case 'medida_cautelar':
-      return buildMedidaCautelar(state)
-    case 'homologacion_desocupacion':
-      return buildHomologacion(state)
-    case 'conocimiento':
-    case 'ejecucion_sentencia':
-    case 'ejecutivo':
-    case 'sucesion':
-      return buildGeneral(state)
-    default:
-      return buildEmpty(state)
-  }
+  const builder = PROCESS_REGISTRY[state.tipoProceso]
+  if (builder) return builder(state)
+  return buildEmpty(state)
 }
 
 // ---- Implementaciones por tipo de proceso ----
@@ -114,7 +212,56 @@ function buildExhorto(state: WizardState): CalculoResultado {
 }
 
 function buildIncidente(state: WizardState): CalculoResultado {
-  throw new Error('buildIncidente no implementado')
+  const uma = state.valorUMA
+  const base = state.baseValor
+
+  const baseEnUMA = base / uma
+  const porcentajeMin = 0.02
+  const porcentajeMax = 0.20
+  const minUMA = baseEnUMA * porcentajeMin
+  const maxUMA = baseEnUMA * porcentajeMax
+  const minPesos = minUMA * uma
+  const maxPesos = maxUMA * uma
+
+  return {
+    tipoProceso: 'incidente',
+    esProvisorio: false,
+    baseOriginal: base,
+    baseFinal: base,
+    valorUMA: uma,
+    honorarios: {
+      patrocinante: { rango: { minUMA, maxUMA, minPesos, maxPesos } },
+      apoderado: { rango: { minUMA: 0, maxUMA: 0, minPesos: 0, maxPesos: 0 } },
+      procurador: { rango: { minUMA: 0, maxUMA: 0, minPesos: 0, maxPesos: 0 } },
+    },
+    auxiliares: { minUMA: 0, maxUMA: 0, minPesos: 0, maxPesos: 0 },
+    incidente: {
+      porcentajeMin: 2,
+      porcentajeMax: 20,
+    },
+    transformaciones: [
+      {
+        id: 'incidente-minimo',
+        etapa: 'honorarios',
+        concepto: 'Honorarios m\u00ednimos para incidente (2% de la base)',
+        articulo: 'art. 29 inc. g',
+        visible: true,
+        valorPrevio: base,
+        factor: porcentajeMin,
+        valorPosterior: minPesos,
+      },
+      {
+        id: 'incidente-maximo',
+        etapa: 'honorarios',
+        concepto: 'Honorarios m\u00e1ximos para incidente (20% de la base)',
+        articulo: 'art. 29 inc. g',
+        visible: true,
+        valorPrevio: base,
+        factor: porcentajeMax,
+        valorPosterior: maxPesos,
+      },
+    ],
+  }
 }
 
 function buildMedidaCautelar(state: WizardState): CalculoResultado {

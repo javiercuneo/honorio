@@ -1,4 +1,4 @@
-// ---------------------------------------------------------------
+﻿// ---------------------------------------------------------------
 // lib/legal/render-legacy.ts
 // Renderizador legacy: convierte CalculoResultado al HTML exacto
 // que producia calcularFinal().
@@ -59,7 +59,20 @@ function renderExhortoHTML(result: CalculoResultado): string {
 }
 
 function renderIncidenteHTML(result: CalculoResultado): string {
-  throw new Error('renderIncidenteHTML no implementado')
+  const { baseOriginal, baseFinal, valorUMA, honorarios } = result
+  const base = baseFinal || baseOriginal
+  const baseUMA = valorUMA > 0 ? base / valorUMA : 0
+  const { minUMA, maxUMA, minPesos, maxPesos } = honorarios.patrocinante.rango
+
+  return '<div class="dashboard-card">' +
+    '<div class="summary-box">\uD83D\uDCCB Resumen del juicio<br>Tipo de proceso: Incidente<br>Base: $' + formatPesos(base) + '<br>Valor UMA: $' + formatPesos(valorUMA) + '<br>Base en UMA: ' + baseUMA.toFixed(2) + '</div>' +
+    '<h3>Incidente (art.33 ley 21839)</h3>' +
+    '<table>' +
+    '<tr><th>Concepto</th><th>UMA</th><th>Pesos ($)</th></tr>' +
+    '<tr><td>M\u00ednimo (2%)</td><td>' + minUMA.toFixed(2) + '</td><td>$' + formatPesos(minPesos) + '</td></tr>' +
+    '<tr><td>M\u00e1ximo (20%)</td><td>' + maxUMA.toFixed(2) + '</td><td>$' + formatPesos(maxPesos) + '</td></tr>' +
+    '</table>' +
+    '<div class="legal-box">Tener en cuenta que seg\u00fan el inc. g) del art. 29, "los incidentes se dividir\u00e1n en 2 etapas; la primera se compone del planteo que lo origine, sea verbal o escrito, y la segunda, del desarrollo hasta su conclusi\u00f3n".</div></div>'
 }
 
 function renderMedidaCautelarHTML(result: CalculoResultado): string {

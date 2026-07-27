@@ -1,4 +1,4 @@
-// ---------------------------------------------------------------
+﻿// ---------------------------------------------------------------
 // lib/legal/adapters.ts
 // Capa de adaptacion framework-agnostica.
 // Traduce el contrato JS del motor legacy (window.*) a una interfaz
@@ -15,7 +15,7 @@ import type {
   GrupoResult,
   MinimosModo,
 } from './types'
-import { buildCalculationResult } from './calculate'
+import { buildCalculationResult, PROCESS_REGISTRY } from './calculate'
 import { renderLegacyHTML } from './render-legacy'
 
 // ---- Helpers de tipo ----
@@ -153,8 +153,8 @@ export function calcularFinalHTML(): string {
 
   try {
     const state = g().wizardState as WizardState
-    if (state?.tipoProceso === 'exhorto') {
-      console.log('[DIAG] exhorto: usando buildCalculationResult + renderLegacyHTML')
+    if (state?.tipoProceso && state.tipoProceso in PROCESS_REGISTRY) {
+      console.log('[DIAG] ' + state.tipoProceso + ': usando buildCalculationResult + renderLegacyHTML')
       const result = buildCalculationResult(state)
       container!.innerHTML = renderLegacyHTML(result)
     } else {
