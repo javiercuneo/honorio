@@ -1,4 +1,4 @@
-﻿// ---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Test de equivalencia: aplicarReduccionesBase() (TS) vs legacy
 //
 // Verifica que el bloque extraido produzca exactamente los mismos
@@ -7,33 +7,24 @@
 // Uso: npx tsx lib/legal/__tests__/reduccionesBase.validation.ts
 // ---------------------------------------------------------------
 
-import { aplicarReduccionesBase, type ReduccionesBaseInput } from '../calculate'
+import { aplicarReduccionesBase } from '../calculate'
 
 // ---- Legacy reference: logic from calculations.js lineas 117-137 ----
 function legacyCalcularBaseReducida(input: {
-  tipoProceso: string
   baseValor: number
-  objetoBase?: string
-  desalojoVivienda?: string | null
-  sentenciaResultado?: string | null
-  modoTerminacion?: string
-  caducidadCriterio?: string
+  esViviendaProtegida: boolean
+  demandaRechazada: boolean
+  caducidadArt22: boolean
 }): number {
   let baseReducida = input.baseValor
 
-  if (input.tipoProceso === 'conocimiento' && input.objetoBase === 'desalojo' && input.desalojoVivienda === 'vivienda') {
+  if (input.esViviendaProtegida) {
     baseReducida *= 0.8
   }
-  if (
-    (input.tipoProceso === 'conocimiento' || input.tipoProceso === 'ejecucion_sentencia' || input.tipoProceso === 'ejecutivo') &&
-    input.sentenciaResultado === 'rechazada'
-  ) {
+  if (input.demandaRechazada) {
     baseReducida *= 0.7
   }
-  if (
-    (input.tipoProceso === 'conocimiento' || input.tipoProceso === 'ejecucion_sentencia' || input.tipoProceso === 'ejecutivo') &&
-    input.modoTerminacion === 'caducidad' && input.caducidadCriterio === 'art22'
-  ) {
+  if (input.caducidadArt22) {
     baseReducida *= 0.7
   }
 
@@ -45,7 +36,12 @@ const BASE = 1000000
 
 interface TestCase {
   label: string
-  input: ReduccionesBaseInput
+  input: {
+    baseValor: number
+    esViviendaProtegida?: boolean
+    demandaRechazada?: boolean
+    caducidadArt22?: boolean
+  }
   expectReduccionesCount: number
   expectIds?: string[]
 }
@@ -53,68 +49,67 @@ interface TestCase {
 const TEST_CASES: TestCase[] = [
   {
     label: 'sin reducciones',
-    input: { tipoProceso: 'conocimiento', baseValor: BASE, objetoBase: 'sumas_dinero', sentenciaResultado: 'admitida' },
+    input: { baseValor: BASE },
     expectReduccionesCount: 0,
   },
   {
     label: 'desalojo vivienda -20%',
-    input: { tipoProceso: 'conocimiento', baseValor: BASE, objetoBase: 'desalojo', desalojoVivienda: 'vivienda' },
+    input: { baseValor: BASE, esViviendaProtegida: true },
     expectReduccionesCount: 1,
     expectIds: ['base-desalojo-vivienda'],
   },
   {
     label: 'demanda rechazada -30%',
-    input: { tipoProceso: 'ejecutivo', baseValor: BASE, sentenciaResultado: 'rechazada' },
+    input: { baseValor: BASE, demandaRechazada: true },
     expectReduccionesCount: 1,
     expectIds: ['base-demanda-rechazada'],
   },
   {
     label: 'caducidad art22 -30%',
-    input: { tipoProceso: 'conocimiento', baseValor: BASE, modoTerminacion: 'caducidad', caducidadCriterio: 'art22' },
+    input: { baseValor: BASE, caducidadArt22: true },
     expectReduccionesCount: 1,
     expectIds: ['base-caducidad-art22'],
   },
   {
     label: 'desalojo + rechazada (multiplicativo)',
-    input: { tipoProceso: 'conocimiento', baseValor: BASE, objetoBase: 'desalojo', desalojoVivienda: 'vivienda', sentenciaResultado: 'rechazada' },
+    input: { baseValor: BASE, esViviendaProtegida: true, demandaRechazada: true },
     expectReduccionesCount: 2,
     expectIds: ['base-desalojo-vivienda', 'base-demanda-rechazada'],
   },
   {
     label: 'desalojo + caducidad art22',
-    input: { tipoProceso: 'conocimiento', baseValor: BASE, objetoBase: 'desalojo', desalojoVivienda: 'vivienda', modoTerminacion: 'caducidad', caducidadCriterio: 'art22' },
+    input: { baseValor: BASE, esViviendaProtegida: true, caducidadArt22: true },
     expectReduccionesCount: 2,
     expectIds: ['base-desalojo-vivienda', 'base-caducidad-art22'],
   },
   {
     label: 'ejecutivo no aplica desalojo',
-    input: { tipoProceso: 'ejecutivo', baseValor: BASE, objetoBase: 'desalojo', desalojoVivienda: 'vivienda' },
+    input: { baseValor: BASE, esViviendaProtegida: false },
     expectReduccionesCount: 0,
   },
   {
     label: 'ejecutivo + rechazada (debe aplicar)',
-    input: { tipoProceso: 'ejecutivo', baseValor: BASE, sentenciaResultado: 'rechazada' },
+    input: { baseValor: BASE, demandaRechazada: true },
     expectReduccionesCount: 1,
     expectIds: ['base-demanda-rechazada'],
   },
   {
     label: 'sucesion + rechazada (no debe aplicar)',
-    input: { tipoProceso: 'sucesion', baseValor: BASE, sentenciaResultado: 'rechazada' },
+    input: { baseValor: BASE, demandaRechazada: false },
     expectReduccionesCount: 0,
   },
   {
     label: 'caducidad art25 => no aplica reduccion base',
-    input: { tipoProceso: 'conocimiento', baseValor: BASE, modoTerminacion: 'caducidad', caducidadCriterio: 'art25' },
+    input: { baseValor: BASE, caducidadArt22: false },
     expectReduccionesCount: 0,
   },
   {
     label: 'base cero',
-    input: { tipoProceso: 'conocimiento', baseValor: 0, objetoBase: 'desalojo', desalojoVivienda: 'vivienda', sentenciaResultado: 'rechazada' },
+    input: { baseValor: 0, esViviendaProtegida: true, demandaRechazada: true },
     expectReduccionesCount: 2,
     expectIds: ['base-desalojo-vivienda', 'base-demanda-rechazada'],
   },
 ]
-
 let allPassed = true
 let totalTests = 0
 let failedTests = 0
@@ -179,7 +174,7 @@ for (const tc of TEST_CASES) {
       failedTests++
     }
 
-    // Check valorPrevio * factor ≈ valorPosterior
+    // Check valorPrevio * factor â‰ˆ valorPosterior
     totalTests++
     const expectedPost = r.valorPrevio * r.factor
     const diffPost = Math.abs(expectedPost - r.valorPosterior)

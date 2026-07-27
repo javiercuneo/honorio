@@ -1,4 +1,4 @@
-﻿// ---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Test de equivalencia: aplicarReduccionesEscala() (TS) vs legacy
 //
 // Verifica que el bloque extraido produzca exactamente los mismos
@@ -131,30 +131,30 @@ for (const tc of TEST_CASES) {
 
   // Compare factorEscala
   totalTests++
-  const diff = Math.abs(legacyFactor - modernResult.factorEscala)
+  const diff = Math.abs(legacyFactor - modernResult.factor)
   if (diff > 1e-10) {
     console.log('  FAIL ' + label + ' factorEscala')
     console.log('       legacy=' + legacyFactor.toFixed(6))
-    console.log('       modern=' + modernResult.factorEscala.toFixed(6))
+    console.log('       modern=' + modernResult.factor.toFixed(6))
     console.log('       diff=' + diff.toExponential(2))
     allPassed = false
     failedTests++
   } else {
-    console.log('  OK   ' + label + ' factor=' + modernResult.factorEscala.toFixed(4) + '  reducciones=' + modernResult.reducciones.length)
+    console.log('  OK   ' + label + ' factor=' + modernResult.factor.toFixed(4) + '  reducciones=' + modernResult.transformaciones.length)
   }
 
   // Compare reducciones count
   totalTests++
-  if (modernResult.reducciones.length !== tc.expectReduccionesCount) {
+  if (modernResult.transformaciones.length !== tc.expectReduccionesCount) {
     console.log('  FAIL ' + label + ' reducciones count')
-    console.log('       expected=' + tc.expectReduccionesCount + ' actual=' + modernResult.reducciones.length)
+    console.log('       expected=' + tc.expectReduccionesCount + ' actual=' + modernResult.transformaciones.length)
     allPassed = false
     failedTests++
   }
 
   // Validate each reduccion structure
-  for (let i = 0; i < modernResult.reducciones.length; i++) {
-    const r = modernResult.reducciones[i]
+  for (let i = 0; i < modernResult.transformaciones.length; i++) {
+    const r = modernResult.transformaciones[i]
 
     totalTests++
     if (!r.id || !r.etapa || !r.concepto || !r.articulo) {
@@ -191,7 +191,7 @@ for (const tc of TEST_CASES) {
 
   // Validate specific IDs
   if (tc.expectIds) {
-    const actualIds = modernResult.reducciones.map(r => r.id)
+    const actualIds = modernResult.transformaciones.map(r => r.id)
     for (const expectedId of tc.expectIds) {
       totalTests++
       if (!actualIds.includes(expectedId)) {
