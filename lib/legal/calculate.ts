@@ -361,6 +361,116 @@ export function aplicarReduccionesEscala(input: ReduccionesEscalaInput): Reducci
   return { factorEscala, reducciones }
 }
 
+// ================================================================
+// REDUCCIONES FINALES SOBRE HONORARIOS
+// ================================================================
+
+/**
+ * Datos minimos necesarios para aplicar reducciones finales.
+ * DTO desacoplado de WizardState.
+ */
+export interface ReduccionesFinalesInput {
+  tipoProceso: string
+  tuvoExcepciones?: boolean | null
+  objetoBase?: string
+  posesoriasTipo?: string | null
+}
+
+/**
+ * Resultado de aplicarReduccionesFinales.
+ */
+export interface ReduccionesFinalesResult {
+  factorFinal: number
+  reducciones: Transformacion[]
+}
+
+/**
+ * Aplica las reducciones finales sobre honorarios previstas en los
+ * articulos 34, 38, 41 y 49 de la Ley 27.423.
+ *
+ * Reglas aplicadas (en orden, con las primeras dos como if/else if):
+ *   1. Ejecutivo sin excepciones -10% (art. 34) — solo ejecutivo
+ *   2. Ejecucion de sentencia sin excepciones -10% (art. 41 + 34)
+ *      — solo ejecucion_sentencia
+ *   3. Posesorias/interdictos beneficio exclusivo -20% (art. 38)
+ *      — solo conocimiento (multiplicativo)
+ *   4. Incidencia colectiva -25% (art. 49)
+ *      — solo conocimiento (multiplicativo)
+ */
+export function aplicarReduccionesFinales(input: ReduccionesFinalesInput): ReduccionesFinalesResult {
+  let factorFinal = 1
+  const reducciones: Transformacion[] = []
+
+  // Regla 1: Ejecutivo sin excepciones — art. 34
+  // Usa = (no *=) en el legacy porque es if/else if
+  if (input.tipoProceso === 'ejecutivo' && input.tuvoExcepciones === false) {
+    const anterior = factorFinal
+    factorFinal = 0.9
+    reducciones.push({
+      id: 'final-ejecutivo-sin-excepciones',
+      etapa: 'honorarios',
+      concepto: '10% por ejecutivo sin excepciones (art.34)',
+      articulo: 'art. 34',
+      visible: true,
+      valorPrevio: anterior,
+      factor: 0.9,
+      valorPosterior: factorFinal,
+    })
+  } else if (input.tipoProceso === 'ejecucion_sentencia' && input.tuvoExcepciones === false) {
+    // Regla 2: Ejecucion de sentencia sin excepciones — art. 41 + 34
+    const anterior = factorFinal
+    factorFinal = 0.9
+    reducciones.push({
+      id: 'final-ejecucion-sin-excepciones',
+      etapa: 'honorarios',
+      concepto: '10% adicional por ejecucion de sentencia sin excepciones (art.41 + art.34)',
+      articulo: 'art. 41',
+      visible: true,
+      valorPrevio: anterior,
+      factor: 0.9,
+      valorPosterior: factorFinal,
+    })
+  }
+
+  // Regla 3: Posesorias/interdictos beneficio exclusivo — art. 38
+  if (
+    input.tipoProceso === 'conocimiento' &&
+    input.objetoBase === 'posesorias_interdictos' &&
+    input.posesoriasTipo === 'beneficio'
+  ) {
+    const anterior = factorFinal
+    factorFinal *= 0.8
+    reducciones.push({
+      id: 'final-posesorias-beneficio',
+      etapa: 'honorarios',
+      concepto: '20% por art. 38 (posesorias/interdictos beneficio exclusivo)',
+      articulo: 'art. 38',
+      visible: true,
+      valorPrevio: anterior,
+      factor: 0.8,
+      valorPosterior: factorFinal,
+    })
+  }
+
+  // Regla 4: Incidencia colectiva — art. 49
+  if (input.tipoProceso === 'conocimiento' && input.objetoBase === 'incidencia_colectiva') {
+    const anterior = factorFinal
+    factorFinal *= 0.75
+    reducciones.push({
+      id: 'final-incidencia-colectiva',
+      etapa: 'honorarios',
+      concepto: '25% por art. 49 (incidencia colectiva)',
+      articulo: 'art. 49',
+      visible: true,
+      valorPrevio: anterior,
+      factor: 0.75,
+      valorPosterior: factorFinal,
+    })
+  }
+
+  return { factorFinal, reducciones }
+}
+
 /**
  * Construye el resultado estructurado del calculo de honorarios.
  * Entry point unico: delega internamente segun el tipo de proceso.
