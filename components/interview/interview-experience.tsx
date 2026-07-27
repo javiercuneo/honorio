@@ -17,7 +17,7 @@ import { ArrowLeft, ArrowRight, Scale } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ALL_STEPS, type WizardStepDef } from '@/lib/wizard/wizard-schema'
 import { useWizard } from '@/hooks/useWizard'
-import { LegacyLoader } from '@/components/LegacyLoader'
+import { useLegacyReady } from '@/components/LegacyLoader'
 import { ProgressRail } from './progress-rail'
 import { ContextPanel } from './context-panel'
 import { StepShell } from './step-shell'
@@ -29,7 +29,9 @@ import { DashboardView } from './dashboard-view'
 const transition = { duration: 0.4, ease: [0.22, 1, 0.36, 1] as const }
 
 export function InterviewExperience() {
-  const wizard = useWizard(ALL_STEPS)
+  const { umaValorCargado } = useLegacyReady()
+  const initialUma = umaValorCargado ? { umaInicio: umaValorCargado } : undefined
+  const wizard = useWizard(ALL_STEPS, initialUma)
   const [direction, setDirection] = useState(1)
 
   const go = useCallback((dir: number, updater: () => void) => {
@@ -60,7 +62,6 @@ export function InterviewExperience() {
   // ---- Dashboard ----
   if (wizard.phase === 'dashboard') {
     return (
-      <LegacyLoader>
       <div className="min-h-screen bg-background text-foreground">
         <header className="mx-auto flex max-w-6xl items-center justify-between px-5 py-6 md:px-8">
           <Brand />
@@ -81,7 +82,6 @@ export function InterviewExperience() {
           />
         </motion.div>
       </div>
-    </LegacyLoader>
     )
   }
 
@@ -89,7 +89,6 @@ export function InterviewExperience() {
   const currentStep = wizard.currentStep as WizardStepDef | null
 
   return (
-    <LegacyLoader>
     <div className="min-h-screen bg-background text-foreground">
       <div className="mx-auto flex min-h-screen max-w-6xl flex-col px-5 pb-10 md:px-8">
         {/* Header */}
@@ -177,7 +176,7 @@ export function InterviewExperience() {
                     </span>
                   )}
                   <span className="hidden font-mono text-[11px] uppercase tracking-wider text-muted-foreground/70 sm:block">
-                    {hasAnswer ? 'Listo' : 'Seleccione una opcion'}
+                    {hasAnswer ? 'Listo' : (currentStep?.kind === 'numeric' ? 'Ingrese un valor' : 'Seleccione una opcion')}
                   </span>
                   <Button
                     onClick={handleNext}
@@ -219,7 +218,6 @@ export function InterviewExperience() {
         </div>
       </div>
     </div>
-    </LegacyLoader>
   )
 }
 

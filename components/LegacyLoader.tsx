@@ -13,9 +13,10 @@ import * as adapters from '@/lib/legal/adapters'
 interface LegacyContextType {
   ready: boolean
   error: string | null
+  umaValorCargado: number | null
 }
 
-const LegacyContext = createContext<LegacyContextType>({ ready: false, error: null })
+const LegacyContext = createContext<LegacyContextType>({ ready: false, error: null, umaValorCargado: null })
 
 export function useLegacyReady() {
   return useContext(LegacyContext)
@@ -52,6 +53,7 @@ async function loadScript(src: string): Promise<void> {
 export function LegacyLoader({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [umaValorCargado, setUmaValor] = useState<number | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -74,13 +76,15 @@ export function LegacyLoader({ children }: { children: ReactNode }) {
         }
         console.log('[DIAG] LegacyLoader: isMotorLoaded OK')
 
-        if (!cancelled) {
-          // Iniciar carga de UMA desde Google Sheets (silenciosa)
-          adapters.cargarUMA().catch(() => {
-            // Fallo en carga UMA no es critico; se usara el valor default
-            console.warn('No se pudo cargar la UMA desde Google Sheets')
-          })
-
+                if (!cancelled) {
+          // Cargar UMA desde Google Sheets y esperar resultado
+          try {
+            await adapters.cargarUMA()
+            const uma = adapters.getUMA()
+            if (!cancelled) setUmaValor(uma)
+          } catch {
+            console.warn('No se pudo cargar la UMA desde Google Sheets, se usara el valor default')
+          }
           setReady(true)
         }
       } catch (err) {
@@ -97,7 +101,7 @@ export function LegacyLoader({ children }: { children: ReactNode }) {
   }, [])
 
   return (
-    <LegacyContext.Provider value={{ ready, error }}>
+    <LegacyContext.Provider value={{ ready, error, umaValorCargado }}>
       {!ready ? (
         <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
           <div className="text-center">

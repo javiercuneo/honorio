@@ -394,28 +394,7 @@ export const LEGAL_STEPS: WizardStepDef[] = [
     },
   },
 
-  // Paso 2: Contingencias
-  // NOTA: Este paso es dinamico segun tipoProceso.
-  // Las opciones cambian segun el valor de tipoProceso.
-  // El hook useWizard determina que opciones mostrar.
-  {
-    id: 'contingencias',
-    kind: 'cards',
-    select: 'single',
-    eyebrow: 'Contingencias',
-    pregunta: 'Contingencias procesales',
-    ayuda: 'Seleccione las circunstancias especificas del proceso que afectan el calculo.',
-    resumenLabel: 'Contingencias',
-    options: [], // Se completa dinamicamente segun tipoProceso
-    dependsOn: ['tipoProceso'],
-    explicacion: {
-      brief: 'Seleccione la opcion que corresponda al caso.',
-      expanded: 'Esta informacion se utiliza para el calculo arancelario.',
-      full: ['Complete los datos segun corresponda.'],
-    },
-  },
-
-  // Paso 3: Objeto del juicio (solo para conocimiento)
+  // Paso 2: Objeto del juicio (solo para conocimiento)
   {
     id: 'objeto',
     kind: 'cards',
@@ -434,7 +413,7 @@ export const LEGAL_STEPS: WizardStepDef[] = [
     },
   },
 
-  // Paso 4: Base regulatoria
+  // Paso 3: Base regulatoria
   {
     id: 'base',
     kind: 'numeric',
@@ -449,7 +428,6 @@ export const LEGAL_STEPS: WizardStepDef[] = [
     step: 1,
     default: 0,
     format: pesos,
-    condition: (answers) => answers.tipoProceso !== 'exhorto',
     explicacion: {
       brief: 'Seleccione la opcion que corresponda al caso.',
       expanded: 'Esta informacion se utiliza para el calculo arancelario.',
@@ -457,54 +435,6 @@ export const LEGAL_STEPS: WizardStepDef[] = [
     },
   },
 ]
-
-// ---- Mapa de opciones dinamicas para contingencias ----
-// El hook usa esto para determinar que opciones mostrar segun tipoProceso.
-
-export const CONTINGENCIAS_POR_PROCESO: Record<
-  string,
-  { paso: string; opciones: CardOption[]; opcionesSecundarias?: Record<string, CardOption[]> }
-> = {
-  conocimiento: {
-    paso: 'modoTerminacion',
-    opciones: MODOS_TERMINACION,
-    opcionesSecundarias: {
-      sentencia: SENTENCIA_RESULTADO,
-      modos_anormales: APERTURA_PRUEBA,
-      caducidad: CADUCIDAD_CRITERIO,
-    },
-  },
-  ejecucion_sentencia: {
-    paso: 'modoTerminacion',
-    opciones: [...MODOS_TERMINACION, ...EXCEPCIONES],
-    opcionesSecundarias: {
-      sentencia: SENTENCIA_RESULTADO,
-      modos_anormales: APERTURA_PRUEBA,
-      caducidad: CADUCIDAD_CRITERIO,
-    },
-  },
-  ejecutivo: {
-    paso: 'modoTerminacion',
-    opciones: [...MODOS_TERMINACION, ...EXCEPCIONES],
-    opcionesSecundarias: {
-      sentencia: SENTENCIA_RESULTADO,
-      modos_anormales: APERTURA_PRUEBA,
-      caducidad: CADUCIDAD_CRITERIO,
-    },
-  },
-  sucesion: {
-    paso: 'sucesionLetrado',
-    opciones: SUCESION_LETRADO,
-  },
-  medida_cautelar: {
-    paso: 'cautelarOposicion',
-    opciones: CAUTELAR_OPOSICION,
-  },
-  homologacion_desocupacion: {
-    paso: 'homologacionVivienda',
-    opciones: HOMOLOGACION_VIVIENDA,
-  },
-}
 
 // ---- Metadatos de pasos ----
 // Sub-opciones que aparecen cuando se selecciona una opcion particular.
@@ -517,15 +447,6 @@ export const SUB_OPCIONES: Record<
     desalojo: DESALOJO_TIPO,
     posesorias_interdictos: POSESORIAS_TIPO,
   },
-}
-
-// ---- Nombres legibles para valores ----
-export function labelDelValor(pasoId: string, valor: string): string {
-  if (pasoId === 'tipoProceso') {
-    return TIPOS_PROCESO.find(o => o.id === valor)?.label ?? valor
-  }
-  // ... se completa segun necesidad
-  return valor
 }
 
 // ---- Resumen de pasos para el panel lateral ----
@@ -703,11 +624,30 @@ export const STEP_HOMOLOGACION_VIVIENDA: CardsStepDef = {
     },
 }
 
+// ---- Mapa de pasos por tipo de proceso ----
+// Declara explicitamente que pasos necesita cada proceso.
+// Reemplaza gradualmente las conditions en cada step.
+export const PROCESS_STEP_MAP: Record<string, string[]> = {
+  exhorto: ['umaInicio', 'tipoProceso'],
+  incidente: ['umaInicio', 'tipoProceso', 'base'],
+  conocimiento: ['umaInicio', 'tipoProceso', 'modoTerminacion',
+    'sentenciaResultado', 'caducidadCriterio', 'aperturaPrueba', 'objeto', 'base'],
+  ejecucion_sentencia: ['umaInicio', 'tipoProceso', 'modoTerminacion',
+    'sentenciaResultado', 'caducidadCriterio', 'aperturaPrueba',
+    'tuvoExcepciones', 'base'],
+  ejecutivo: ['umaInicio', 'tipoProceso', 'modoTerminacion',
+    'sentenciaResultado', 'caducidadCriterio', 'aperturaPrueba',
+    'tuvoExcepciones', 'base'],
+  sucesion: ['umaInicio', 'tipoProceso', 'sucesionUnicoLetrado', 'base'],
+  medida_cautelar: ['umaInicio', 'tipoProceso', 'medidaOposicion', 'base'],
+  homologacion_desocupacion: ['umaInicio', 'tipoProceso', 'homologacionVivienda', 'base'],
+}
 // ---- Lista completa de pasos (ordenada) ----
 // El hook filtra los pasos segun su condicion para construir el wizard visible.
 
 export const ALL_STEPS: WizardStepDef[] = [
-  ...LEGAL_STEPS.slice(0, 2), // umaInicio, tipoProceso
+  LEGAL_STEPS[0], // umaInicio
+  LEGAL_STEPS[1], // tipoProceso
   STEP_MODO_TERMINACION,
   STEP_SENTENCIA_RESULTADO,
   STEP_CADUCIDAD_CRITERIO,
@@ -716,6 +656,6 @@ export const ALL_STEPS: WizardStepDef[] = [
   STEP_SUCESION_LETRADO,
   STEP_CAUTELAR_OPOSICION,
   STEP_HOMOLOGACION_VIVIENDA,
-  LEGAL_STEPS[3], // objeto
-  LEGAL_STEPS[4], // base
+  LEGAL_STEPS[2], // objeto
+  LEGAL_STEPS[3], // base
 ]

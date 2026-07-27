@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import type { ReactNode } from 'react'
 import { ExplanationDisclosure } from './explanation-disclosure'
@@ -33,9 +33,8 @@ export function StepShell({
 
       <div className="mt-8">{children}</div>
 
-      <div className="mt-5 max-w-md">
-        <ExplanationDisclosure explanation={explanation} />
-      </div>
+      {explanation.brief !== "Seleccione la opcion que corresponda al caso." ? (
+        <ExplanationDisclosure explanation={explanation} />) : null}
     </div>
   )
 }

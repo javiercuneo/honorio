@@ -1,8 +1,8 @@
-﻿// ---------------------------------------------------------------
+// ---------------------------------------------------------------
 // hooks/useWizard.ts
 // Hook de orquestacion del wizard legal.
 // Conecta el schema declarativo con los adapters del motor legacy.
-// NO contiene reglas juridicas � solo Orquestacion.
+// NO contiene reglas juridicas ? solo Orquestacion.
 //
 // Responsabilidades:
 // - Computar la lista de pasos visibles (segun condiciones del schema)
@@ -19,6 +19,7 @@
 import { useCallback, useMemo, useState } from 'react'
 import type { Answers, WizardState } from '@/lib/legal/types'
 import type { WizardStepDef } from '@/lib/wizard/wizard-schema'
+import { PROCESS_STEP_MAP } from '@/lib/wizard/wizard-schema'
 import * as adapters from '@/lib/legal/adapters'
 
 export type Phase = 'intro' | 'question' | 'dashboard'
@@ -40,14 +41,19 @@ export interface UseWizardReturn {
   calculate: () => string
 }
 
-export function useWizard(allSteps: WizardStepDef[]): UseWizardReturn {
+export function useWizard(allSteps: WizardStepDef[], initialValues?: Partial<Answers>): UseWizardReturn {
   const [phase, setPhase] = useState<Phase>('intro')
   const [index, setIndex] = useState(0)
-  const [answers, setAnswers] = useState<Answers>({})
+  const [answers, setAnswers] = useState<Answers>((initialValues ?? {}) as Answers)
   const [errorMessage, setError] = useState<string | null>(null)
 
   // ---- Computar pasos visibles segun condiciones ----
   const visibleSteps = useMemo(() => {
+    const tipo = answers.tipoProceso as string | undefined
+    const stepIds = tipo ? PROCESS_STEP_MAP[tipo] : undefined
+    if (stepIds) {
+      return allSteps.filter(s => stepIds.includes(s.id))
+    }
     return allSteps.filter((step) => {
       if (!step.condition) return true
       return step.condition(answers)

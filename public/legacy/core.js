@@ -18,7 +18,7 @@ function formatNumber(num) {
 
 function cargarUMA() {
     const url = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ8tumvxptTGBCfScMwWxK7r6ATnGfMw061GKGdzfIVyThcSGzUqjI-vcpME1AtykPmjqTq0xdjgc7D/pub?output=csv';
-    fetch(url)
+    return fetch(url)
         .then(response => response.text())
         .then(data => {
             const filas = data.split('\n');
