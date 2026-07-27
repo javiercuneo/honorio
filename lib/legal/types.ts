@@ -1,6 +1,6 @@
-// ---------------------------------------------------------------
+﻿// ---------------------------------------------------------------
 // lib/legal/types.ts
-// Interfaces del motor juridico � Framework-agnostic
+// Interfaces del motor juridico — Framework-agnostic
 // Refleja el contrato publico de core.js + state.js + calculations.js
 // Milestone 1: copia fiel del contrato JS. Milestone 2: tipado estricto.
 // ---------------------------------------------------------------
@@ -146,8 +146,15 @@ export interface Honorarios {
   procurador: HonorariosRol
 }
 
-/// Segunda instancia (art. 30)
+/// Segunda instancia (art. 30) — valores por rol
 export interface SegundaInstancia {
+  patrocinante: SegundaInstanciaRol
+  apoderado: SegundaInstanciaRol
+  procurador: SegundaInstanciaRol
+}
+
+/// Valores de segunda instancia para un rol especifico
+export interface SegundaInstanciaRol {
   minimo: Rango
   maximo: Rango
   revocada: Rango

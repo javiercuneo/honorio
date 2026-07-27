@@ -10,7 +10,7 @@
 // Milestone 2: implementacion progresiva caso por caso.
 // ---------------------------------------------------------------
 
-import type { WizardState, CalculoResultado, EscalaResult, Transformacion, Rango, Partidor } from './types'
+import type { WizardState, CalculoResultado, EscalaResult, Transformacion, Rango, Partidor, SegundaInstancia, SegundaInstanciaRol } from './types'
 
 // ---- Registry de procesos ----
 // Cada proceso registra su funcion build.
@@ -526,24 +526,6 @@ export function calcularAuxiliares(baseEnUMA: number, valorUMA: number): Rango {
 // ================================================================
 
 /**
- * Resultado de segunda instancia para un rol especifico.
- */
-export interface SegundaInstanciaRol {
-  minimo: Rango
-  maximo: Rango
-  revocada: Rango
-}
-
-/**
- * Resultado completo de segunda instancia para los tres roles.
- */
-export interface SegundaInstanciaResult {
-  patrocinante: SegundaInstanciaRol
-  apoderado: SegundaInstanciaRol
-  procurador: SegundaInstanciaRol
-}
-
-/**
  * Calcula los honorarios de segunda instancia (art. 30).
  *
  * Minimo: 30% de primera instancia
@@ -558,7 +540,7 @@ export function calcularSegundaInstancia(
   minProc: number,
   maxProc: number,
   valorUMA: number,
-): SegundaInstanciaResult {
+): SegundaInstancia {
   const buildRol = (min: number, max: number): SegundaInstanciaRol => ({
     minimo: { minUMA: min * 0.30, maxUMA: min * 0.30, minPesos: min * 0.30 * valorUMA, maxPesos: min * 0.30 * valorUMA },
     maximo: { minUMA: max * 0.35, maxUMA: max * 0.35, minPesos: max * 0.35 * valorUMA, maxPesos: max * 0.35 * valorUMA },
@@ -740,7 +722,105 @@ function buildHomologacion(state: WizardState): CalculoResultado {
 }
 
 function buildGeneral(state: WizardState): CalculoResultado {
-  throw new Error('buildGeneral no implementado')
+  const uma = state.valorUMA
+
+  // 1. Base reductions
+  const { baseFinal, reducciones: txBase } = aplicarReduccionesBase({
+    tipoProceso: state.tipoProceso,
+    baseValor: state.baseValor,
+    objetoBase: state.objetoBase,
+    desalojoVivienda: state.desalojoVivienda,
+    sentenciaResultado: state.sentenciaResultado,
+    modoTerminacion: state.modoTerminacion,
+    caducidadCriterio: state.caducidadCriterio,
+  })
+
+  // 2. Scale
+  const escala = calcularEscala(baseFinal, uma)
+  if (!escala) return buildEmpty(state)
+
+  // 3. Scale reductions
+  const { factorEscala, reducciones: txEscala } = aplicarReduccionesEscala({
+    tipoProceso: state.tipoProceso,
+    sucesionUnicoLetrado: state.sucesionUnicoLetrado,
+    modoTerminacion: state.modoTerminacion,
+    caducidadCriterio: state.caducidadCriterio,
+    aperturaPrueba: state.aperturaPrueba,
+  })
+
+  const minEscala = escala.patrocinante.full.min * factorEscala
+  const maxEscala = escala.patrocinante.full.max * factorEscala
+  const minApoEscala = escala.apoderado.full.min * factorEscala
+  const maxApoEscala = escala.apoderado.full.max * factorEscala
+
+  // 4. Final reductions
+  const { factorFinal, reducciones: txFinal } = aplicarReduccionesFinales({
+    tipoProceso: state.tipoProceso,
+    tuvoExcepciones: state.tuvoExcepciones,
+    objetoBase: state.objetoBase,
+    posesoriasTipo: state.posesoriasTipo,
+  })
+
+  const minFinal = minEscala * factorFinal
+  const maxFinal = maxEscala * factorFinal
+  const minApoFinal = minApoEscala * factorFinal
+  const maxApoFinal = maxApoEscala * factorFinal
+
+  // 5. Procurador (40% of final patrocinante)
+  const proc = calcularProcurador(minFinal, maxFinal, uma)
+
+  // 6. Auxiliares (5%-10% of base in UMA)
+  const aux = calcularAuxiliares(escala.baseEnUMA, uma)
+
+  // 7. Apoderado
+  const apo = calcularApoderado(minApoFinal, maxApoFinal, uma)
+
+  // 8. Segunda instancia
+  const segundaInstancia = calcularSegundaInstancia(
+    minFinal, maxFinal,
+    minApoFinal, maxApoFinal,
+    proc.minUMA, proc.maxUMA,
+    uma,
+  )
+
+  // 9. Partidor (solo sucesion)
+  const partidor = state.tipoProceso === 'sucesion'
+    ? calcularPartidor(baseFinal, uma)
+    : undefined
+
+  return {
+    tipoProceso: state.tipoProceso,
+    esProvisorio: state.esProvisorio,
+    baseOriginal: state.baseValor,
+    baseFinal,
+    valorUMA: uma,
+    escala: {
+      titulo: escala.tituloEscala,
+      baseEnUMA: escala.baseEnUMA,
+      porcentajeMin: escala.minPorc,
+      porcentajeMax: escala.maxPorc,
+      porcentajeMinAplicado: escala.minPorc * factorEscala * factorFinal,
+      porcentajeMaxAplicado: escala.maxPorc * factorEscala * factorFinal,
+      escalera: escala.maximoEscalaAnterior > 0 ? {
+        maximoEscalaAnterior: escala.maximoEscalaAnterior,
+        limiteAnterior: escala.limiteAnterior,
+        excedente: escala.baseEnUMA - escala.limiteAnterior,
+      } : undefined,
+    },
+    honorarios: {
+      patrocinante: { rango: { minUMA: minFinal, maxUMA: maxFinal, minPesos: minFinal * uma, maxPesos: maxFinal * uma } },
+      apoderado: { rango: apo },
+      procurador: { rango: proc },
+    },
+    auxiliares: aux,
+    segundaInstancia,
+    partidor: partidor ?? undefined,
+    transformaciones: [
+      ...txBase,
+      ...txEscala,
+      ...txFinal,
+    ],
+  }
 }
 
 function buildEmpty(state: WizardState): CalculoResultado {
