@@ -10,7 +10,7 @@
 // Milestone 2: implementacion progresiva caso por caso.
 // ---------------------------------------------------------------
 
-import type { WizardState, CalculoResultado, EscalaResult, Transformacion } from './types'
+import type { WizardState, CalculoResultado, EscalaResult, Transformacion, Rango } from './types'
 
 // ---- Registry de procesos ----
 // Cada proceso registra su funcion build.
@@ -469,6 +469,56 @@ export function aplicarReduccionesFinales(input: ReduccionesFinalesInput): Reduc
   }
 
   return { factorFinal, reducciones }
+}
+
+// ================================================================
+// FUNCIONES HELPER: APODERADO, PROCURADOR, AUXILIARES
+// ================================================================
+
+/**
+ * Calcula los honorarios del apoderado: patrocinante + 40% (art. 20).
+ */
+export function calcularApoderado(minPatroUMA: number, maxPatroUMA: number, valorUMA: number): Rango {
+  const minUMA = minPatroUMA * 1.4
+  const maxUMA = maxPatroUMA * 1.4
+  return {
+    minUMA,
+    maxUMA,
+    minPesos: minUMA * valorUMA,
+    maxPesos: maxUMA * valorUMA,
+  }
+}
+
+/**
+ * Calcula los honorarios del procurador: 40% del patrocinante (art. 20).
+ */
+export function calcularProcurador(minPatroUMA: number, maxPatroUMA: number, valorUMA: number): Rango {
+  const minUMA = minPatroUMA * 0.4
+  const maxUMA = maxPatroUMA * 0.4
+  return {
+    minUMA,
+    maxUMA,
+    minPesos: minUMA * valorUMA,
+    maxPesos: maxUMA * valorUMA,
+  }
+}
+
+/**
+ * Calcula los honorarios de auxiliares de justicia: 5% a 10% de la base
+ * en UMA (art. 21 antepenultimo parrafo).
+ *
+ * @param baseEnUMA - Base regulatoria expresada en UMA (ya reducida)
+ * @param valorUMA  - Valor de la UMA vigente
+ */
+export function calcularAuxiliares(baseEnUMA: number, valorUMA: number): Rango {
+  const minUMA = baseEnUMA * 0.05
+  const maxUMA = baseEnUMA * 0.10
+  return {
+    minUMA,
+    maxUMA,
+    minPesos: minUMA * valorUMA,
+    maxPesos: maxUMA * valorUMA,
+  }
 }
 
 /**
