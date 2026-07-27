@@ -10,7 +10,7 @@
 // Milestone 2: implementacion progresiva caso por caso.
 // ---------------------------------------------------------------
 
-import type { WizardState, CalculoResultado, EscalaResult } from './types'
+import type { WizardState, CalculoResultado, EscalaResult, Transformacion } from './types'
 
 // ---- Registry de procesos ----
 // Cada proceso registra su funcion build.
@@ -124,6 +124,115 @@ export function calcularEscala(basePesos: number, valorUMA: number): EscalaResul
     auxMin,
     auxMax,
   }
+}
+
+// ================================================================
+// REDUCCIONES DE BASE
+// ================================================================
+
+/**
+ * Datos minimos necesarios para aplicar reducciones de base.
+ * DTO intencionalmente desacoplado de WizardState.
+ */
+export interface ReduccionesBaseInput {
+  tipoProceso: string
+  baseValor: number
+  objetoBase?: string
+  desalojoVivienda?: string | null
+  sentenciaResultado?: string | null
+  modoTerminacion?: string
+  caducidadCriterio?: string
+}
+
+/**
+ * Resultado de aplicarReduccionesBase.
+ */
+export interface ReduccionesBaseResult {
+  baseFinal: number
+  reducciones: Transformacion[]
+}
+
+/**
+ * Aplica las reducciones a la base regulatoria previstas en los
+ * articulos 22, 40 y concordantes de la Ley 27.423.
+ *
+ * Reglas aplicadas (en orden):
+ *   1. Desalojo para vivienda -20% (art. 40) — solo conocimiento
+ *   2. Demanda rechazada -30% (art. 22) — conocimiento, ejecucion_sentencia, ejecutivo
+ *   3. Caducidad art. 22 -30% (art. 22) — conocimiento, ejecucion_sentencia, ejecutivo
+ *
+ * Las reglas son multiplicativas entre si.
+ * La funcion NO conoce WizardState, HTML ni procesos mas alla
+ * de lo necesario para decidir cada regla.
+ */
+export function aplicarReduccionesBase(input: ReduccionesBaseInput): ReduccionesBaseResult {
+  let baseFinal = input.baseValor
+  const reducciones: Transformacion[] = []
+
+  // Regla 1: Desalojo para vivienda — art. 40
+  if (
+    input.tipoProceso === 'conocimiento' &&
+    input.objetoBase === 'desalojo' &&
+    input.desalojoVivienda === 'vivienda'
+  ) {
+    const anterior = baseFinal
+    baseFinal *= 0.8
+    reducciones.push({
+      id: 'base-desalojo-vivienda',
+      etapa: 'base',
+      concepto: 'Desalojo para vivienda: -20% (art.40)',
+      articulo: 'art. 40',
+      visible: true,
+      valorPrevio: anterior,
+      factor: 0.8,
+      valorPosterior: baseFinal,
+    })
+  }
+
+  // Regla 2: Demanda rechazada — art. 22
+  if (
+    (input.tipoProceso === 'conocimiento' ||
+     input.tipoProceso === 'ejecucion_sentencia' ||
+     input.tipoProceso === 'ejecutivo') &&
+    input.sentenciaResultado === 'rechazada'
+  ) {
+    const anterior = baseFinal
+    baseFinal *= 0.7
+    reducciones.push({
+      id: 'base-demanda-rechazada',
+      etapa: 'base',
+      concepto: 'Demanda rechazada: -30% (art.22)',
+      articulo: 'art. 22',
+      visible: true,
+      valorPrevio: anterior,
+      factor: 0.7,
+      valorPosterior: baseFinal,
+    })
+  }
+
+  // Regla 3: Caducidad tratada como demanda desestimada — art. 22
+  if (
+    (input.tipoProceso === 'conocimiento' ||
+     input.tipoProceso === 'ejecucion_sentencia' ||
+     input.tipoProceso === 'ejecutivo') &&
+    input.modoTerminacion === 'caducidad' &&
+    input.caducidadCriterio === 'art22'
+  ) {
+    const anterior = baseFinal
+    baseFinal *= 0.7
+    reducciones.push({
+      id: 'base-caducidad-art22',
+      etapa: 'base',
+      concepto: 'Caducidad tratada como demanda desestimada: -30% (art.22)',
+      articulo: 'art. 22',
+      visible: true,
+      valorPrevio: anterior,
+      factor: 0.7,
+      valorPosterior: baseFinal,
+    })
+  }
+
+  return { baseFinal, reducciones }
 }
 
 /**
