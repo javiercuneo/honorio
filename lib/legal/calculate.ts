@@ -235,6 +235,132 @@ export function aplicarReduccionesBase(input: ReduccionesBaseInput): Reducciones
   return { baseFinal, reducciones }
 }
 
+// ================================================================
+// REDUCCIONES DE ESCALA
+// ================================================================
+
+/**
+ * Datos minimos necesarios para aplicar reducciones de escala.
+ * DTO desacoplado de WizardState.
+ */
+export interface ReduccionesEscalaInput {
+  tipoProceso: string
+  sucesionUnicoLetrado?: boolean | null
+  modoTerminacion?: string
+  caducidadCriterio?: string
+  aperturaPrueba?: boolean | null
+}
+
+/**
+ * Resultado de aplicarReduccionesEscala.
+ * Devuelve el factor acumulado y las transformaciones que documentan
+ * cada regla aplicada sobre la cadena de factores.
+ */
+export interface ReduccionesEscalaResult {
+  factorEscala: number
+  reducciones: Transformacion[]
+}
+
+/**
+ * Aplica las reducciones de escala previstas en los articulos 25,
+ * 35 y 41 de la Ley 27.423.
+ *
+ * Reglas aplicadas (multiplicativas, en orden):
+ *   1. Unico letrado en sucesion -50% (art. 35) — solo sucesion
+ *   2. Ejecucion de sentencia -50% (art. 41) — solo ejecucion_sentencia
+ *   3. Terminacion anormal antes de apertura a prueba -50% (art. 25)
+ *      — conocimiento, ejecucion_sentencia, ejecutivo
+ *   4. Caducidad art. 25 antes de apertura a prueba -50% (art. 25)
+ *      — conocimiento, ejecucion_sentencia, ejecutivo
+ *
+ * Cada transformacion registra el valor del factorEscala acumulado
+ * antes y despues de aplicar la regla.
+ * La funcion NO conoce WizardState, HTML ni procesos.
+ */
+export function aplicarReduccionesEscala(input: ReduccionesEscalaInput): ReduccionesEscalaResult {
+  let factorEscala = 1
+  const reducciones: Transformacion[] = []
+
+  // Regla 1: Unico letrado en sucesion — art. 35
+  if (input.tipoProceso === 'sucesion' && input.sucesionUnicoLetrado === true) {
+    const anterior = factorEscala
+    factorEscala *= 0.5
+    reducciones.push({
+      id: 'escala-unico-letrado',
+      etapa: 'escala',
+      concepto: '50% por unico letrado en sucesion (art.35)',
+      articulo: 'art. 35',
+      visible: true,
+      valorPrevio: anterior,
+      factor: 0.5,
+      valorPosterior: factorEscala,
+    })
+  }
+
+  // Regla 2: Ejecucion de sentencia — art. 41
+  if (input.tipoProceso === 'ejecucion_sentencia') {
+    const anterior = factorEscala
+    factorEscala *= 0.5
+    reducciones.push({
+      id: 'escala-ejecucion-sentencia',
+      etapa: 'escala',
+      concepto: '50% por ejecucion de sentencia (art.41)',
+      articulo: 'art. 41',
+      visible: true,
+      valorPrevio: anterior,
+      factor: 0.5,
+      valorPosterior: factorEscala,
+    })
+  }
+
+  // Regla 3: Terminacion anormal antes de apertura a prueba — art. 25
+  if (
+    (input.tipoProceso === 'conocimiento' ||
+     input.tipoProceso === 'ejecucion_sentencia' ||
+     input.tipoProceso === 'ejecutivo') &&
+    input.modoTerminacion === 'modos_anormales' &&
+    input.aperturaPrueba === false
+  ) {
+    const anterior = factorEscala
+    factorEscala *= 0.5
+    reducciones.push({
+      id: 'escala-modos-anormales-sin-prueba',
+      etapa: 'escala',
+      concepto: '50% por terminacion anormal antes de apertura a prueba (art.25)',
+      articulo: 'art. 25',
+      visible: true,
+      valorPrevio: anterior,
+      factor: 0.5,
+      valorPosterior: factorEscala,
+    })
+  }
+
+  // Regla 4: Caducidad art. 25 antes de apertura a prueba — art. 25
+  if (
+    (input.tipoProceso === 'conocimiento' ||
+     input.tipoProceso === 'ejecucion_sentencia' ||
+     input.tipoProceso === 'ejecutivo') &&
+    input.modoTerminacion === 'caducidad' &&
+    input.caducidadCriterio === 'art25' &&
+    input.aperturaPrueba === false
+  ) {
+    const anterior = factorEscala
+    factorEscala *= 0.5
+    reducciones.push({
+      id: 'escala-caducidad-art25-sin-prueba',
+      etapa: 'escala',
+      concepto: '50% por caducidad tratada como modo anormal antes de prueba (art.25)',
+      articulo: 'art. 25',
+      visible: true,
+      valorPrevio: anterior,
+      factor: 0.5,
+      valorPosterior: factorEscala,
+    })
+  }
+
+  return { factorEscala, reducciones }
+}
+
 /**
  * Construye el resultado estructurado del calculo de honorarios.
  * Entry point unico: delega internamente segun el tipo de proceso.
