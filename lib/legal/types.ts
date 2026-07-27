@@ -104,17 +104,105 @@ export interface GrupoResult {
   max: number
 }
 
-// ---- Output de calcularFinal (estructurado, para Milestone 2) ----
-// Por ahora el motor genera HTML directamente. Esto es un placeholder
-// para cuando extraigamos la logica a TS puro.
+// ---- Output de calcularFinal (estructurado, Milestone 2) ----
+// Por ahora el motor genera HTML directamente. Esto es un placeholder.
 export interface ResultadoCalculo {
   html: string
-  // En Milestone 2 se agregaran campos estructurados:
-  // escala: EscalaResult
-  // honorarios: { patrocinante, apoderado, procurador }
-  // segundaInstancia: ...
-  // auxiliares: ...
-  // minimos: ...
+}
+
+// ============================================================
+// Modelo estructurado de resultados (Milestone 2+)
+// ============================================================
+
+/// Rango simple de valores minimo/maximo
+export interface Rango {
+  minUMA: number
+  maxUMA: number
+  minPesos: number
+  maxPesos: number
+}
+
+/// Transformacion aplicada a una variable durante el calculo
+export interface Transformacion {
+  id: string
+  etapa: 'base' | 'escala' | 'honorarios'
+  concepto: string
+  articulo: string
+  visible: boolean
+  valorPrevio: number
+  factor: number
+  valorPosterior: number
+}
+
+/// Honorarios para un rol (patrocinante, apoderado o procurador)
+export interface HonorariosRol {
+  rango: Rango
+}
+
+/// Honorarios para los tres roles
+export interface Honorarios {
+  patrocinante: HonorariosRol
+  apoderado: HonorariosRol
+  procurador: HonorariosRol
+}
+
+/// Segunda instancia (art. 30)
+export interface SegundaInstancia {
+  minimo: Rango
+  maximo: Rango
+  revocada: Rango
+}
+
+/// Informacion de transparencia de la escala (art. 21)
+export interface EscaleraInfo {
+  maximoEscalaAnterior: number
+  limiteAnterior: number
+  excedente: number
+}
+
+/// Escala arancelaria aplicada
+export interface EscalaAplicada {
+  titulo: string
+  baseEnUMA: number
+  porcentajeMin: number
+  porcentajeMax: number
+  porcentajeMinAplicado: number
+  porcentajeMaxAplicado: number
+  escalera?: EscaleraInfo
+}
+
+/// Partidor (solo sucesion, art. 35)
+export interface Partidor {
+  minPorcentaje: number
+  maxPorcentaje: number
+  minUMA: number
+  maxUMA: number
+  minPesos: number
+  maxPesos: number
+}
+
+/// Resultado completo y estructurado del calculo de honorarios
+export interface CalculoResultado {
+  tipoProceso: ProcesoTipo
+  esProvisorio: boolean
+  baseOriginal: number
+  baseFinal: number
+  valorUMA: number
+  escala?: EscalaAplicada
+  honorarios: Honorarios
+  segundaInstancia?: SegundaInstancia
+  auxiliares: Rango
+  partidor?: Partidor
+  exhorto?: {
+    incisoA: number
+    incisoB: Rango
+    incisoC: Rango
+  }
+  incidente?: {
+    porcentajeMin: number
+    porcentajeMax: number
+  }
+  transformaciones: Transformacion[]
 }
 
 // ---- Minimos ----
