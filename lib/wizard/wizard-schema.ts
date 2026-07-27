@@ -371,13 +371,9 @@ export const LEGAL_STEPS: WizardStepDef[] = [
     presets: [70000, 92482, 100000, 120000],
     format: pesos,
     explicacion: {
-      brief: 'La UMA es la unidad de medida base para todos los calculos arancelarios.',
-      expanded: 'La Ley 27.423 establece que los honorarios se calculan en UMA (Unidad de Medida Arancelaria), cuyo valor es fijado periodicamente por el Consejo de la Magistratura. Este valor se multiplica por la cantidad de UMA que resulte de aplicar la escala del art. 21.',
-      full: [
-        'El valor de la UMA se actualiza trimestralmente.',
-        'Se carga automaticamente desde la planilla oficial del Consejo de la Magistratura.',
-        'Puede modificarse manualmente si el valor automatico no es el correcto.',
-      ],
+      brief: 'Seleccione la opcion que corresponda al caso.',
+      expanded: 'Esta informacion se utiliza para el calculo arancelario.',
+      full: ['Complete los datos segun corresponda.'],
     },
   },
 
@@ -392,13 +388,9 @@ export const LEGAL_STEPS: WizardStepDef[] = [
     resumenLabel: 'Tipo de proceso',
     options: TIPOS_PROCESO,
     explicacion: {
-      brief: 'Cada tipo de proceso tiene reglas arancelarias especificas en la Ley 27.423.',
-      expanded: 'La ley distingue entre procesos de conocimiento, ejecutivos, sucesorios, medidas cautelares, entre otros. Cada uno tiene su propio tratamiento en cuanto a base regulatoria, escala aplicable y reducciones.',
-      full: [
-        'Los procesos de conocimiento tienen la escala mas completa (Art. 21).',
-        'Los ejecutivos y ejecucion de sentencia tienen reducciones especificas.',
-        'Las sucesiones tienen reglas particulares para unico letrado y partidor.',
-      ],
+      brief: 'Seleccione la opcion que corresponda al caso.',
+      expanded: 'Esta informacion se utiliza para el calculo arancelario.',
+      full: ['Complete los datos segun corresponda.'],
     },
   },
 
@@ -417,14 +409,9 @@ export const LEGAL_STEPS: WizardStepDef[] = [
     options: [], // Se completa dinamicamente segun tipoProceso
     dependsOn: ['tipoProceso'],
     explicacion: {
-      brief: 'Las contingencias procesales modifican la base y/o la escala aplicable.',
-      expanded: 'Dependiendo del tipo de proceso y su forma de terminacion, la ley establece reducciones en la base regulatoria (Art. 22, 40) o en la escala de honorarios (Art. 25, 35, 41).',
-      full: [
-        'Sentencia: puede ser admitida o rechazada (Art. 22).',
-        'Modos anormales: allanamiento, transaccion o desistimiento (Art. 25).',
-        'Caducidad: puede tratarse como Art. 22 o Art. 25.',
-        'Provisorios: solo se muestra el minimo (Art. 12).',
-      ],
+      brief: 'Seleccione la opcion que corresponda al caso.',
+      expanded: 'Esta informacion se utiliza para el calculo arancelario.',
+      full: ['Complete los datos segun corresponda.'],
     },
   },
 
@@ -441,14 +428,9 @@ export const LEGAL_STEPS: WizardStepDef[] = [
     dependsOn: ['tipoProceso'],
     condition: (answers) => answers.tipoProceso === 'conocimiento',
     explicacion: {
-      brief: 'El objeto del juicio determina la base regulatoria segun distintos articulos de la ley.',
-      expanded: 'Cada tipo de objeto tiene reglas especificas para determinar la base: sumas de dinero (Art. 22), inmuebles (Art. 23), desalojo (Art. 40), alimentos (Art. 39), etc.',
-      full: [
-        'Para sumas de dinero: la cuantia es el monto de demanda o liquidacion (Art. 22).',
-        'Para inmuebles: valuacion fiscal + 50% o tasacion (Art. 23).',
-        'Para desalojo: total de alquileres del contrato (Art. 40).',
-        'Cada objeto tiene su propio metodo de calculo de la base.',
-      ],
+      brief: 'Seleccione la opcion que corresponda al caso.',
+      expanded: 'Esta informacion se utiliza para el calculo arancelario.',
+      full: ['Complete los datos segun corresponda.'],
     },
   },
 
@@ -469,13 +451,9 @@ export const LEGAL_STEPS: WizardStepDef[] = [
     presets: [500000, 1000000, 5000000, 10000000],
     format: pesos,
     explicacion: {
-      brief: 'La base regulatoria es el valor economico sobre el que se aplica la escala de honorarios.',
-      expanded: 'La base se determina segun las reglas de los articulos 22, 23, 24 de la Ley 27.423, dependiendo del tipo de proceso y objeto del juicio. Sobre esta base se aplica la escala porcentual del Art. 21.',
-      full: [
-        'La base debe incluir los intereses (Art. 24).',
-        'Puede reducirse por aplicacion de los articulos 22 (demanda rechazada) y 40 (vivienda).',
-        'No ingrese montos ya reducidos: el sistema aplica las reducciones automaticamente.',
-      ],
+      brief: 'Seleccione la opcion que corresponda al caso.',
+      expanded: 'Esta informacion se utiliza para el calculo arancelario.',
+      full: ['Complete los datos segun corresponda.'],
     },
   },
 ]
@@ -590,15 +568,10 @@ export const STEP_MODO_TERMINACION: CardsStepDef = {
   condition: (answers) =>
     ['conocimiento', 'ejecucion_sentencia', 'ejecutivo'].includes(answers.tipoProceso as string),
   explicacion: {
-    brief: 'La forma de terminacion determina que reducciones se aplican.',
-    expanded: 'Sentencia (Art. 22), modos anormales (Art. 25), caducidad (Art. 22 o 25) y provisorios (Art. 12) tienen distintos tratamientos arancelarios.',
-    full: [
-      'Sentencia admitida: sin reduccion adicional.',
-      'Sentencia rechazada: base reducida 30% (Art. 22).',
-      'Modos anormales antes de prueba: 50% de escala (Art. 25).',
-      'Provisorios: solo minimo (Art. 12).',
-    ],
-  },
+      brief: 'Seleccione la opcion que corresponda al caso.',
+      expanded: 'Esta informacion se utiliza para el calculo arancelario.',
+      full: ['Complete los datos segun corresponda.'],
+    },
 }
 
 export const STEP_SENTENCIA_RESULTADO: CardsStepDef = {
@@ -613,10 +586,10 @@ export const STEP_SENTENCIA_RESULTADO: CardsStepDef = {
   dependsOn: ['modoTerminacion'],
   condition: (answers) => answers.modoTerminacion === 'sentencia',
   explicacion: {
-    brief: 'Si la demanda es rechazada, la base se reduce un 30% (Art. 22).',
-    expanded: 'El Art. 22 establece que si la demanda es desestimada, se toma como valor del pleito el importe de la misma disminuido en un 30%.',
-    full: ['Demanda admitida: sin reduccion.', 'Demanda rechazada: base -30% (Art. 22).'],
-  },
+      brief: 'Seleccione la opcion que corresponda al caso.',
+      expanded: 'Esta informacion se utiliza para el calculo arancelario.',
+      full: ['Complete los datos segun corresponda.'],
+    },
 }
 
 export const STEP_APERTURA_PRUEBA: CardsStepDef = {
@@ -633,10 +606,10 @@ export const STEP_APERTURA_PRUEBA: CardsStepDef = {
     answers.modoTerminacion === 'modos_anormales' ||
     (answers.modoTerminacion === 'caducidad' && answers.caducidadCriterio === 'art25'),
   explicacion: {
-    brief: 'Si ocurre antes de la apertura a prueba, los honorarios se reducen al 50%.',
-    expanded: 'Art. 25: allanamiento, desistimiento y transaccion antes de la apertura a prueba = 50% de la escala.',
-    full: ['Antes de prueba: 50% de la escala.', 'Despues de prueba: 100% de la escala.'],
-  },
+      brief: 'Seleccione la opcion que corresponda al caso.',
+      expanded: 'Esta informacion se utiliza para el calculo arancelario.',
+      full: ['Complete los datos segun corresponda.'],
+    },
 }
 
 export const STEP_CADUCIDAD_CRITERIO: CardsStepDef = {
@@ -651,13 +624,10 @@ export const STEP_CADUCIDAD_CRITERIO: CardsStepDef = {
   dependsOn: ['modoTerminacion'],
   condition: (answers) => answers.modoTerminacion === 'caducidad',
   explicacion: {
-    brief: 'La caducidad puede tratarse como demanda desestimada (Art. 22) o como modo anormal (Art. 25).',
-    expanded: 'Art. 22: base reducida 30%. Art. 25: 50% de la escala si es antes de apertura a prueba.',
-    full: [
-      'Art. 22: reduccion de base del 30%.',
-      'Art. 25: reduccion de escala al 50% si es antes de prueba.',
-    ],
-  },
+      brief: 'Seleccione la opcion que corresponda al caso.',
+      expanded: 'Esta informacion se utiliza para el calculo arancelario.',
+      full: ['Complete los datos segun corresponda.'],
+    },
 }
 
 export const STEP_EXCEPCIONES: CardsStepDef = {
@@ -673,10 +643,10 @@ export const STEP_EXCEPCIONES: CardsStepDef = {
   condition: (answers) =>
     ['ejecucion_sentencia', 'ejecutivo'].includes(answers.tipoProceso as string),
   explicacion: {
-    brief: 'Sin excepciones: reduccion del 10% (Arts. 34 y 41).',
-    expanded: 'Art. 34 (ejecutivo) y Art. 41 (ejecucion de sentencia): no habiendo excepciones, los honorarios se reducen en un 10%.',
-    full: ['Con excepciones: sin reduccion.', 'Sin excepciones: -10% sobre honorarios.'],
-  },
+      brief: 'Seleccione la opcion que corresponda al caso.',
+      expanded: 'Esta informacion se utiliza para el calculo arancelario.',
+      full: ['Complete los datos segun corresponda.'],
+    },
 }
 
 export const STEP_SUCESION_LETRADO: CardsStepDef = {
@@ -691,10 +661,10 @@ export const STEP_SUCESION_LETRADO: CardsStepDef = {
   dependsOn: ['tipoProceso'],
   condition: (answers) => answers.tipoProceso === 'sucesion',
   explicacion: {
-    brief: 'Unico letrado en sucesion: 50% de la escala (Art. 35).',
-    expanded: 'Art. 35: si un solo abogado patrocina a todos los herederos, sus honorarios se regulan en la mitad del minimo y del maximo de la escala del Art. 21.',
-    full: ['Unico letrado: 50% de la escala.', 'Varios letrados: escala completa.'],
-  },
+      brief: 'Seleccione la opcion que corresponda al caso.',
+      expanded: 'Esta informacion se utiliza para el calculo arancelario.',
+      full: ['Complete los datos segun corresponda.'],
+    },
 }
 
 export const STEP_CAUTELAR_OPOSICION: CardsStepDef = {
@@ -709,10 +679,10 @@ export const STEP_CAUTELAR_OPOSICION: CardsStepDef = {
   dependsOn: ['tipoProceso'],
   condition: (answers) => answers.tipoProceso === 'medida_cautelar',
   explicacion: {
-    brief: 'Con oposicion: 50% de la escala. Sin oposicion: 25% (Art. 37).',
-    expanded: 'Art. 37: las medidas cautelares se regulan sobre el 25% de la escala; si hay oposicion, sobre el 50%.',
-    full: ['Sin oposicion: 25% de la escala.', 'Con oposicion: 50% de la escala.'],
-  },
+      brief: 'Seleccione la opcion que corresponda al caso.',
+      expanded: 'Esta informacion se utiliza para el calculo arancelario.',
+      full: ['Complete los datos segun corresponda.'],
+    },
 }
 
 export const STEP_HOMOLOGACION_VIVIENDA: CardsStepDef = {
@@ -727,10 +697,10 @@ export const STEP_HOMOLOGACION_VIVIENDA: CardsStepDef = {
   dependsOn: ['tipoProceso'],
   condition: (answers) => answers.tipoProceso === 'homologacion_desocupacion',
   explicacion: {
-    brief: 'Vivienda: base -20% (Art. 40).',
-    expanded: 'Art. 40: en desalojos para vivienda, la base se reduce en un 20%. Ademas, la homologacion reduce los honorarios al 50%.',
-    full: ['Vivienda: base -20% + 50% por homologacion.', 'Otros: solo 50% por homologacion.'],
-  },
+      brief: 'Seleccione la opcion que corresponda al caso.',
+      expanded: 'Esta informacion se utiliza para el calculo arancelario.',
+      full: ['Complete los datos segun corresponda.'],
+    },
 }
 
 // ---- Lista completa de pasos (ordenada) ----

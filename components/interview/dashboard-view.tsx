@@ -14,12 +14,28 @@ type DashboardViewProps = {
   onRestart: () => void
 }
 
+let _calcCount = 0
+
 export function DashboardView({ wizard, onBack, onRestart }: DashboardViewProps) {
   const html = useMemo(() => {
+    _calcCount++
+    const callId = _calcCount
+    console.group('[DIAG] DashboardView.useMemo calculate() #' + callId)
+    console.log('answers:', JSON.parse(JSON.stringify(wizard.answers)))
     try {
-      return wizard.calculate()
-    } catch {
-      return '<p class="text-destructive">Error al generar el calculo. Verifique los datos ingresados.</p>'
+      const result = wizard.calculate()
+      console.log('result length:', result?.length ?? 0)
+      console.log('result preview:', result?.substring?.(0, 200) ?? '(empty)')
+      console.groupEnd()
+      return result || '<p class="text-muted-foreground">El motor no genero contenido. Verifique los datos.</p>'
+    } catch (e: unknown) {
+      console.error('[DIAG] EXCEPCION en calculate() #' + callId + ':', e)
+      if (e instanceof Error) {
+        console.error('[DIAG] Stack:', e.stack)
+      }
+      console.groupEnd()
+      const errMsg = e instanceof Error ? e.message : String(e)
+      return '<p class="text-destructive">Error al generar el calculo: ' + errMsg + '</p>'
     }
   }, [wizard])
 

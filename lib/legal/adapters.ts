@@ -23,7 +23,13 @@ function g(): any {
 
 // ---- Estado ----
 export function getWizardState(): WizardState {
-  return g().wizardState as WizardState
+  const ws = g().wizardState
+  if (!ws) {
+    console.warn('[DIAG] adapters.getWizardState(): window.wizardState es undefined - inicializando')
+    resetWizardState()
+    return g().wizardState as WizardState
+  }
+  return ws as WizardState
 }
 
 export function setWizardState(partial: Partial<WizardState>): void {
@@ -31,7 +37,6 @@ export function setWizardState(partial: Partial<WizardState>): void {
 }
 
 export function resetWizardState(): void {
-  // Conserva la UMA actualizada
   const uma = g().wizardState?.valorUMA ?? g().valorUMA ?? 92482
   g().wizardState = {
     step: 0,
@@ -61,7 +66,9 @@ export function getUMA(): number {
 }
 
 export function cargarUMA(): Promise<void> {
-  return g().cargarUMA()
+  const result = g().cargarUMA()
+  if (!result) return Promise.resolve()
+  return result
 }
 
 // ---- Parseo / Formato ----
@@ -79,6 +86,17 @@ export function validarPaso(paso: number): string {
 }
 
 export function recolectarDatos(): void {
+  console.group('[DIAG] adapters.recolectarDatos()')
+  console.log('window.recolectarDatos:', typeof g().recolectarDatos)
+  console.log('window.wizardState:', typeof g().wizardState)
+  console.log('window.calcularEscalaBase:', typeof g().calcularEscalaBase)
+  console.log('window.parseNumber:', typeof g().parseNumber)
+  console.log('window.calcularFinal:', typeof g().calcularFinal)
+  console.log('window.valorUMA:', typeof g().valorUMA)
+  console.log('window.cargarUMA:', typeof g().cargarUMA)
+  console.log('window.mostrarTablasMinimos:', typeof g().mostrarTablasMinimos)
+  console.log('window.validarPasoActual:', typeof g().validarPasoActual)
+  console.groupEnd()
   return g().recolectarDatos()
 }
 
@@ -98,39 +116,54 @@ export function calcularHonorariosPorGrupo(
   return g().calcularHonorariosPorGrupo(basePesos, valorUMA, factor)
 }
 
+let _calcularFinalCount = 0
+
 /**
  * Ejecuta calcularFinal() del motor legacy.
- *
- * El motor legacy genera HTML directamente en el DOM.
- * Esta funcion:
- *  1. Crea un contenedor oculto con el ID que espera el motor
- *  2. Llama calcularFinal()
- *  3. Captura el HTML generado
- *  4. Limpia el contenedor temporal
- *  5. Devuelve el HTML como string
- *
- * TEMPORAL: En Milestone 2 esto se reemplazara por datos estructurados.
  */
 export function calcularFinalHTML(): string {
+  _calcularFinalCount++
+  const callId = _calcularFinalCount
   const resultadoId = 'resultadosDinamicos'
 
-  // Usar contenedor existente o crear uno temporal
+  const motorFn = g().calcularFinal
+  console.group('[DIAG] adapters.calcularFinalHTML() #' + callId)
+  console.log('window.calcularFinal existe:', typeof motorFn === 'function')
+  console.log('window.wizardState existe:', typeof g().wizardState)
+  if (g().wizardState) {
+    console.log('wizardState.tipoProceso:', g().wizardState.tipoProceso)
+    console.log('wizardState.baseValor:', g().wizardState.baseValor)
+    console.log('wizardState.modoTerminacion:', g().wizardState.modoTerminacion)
+    console.log('wizardState.valorUMA:', g().wizardState.valorUMA)
+    console.log('wizardState.step:', g().wizardState.step)
+  }
+
   let container = document.getElementById(resultadoId)
   const created = !container
+  console.log('contenedor encontrado:', !created)
   if (created) {
     container = document.createElement('div')
     container.id = resultadoId
     container.style.display = 'none'
     document.body.appendChild(container)
+    console.log('contenedor creado')
   }
 
-  // Ejecutar el motor (escribe en innerHTML del contenedor)
-  g().calcularFinal()
+  try {
+    g().calcularFinal()
+    console.log('calcularFinal() ejecutado sin excepcion')
+  } catch (e) {
+    console.error('[DIAG] EXCEPCION dentro de calcularFinal():', e)
+    if (e instanceof Error) {
+      console.error('[DIAG] Stack:', e.stack)
+    }
+  }
 
-  // Capturar HTML
   const html = container?.innerHTML ?? ''
+  console.log('HTML generado length:', html.length)
+  console.log('HTML generado (primeros 300 chars):', html.substring(0, 300))
+  console.groupEnd()
 
-  // Limpiar si creamos el contenedor
   if (created && container?.parentNode) {
     container.parentNode.removeChild(container)
   }
@@ -142,8 +175,6 @@ export function calcularFinalHTML(): string {
  * Obtiene el HTML de las tablas de minimos.
  */
 export function obtenerTablasMinimos(modo: MinimosModo): string {
-  // Similar a calcularFinalHTML: el motor puede escribir en el DOM
-  // o devolver un string segun el modo.
   const resultadoId = 'resultadosDinamicos'
   let container = document.getElementById(resultadoId)
   const created = !container
@@ -156,9 +187,6 @@ export function obtenerTablasMinimos(modo: MinimosModo): string {
 
   g().mostrarTablasMinimos(modo)
 
-  // Si la funcion devuelve HTML (como en extrajudicial/art58/etc),
-  // lo usamos directamente. Si escribe en el DOM (como judicial),
-  // lo capturamos del contenedor.
   const html = container?.innerHTML ?? ''
   if (created && container?.parentNode) {
     container.parentNode.removeChild(container)

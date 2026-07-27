@@ -158,14 +158,41 @@ export function useWizard(allSteps: WizardStepDef[]): UseWizardReturn {
 
   // ---- Ejecutar calculo final ----
   const calculate = useCallback((): string => {
+    console.group(`[DIAG] useWizard.calculate()`)
+    console.log(`answers enviadas al adapter:`, JSON.parse(JSON.stringify(answers)))
+
     // 1. Sincronizar todas las respuestas con el motor legacy
     syncAllToLegacy(answers)
+    console.log(`window.wizardState DESPUES de syncAllToLegacy:`)
+    const ws = (window as any).wizardState
+    console.log(`  step:`, ws?.step)
+    console.log(`  tipoProceso:`, ws?.tipoProceso)
+    console.log(`  valorUMA:`, ws?.valorUMA)
+    console.log(`  modoTerminacion:`, ws?.modoTerminacion)
+    console.log(`  sentenciaResultado:`, ws?.sentenciaResultado)
+    console.log(`  aperturaPrueba:`, ws?.aperturaPrueba)
+    console.log(`  caducidadCriterio:`, ws?.caducidadCriterio)
+    console.log(`  tuvoExcepciones:`, ws?.tuvoExcepciones)
+    console.log(`  sucesionUnicoLetrado:`, ws?.sucesionUnicoLetrado)
+    console.log(`  medidaOposicion:`, ws?.medidaOposicion)
+    console.log(`  homologacionVivienda:`, ws?.homologacionVivienda)
+    console.log(`  objetoBase:`, ws?.objetoBase)
+    console.log(`  desalojoVivienda:`, ws?.desalojoVivienda)
+    console.log(`  posesoriasTipo:`, ws?.posesoriasTipo)
+    console.log(`  baseValor:`, ws?.baseValor)
+    console.log(`  esProvisorio:`, ws?.esProvisorio)
+    console.log(`  desdeMinimos:`, ws?.desdeMinimos)
+    console.log(`  desdeResultado:`, ws?.desdeResultado)
+    console.log(`window.wizardState === wizardState (let en state.js):`, ws === (window as any).wizardState)
 
     // 2. Recolectar datos (el motor legacy lee inputs del DOM)
     adapters.recolectarDatos()
 
     // 3. Ejecutar calculo y capturar HTML
-    return adapters.calcularFinalHTML()
+    const result = adapters.calcularFinalHTML()
+    console.log(`HTML final length:`, result?.length ?? 0)
+    console.groupEnd()
+    return result
   }, [answers])
 
   return {

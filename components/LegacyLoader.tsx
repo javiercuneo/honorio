@@ -23,14 +23,30 @@ export function useLegacyReady() {
 
 const SCRIPTS = ['/legacy/core.js', '/legacy/state.js', '/legacy/calculations.js']
 
-function loadScript(src: string): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const script = document.createElement('script')
-    script.src = src
-    script.onload = () => resolve()
-    script.onerror = () => reject(new Error('Error al cargar: ' + src))
-    document.head.appendChild(script)
-  })
+let _loadCount = 0
+
+async function loadScript(src: string): Promise<void> {
+  _loadCount++
+  const loadId = _loadCount
+  console.log('[DIAG] LegacyLoader: fetch+eval #' + loadId + ' para', src)
+
+  const response = await fetch(src)
+  if (!response.ok) {
+    throw new Error('Error HTTP ' + response.status + ' al cargar: ' + src)
+  }
+
+  const code = await response.text()
+  console.log('[DIAG] LegacyLoader: #' + loadId + ' recibido, ' + code.length + ' bytes')
+
+  try {
+    // Ejecutar en el scope global usando eval indirecto
+    const globalEval = eval
+    globalEval(code)
+    console.log('[DIAG] LegacyLoader: #' + loadId + ' EVALUADO OK', src)
+  } catch (e) {
+    console.error('[DIAG] LegacyLoader: #' + loadId + ' ERROR al evaluar', src, e)
+    throw e
+  }
 }
 
 export function LegacyLoader({ children }: { children: ReactNode }) {
@@ -45,13 +61,18 @@ export function LegacyLoader({ children }: { children: ReactNode }) {
         // Cargar scripts en orden
         for (const src of SCRIPTS) {
           if (cancelled) return
+          console.log('[DIAG] LegacyLoader: iniciando carga de', src)
           await loadScript(src)
+          console.log('[DIAG] LegacyLoader: completado', src)
+          console.log('[DIAG] LegacyLoader: despues de ' + src + ' -> window.valorUMA:', typeof (window as any).valorUMA, 'window.calcularEscalaBase:', typeof (window as any).calcularEscalaBase, 'window.wizardState:', typeof (window as any).wizardState, 'window.recolectarDatos:', typeof (window as any).recolectarDatos, 'window.calcularFinal:', typeof (window as any).calcularFinal)
         }
 
         // Verificar que el motor esta disponible
+        console.log('[DIAG] LegacyLoader: verificando isMotorLoaded...')
         if (!adapters.isMotorLoaded()) {
           throw new Error('Motor juridico no disponible despues de cargar scripts')
         }
+        console.log('[DIAG] LegacyLoader: isMotorLoaded OK')
 
         if (!cancelled) {
           // Iniciar carga de UMA desde Google Sheets (silenciosa)
@@ -63,6 +84,7 @@ export function LegacyLoader({ children }: { children: ReactNode }) {
           setReady(true)
         }
       } catch (err) {
+        console.error('[DIAG] LegacyLoader: ERROR en load():', err)
         if (!cancelled) {
           setError(err instanceof Error ? err.message : 'Error desconocido')
         }
