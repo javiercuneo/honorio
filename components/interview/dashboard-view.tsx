@@ -1,10 +1,12 @@
 'use client'
 
-import { useMemo } from 'react'
-import { motion } from 'motion/react'
-import { ArrowLeft, RotateCcw } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import type { UseWizardReturn } from '@/hooks/useWizard'
+import { useMemo } from "react"
+import { motion } from "motion/react"
+import { ArrowLeft, RotateCcw } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import type { UseWizardReturn } from "@/hooks/useWizard"
+import { calcularResultadoEstructurado } from "@/lib/legal/adapters"
+import { Dashboard } from "@/components/dashboard/Dashboard"
 
 const ease = [0.22, 1, 0.36, 1] as const
 
@@ -16,13 +18,18 @@ type DashboardViewProps = {
 }
 
 export function DashboardView({ wizard, onBack, onRestart, onShowMinimos }: DashboardViewProps) {
-  const html = useMemo(() => {
+  const { resultado, modoTerminacion, sentenciaResultado, objetoBase } = useMemo(() => {
     try {
-      const result = wizard.calculate()
-      return result || '<p class="text-muted-foreground">El motor no genero contenido. Verifique los datos.</p>'
+      wizard.calculate()
+      const result = calcularResultadoEstructurado()
+      return {
+        resultado: result,
+        modoTerminacion: wizard.answers.modoTerminacion as string | undefined,
+        sentenciaResultado: wizard.answers.sentenciaResultado as string | undefined,
+        objetoBase: wizard.answers.objeto as string | undefined,
+      }
     } catch (e: unknown) {
-      const errMsg = e instanceof Error ? e.message : String(e)
-      return '<p class="text-destructive">Error al generar el calculo: ' + errMsg + '</p>'
+      return { resultado: null, modoTerminacion: undefined, sentenciaResultado: undefined }
     }
   }, [wizard])
 
@@ -77,12 +84,21 @@ export function DashboardView({ wizard, onBack, onRestart, onShowMinimos }: Dash
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease, delay: 0.1 }}
-          className="rounded-2xl border border-border bg-card p-6 md:p-10"
         >
-          <div
-            className="prose prose-sm max-w-none prose-headings:font-serif prose-headings:text-foreground prose-headings:tracking-tight prose-p:text-muted-foreground prose-strong:text-foreground prose-table:w-full prose-td:px-3 prose-td:py-2 prose-th:px-3 prose-th:py-2 prose-th:text-left prose-th:font-mono prose-th:text-[11px] prose-th:uppercase prose-th:tracking-wider prose-th:text-muted-foreground"
-            dangerouslySetInnerHTML={{ __html: html }}
-          />
+          {resultado ? (
+            <Dashboard
+              resultado={resultado}
+              modoTerminacion={modoTerminacion}
+              sentenciaResultado={sentenciaResultado}
+              objetoBase={objetoBase}
+            />
+          ) : (
+            <div className="rounded-2xl border border-border bg-card p-10 text-center">
+              <p className="text-muted-foreground">
+                Error al generar el calculo. Verifique los datos ingresados.
+              </p>
+            </div>
+          )}
         </motion.div>
       </div>
     </div>
