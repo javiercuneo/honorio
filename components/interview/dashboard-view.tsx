@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useMemo } from 'react'
 import { motion } from 'motion/react'
@@ -12,28 +12,15 @@ type DashboardViewProps = {
   wizard: UseWizardReturn
   onBack: () => void
   onRestart: () => void
+  onShowMinimos: () => void
 }
 
-let _calcCount = 0
-
-export function DashboardView({ wizard, onBack, onRestart }: DashboardViewProps) {
+export function DashboardView({ wizard, onBack, onRestart, onShowMinimos }: DashboardViewProps) {
   const html = useMemo(() => {
-    _calcCount++
-    const callId = _calcCount
-    console.group('[DIAG] DashboardView.useMemo calculate() #' + callId)
-    console.log('answers:', JSON.parse(JSON.stringify(wizard.answers)))
     try {
       const result = wizard.calculate()
-      console.log('result length:', result?.length ?? 0)
-      console.log('result preview:', result?.substring?.(0, 200) ?? '(empty)')
-      console.groupEnd()
       return result || '<p class="text-muted-foreground">El motor no genero contenido. Verifique los datos.</p>'
     } catch (e: unknown) {
-      console.error('[DIAG] EXCEPCION en calculate() #' + callId + ':', e)
-      if (e instanceof Error) {
-        console.error('[DIAG] Stack:', e.stack)
-      }
-      console.groupEnd()
       const errMsg = e instanceof Error ? e.message : String(e)
       return '<p class="text-destructive">Error al generar el calculo: ' + errMsg + '</p>'
     }
@@ -55,7 +42,7 @@ export function DashboardView({ wizard, onBack, onRestart }: DashboardViewProps)
             Resultados
           </h1>
           <p className="mt-2 max-w-lg text-[15px] leading-relaxed text-muted-foreground">
-            Cálculo en base a los datos ingresados
+            Calculo en base a los datos ingresados
           </p>
         </div>
         <div className="flex shrink-0 items-center gap-2">
@@ -73,7 +60,14 @@ export function DashboardView({ wizard, onBack, onRestart }: DashboardViewProps)
             className="h-10 rounded-full px-5"
           >
             <RotateCcw className="mr-1.5 h-4 w-4" />
-            Nuevo cálculo
+            Nuevo calculo
+          </Button>
+          <Button
+            variant="ghost"
+            onClick={onShowMinimos}
+            className="h-10 rounded-full px-5"
+          >
+            Ver minimos
           </Button>
         </div>
       </motion.header>

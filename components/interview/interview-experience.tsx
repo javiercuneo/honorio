@@ -26,12 +26,14 @@ import { CardsField } from './cards-field'
 import { LandingView } from './landing-view'
 import { IntroView } from './intro-view'
 import { DashboardView } from './dashboard-view'
+import { MinimosView } from './minimos-view'
 
 const transition = { duration: 0.4, ease: [0.22, 1, 0.36, 1] as const }
 
 export function InterviewExperience() {
   const [showLanding, setShowLanding] = useState(true)
-  const { umaValorCargado } = useLegacyReady()
+  const [showMinimos, setShowMinimos] = useState(false)
+  const { ready, error: legacyError, umaValorCargado } = useLegacyReady()
   const initialUma = umaValorCargado ? { umaInicio: umaValorCargado } : undefined
   const wizard = useWizard(ALL_STEPS, initialUma)
 
@@ -67,6 +69,68 @@ export function InterviewExperience() {
     return <LandingView onStart={() => setShowLanding(false)} />
   }
 
+  // ---- Carga pendiente del motor (solo antes del wizard) ----
+  if (wizard.phase === 'question' && !ready && !legacyError) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
+        <div className="text-center">
+          <div className="mb-4 h-8 w-8 animate-spin rounded-full border-2 border-foreground border-t-transparent mx-auto" />
+          <p className="font-mono text-[13px] text-muted-foreground">
+            Cargando motor juridico...
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  if (wizard.phase === 'question' && !ready && legacyError) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
+        <div className="text-center max-w-md">
+          <p className="font-mono text-[13px] text-destructive">
+            Error al cargar el motor juridico: {legacyError}
+          </p>
+          <p className="mt-2 text-[12px] text-muted-foreground">
+            Verifique que los archivos en /public/legacy/ existen.
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  // ---- Minimos Arancelarios ----
+  if (showMinimos && !ready) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
+        <div className="text-center">
+          <div className="mb-4 h-8 w-8 animate-spin rounded-full border-2 border-foreground border-t-transparent mx-auto" />
+          <p className="font-mono text-[13px] text-muted-foreground">
+            Cargando motor juridico...
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  if (showMinimos && ready && !umaValorCargado) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
+        <div className="text-center max-w-md">
+          <p className="font-mono text-[13px] text-destructive">
+            No se pudo cargar el valor de la UMA desde Google Sheets.
+          </p>
+          <p className="mt-2 text-[12px] text-muted-foreground">
+            Los valores de referencia no están disponibles sin el valor de la UMA.
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  if (showMinimos) {
+    return <MinimosView onBack={() => setShowMinimos(false)} umaValor={umaValorCargado!} />
+  }
+
   // ---- Dashboard ----
   if (wizard.phase === 'dashboard') {
     return (
@@ -87,6 +151,7 @@ export function InterviewExperience() {
             wizard={wizard}
             onBack={() => go(-1, () => wizard.back())}
             onRestart={handleRestart}
+            onShowMinimos={() => setShowMinimos(true)}
           />
         </motion.div>
       </div>
@@ -105,9 +170,10 @@ export function InterviewExperience() {
           {wizard.phase === 'question' ? (
           <div className="hidden w-64 md:block lg:w-80">
             <ProgressRail
-              total={wizard.totalSteps}
+              total={wizard.maxTotalSteps}
               current={wizard.index}
               completed={wizard.completedSteps}
+              showFraction={!!wizard.answers.tipoProceso}
             />
           </div>
           ) : null}
@@ -138,7 +204,7 @@ export function InterviewExperience() {
                   transition={transition}
                 >
                   {wizard.phase === 'intro' ? (
-                    <IntroView onStart={() => go(1, () => wizard.jumpTo(0))} />
+                    <IntroView onStart={() => go(1, () => wizard.jumpTo(0))} onShowMinimos={() => setShowMinimos(true)} />
                   ) : currentStep ? (
                     <StepShell
                       eyebrow={currentStep.eyebrow}
@@ -219,6 +285,7 @@ export function InterviewExperience() {
                     steps={wizard.visibleSteps}
                     answers={wizard.answers}
                     currentIndex={wizard.index}
+                    maxTotalSteps={wizard.maxTotalSteps}
                     onJump={handleJumpTo}
                   />
                 </motion.div>
@@ -235,7 +302,7 @@ export function InterviewExperience() {
 
 function Brand() {
   return (
-    <img src="/honorio.png" alt="Honorio" className="h-8 w-auto" />
+    <img src="/honorio.png" alt="Honorio" width="147" className="h-auto" />
   )
 }
 
@@ -253,7 +320,7 @@ function IntroAside() {
       </p>
       <div className="mt-5 space-y-5">
         {[
-          { n: '01', t: 'Configuración', d: 'Ingresá el valor de la UMA' },
+          { n: '01', t: 'Inicio', d: 'Ingresá el valor de la UMA' },
           { n: '02', t: 'Seleccioná el tipo de proceso', d: 'Ejecutivo, Sucesión y demás' },
           { n: '03', t: 'Indicá opciones procesles que cambian el cálculo', d: 'El juicio terminó por sentencia, acuerdo, etc.' },
           { n: '04', t: 'Elegí el objeto del juicio', d: 'Desalojo, Escrituración, u otros' },

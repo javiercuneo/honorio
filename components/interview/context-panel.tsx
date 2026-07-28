@@ -11,6 +11,7 @@ type ContextPanelProps = {
   answers: Answers
   currentIndex: number
   onJump: (index: number) => void
+  maxTotalSteps?: number
 }
 
 function isStepAnswered(step: WizardStepDef, answers: Answers): boolean {
@@ -25,8 +26,13 @@ export function ContextPanel({
   answers,
   currentIndex,
   onJump,
+  maxTotalSteps,
 }: ContextPanelProps) {
   const answered = steps.filter((s) => isStepAnswered(s, answers)).length
+  const showGeneric = !answers.tipoProceso
+  const displaySteps = showGeneric && currentIndex < steps.length - 1
+    ? steps.slice(0, Math.min(currentIndex + 1, steps.length)).concat({ id: "pending", resumenLabel: "Siguiente paso", pregunta: "", ayuda: "", explicacion: { brief: "", expanded: "", full: [] }, eyebrow: "" } as any)
+    : steps
 
   return (
     <aside className="flex flex-col gap-5">
@@ -36,12 +42,12 @@ export function ContextPanel({
             Resumen del caso
           </h2>
           <span className="font-mono text-[11px] tabular-nums text-muted-foreground">
-            {answered}/{steps.length}
+            {answers.tipoProceso ? `${answered}/${maxTotalSteps ?? steps.length}` : ''}
           </span>
         </div>
 
         <ol className="mt-4 space-y-0.5">
-          {steps.map((step, i) => {
+          {displaySteps.map((step, i) => {
             const value = resumenPaso(step, answers)
             const isCurrent = i === currentIndex
             const isDone = isStepAnswered(step, answers)

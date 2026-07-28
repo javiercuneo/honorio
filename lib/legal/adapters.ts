@@ -1,4 +1,4 @@
-﻿// ---------------------------------------------------------------
+// ---------------------------------------------------------------
 // lib/legal/adapters.ts
 // Capa de adaptacion framework-agnostica.
 // Traduce el contrato JS del motor legacy (window.*) a una interfaz
@@ -27,7 +27,6 @@ function g(): any {
 export function getWizardState(): WizardState {
   const ws = g().wizardState
   if (!ws) {
-    console.warn('[DIAG] adapters.getWizardState(): window.wizardState es undefined - inicializando')
     resetWizardState()
     return g().wizardState as WizardState
   }
@@ -64,13 +63,18 @@ export function resetWizardState(): void {
 
 // ---- UMA ----
 export function getUMA(): number {
-  return g().valorUMA ?? 92482
+  return (window as any).valorUMA ?? g().valorUMA ?? 92482
 }
 
 export function cargarUMA(): Promise<void> {
+  const before = (window as any).valorUMA
   const result = g().cargarUMA()
   if (!result) return Promise.resolve()
-  return result
+  return result.then(() => {
+    if ((window as any).valorUMA === before) {
+      throw new Error('No se pudo cargar la UMA desde Google Sheets')
+    }
+  })
 }
 
 // ---- Parseo / Formato ----
@@ -88,17 +92,6 @@ export function validarPaso(paso: number): string {
 }
 
 export function recolectarDatos(): void {
-  console.group('[DIAG] adapters.recolectarDatos()')
-  console.log('window.recolectarDatos:', typeof g().recolectarDatos)
-  console.log('window.wizardState:', typeof g().wizardState)
-  console.log('window.calcularEscalaBase:', typeof g().calcularEscalaBase)
-  console.log('window.parseNumber:', typeof g().parseNumber)
-  console.log('window.calcularFinal:', typeof g().calcularFinal)
-  console.log('window.valorUMA:', typeof g().valorUMA)
-  console.log('window.cargarUMA:', typeof g().cargarUMA)
-  console.log('window.mostrarTablasMinimos:', typeof g().mostrarTablasMinimos)
-  console.log('window.validarPasoActual:', typeof g().validarPasoActual)
-  console.groupEnd()
   return g().recolectarDatos()
 }
 
@@ -118,60 +111,34 @@ export function calcularHonorariosPorGrupo(
   return g().calcularHonorariosPorGrupo(basePesos, valorUMA, factor)
 }
 
-let _calcularFinalCount = 0
-
 /**
  * Ejecuta calcularFinal() del motor legacy.
  */
 export function calcularFinalHTML(): string {
-  _calcularFinalCount++
-  const callId = _calcularFinalCount
   const resultadoId = 'resultadosDinamicos'
-
-  const motorFn = g().calcularFinal
-  console.group('[DIAG] adapters.calcularFinalHTML() #' + callId)
-  console.log('window.calcularFinal existe:', typeof motorFn === 'function')
-  console.log('window.wizardState existe:', typeof g().wizardState)
-  if (g().wizardState) {
-    console.log('wizardState.tipoProceso:', g().wizardState.tipoProceso)
-    console.log('wizardState.baseValor:', g().wizardState.baseValor)
-    console.log('wizardState.modoTerminacion:', g().wizardState.modoTerminacion)
-    console.log('wizardState.valorUMA:', g().wizardState.valorUMA)
-    console.log('wizardState.step:', g().wizardState.step)
-  }
 
   let container = document.getElementById(resultadoId)
   const created = !container
-  console.log('contenedor encontrado:', !created)
   if (created) {
     container = document.createElement('div')
     container.id = resultadoId
     container.style.display = 'none'
     document.body.appendChild(container)
-    console.log('contenedor creado')
   }
 
   try {
     const state = g().wizardState as WizardState
     if (state?.tipoProceso && state.tipoProceso in PROCESS_REGISTRY) {
-      console.log('[DIAG] ' + state.tipoProceso + ': usando buildCalculationResult + renderLegacyHTML')
       const result = buildCalculationResult(state)
       container!.innerHTML = renderLegacyHTML(result)
     } else {
       g().calcularFinal()
     }
-    console.log('calcularFinal() ejecutado sin excepcion')
   } catch (e) {
-    console.error('[DIAG] EXCEPCION dentro de calcularFinal():', e)
-    if (e instanceof Error) {
-      console.error('[DIAG] Stack:', e.stack)
-    }
+    console.error('EXCEPCION dentro de calcularFinal():', e)
   }
 
   const html = container?.innerHTML ?? ''
-  console.log('HTML generado length:', html.length)
-  console.log('HTML generado (primeros 300 chars):', html.substring(0, 300))
-  console.groupEnd()
 
   if (created && container?.parentNode) {
     container.parentNode.removeChild(container)
@@ -183,7 +150,7 @@ export function calcularFinalHTML(): string {
 /**
  * Obtiene el HTML de las tablas de minimos.
  */
-export function obtenerTablasMinimos(modo: MinimosModo): string {
+export function obtenerTablasMinimos(modo: MinimosModo, umaOverride?: number): string {
   const resultadoId = 'resultadosDinamicos'
   let container = document.getElementById(resultadoId)
   const created = !container
@@ -194,7 +161,17 @@ export function obtenerTablasMinimos(modo: MinimosModo): string {
     document.body.appendChild(container)
   }
 
-  g().mostrarTablasMinimos(modo)
+  const correctUma = umaOverride ?? getUMA()
+  g().valorUMA = correctUma
+  if (g().wizardState) {
+    g().wizardState.valorUMA = correctUma
+  }
+
+  const result = g().mostrarTablasMinimos(modo)
+
+  if (typeof result === 'string' && result.length > 0) {
+    container!.innerHTML = result
+  }
 
   const html = container?.innerHTML ?? ''
   if (created && container?.parentNode) {

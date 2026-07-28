@@ -8,9 +8,10 @@ type ProgressRailProps = {
   current: number
   /** how many steps have a saved answer */
   completed: number
+  showFraction?: boolean
 }
 
-export function ProgressRail({ total, current, completed }: ProgressRailProps) {
+export function ProgressRail({ total, current, completed, showFraction = true }: ProgressRailProps) {
   return (
     <div className="flex items-center gap-4">
       <div className="flex flex-1 items-center gap-1.5" aria-hidden="true">
@@ -40,11 +41,13 @@ export function ProgressRail({ total, current, completed }: ProgressRailProps) {
           )
         })}
       </div>
-      <span className="shrink-0 font-mono text-xs tabular-nums tracking-wider text-muted-foreground">
-        {String(Math.min(current + 1, total)).padStart(2, '0')}
-        <span className="mx-0.5 opacity-40">/</span>
-        {String(total).padStart(2, '0')}
-      </span>
+      {showFraction ? (
+        <span className="shrink-0 font-mono text-xs tabular-nums tracking-wider text-muted-foreground">
+          {String(Math.min(current + 1, total)).padStart(2, '0')}
+          <span className="mx-0.5 opacity-40">/</span>
+          {String(total).padStart(2, '0')}
+        </span>
+      ) : null}
     </div>
   )
 }

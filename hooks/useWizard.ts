@@ -1,8 +1,8 @@
-ï»¿// ---------------------------------------------------------------
+// ---------------------------------------------------------------
 // hooks/useWizard.ts
 // Hook de orquestacion del wizard legal.
 // Conecta el schema declarativo con los adapters del motor legacy.
-// NO contiene reglas juridicas ? solo Orquestacion.
+// NO contiene reglas juridicas — solo Orquestacion.
 //
 // Responsabilidades:
 // - Computar la lista de pasos visibles (segun condiciones del schema)
@@ -16,7 +16,7 @@
 
 'use client'
 
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { Answers, WizardState } from '@/lib/legal/types'
 import type { WizardStepDef } from '@/lib/wizard/wizard-schema'
 import { PROCESS_STEP_MAP } from '@/lib/wizard/wizard-schema'
@@ -31,6 +31,7 @@ export interface UseWizardReturn {
   answers: Answers
   visibleSteps: WizardStepDef[]
   totalSteps: number
+  maxTotalSteps: number
   completedSteps: number
   errorMessage: string | null
   setAnswer: (value: string | string[] | number | boolean | null) => void
@@ -45,6 +46,19 @@ export function useWizard(allSteps: WizardStepDef[], initialValues?: Partial<Ans
   const [phase, setPhase] = useState<Phase>('intro')
   const [index, setIndex] = useState(0)
   const [answers, setAnswers] = useState<Answers>((initialValues ?? {}) as Answers)
+  const initialValuesRef = useRef(initialValues)
+
+  useEffect(() => {
+    const newUma = initialValues?.umaInicio
+    const oldUma = initialValuesRef.current?.umaInicio
+    if (newUma !== undefined && newUma !== oldUma) {
+      setAnswers((prev) => {
+        if (prev.umaInicio === newUma) return prev
+        return { ...prev, umaInicio: newUma }
+      })
+    }
+    initialValuesRef.current = initialValues
+  }, [initialValues?.umaInicio])
   const [errorMessage, setError] = useState<string | null>(null)
 
   // ---- Computar pasos visibles segun condiciones ----
@@ -61,6 +75,11 @@ export function useWizard(allSteps: WizardStepDef[], initialValues?: Partial<Ans
   }, [allSteps, answers])
 
   const totalSteps = visibleSteps.length
+  const maxTotalSteps = useMemo(() => {
+    const tipo = answers.tipoProceso as string | undefined
+    if (!tipo) return visibleSteps.length
+    return PROCESS_STEP_MAP[tipo]?.length ?? visibleSteps.length
+  }, [answers.tipoProceso, visibleSteps.length])
   const completedSteps = visibleSteps.filter((s) => {
     const v = answers[s.id]
     return v !== undefined && v !== null && v !== ''
@@ -75,7 +94,6 @@ export function useWizard(allSteps: WizardStepDef[], initialValues?: Partial<Ans
       setError(null)
       setAnswers((prev) => ({ ...prev, [currentStep.id]: value }))
 
-      // Sincronizar con wizardState del motor legacy
       syncToLegacy(currentStep.id, value)
     },
     [currentStep],
@@ -85,7 +103,6 @@ export function useWizard(allSteps: WizardStepDef[], initialValues?: Partial<Ans
   const validateCurrent = useCallback((): string | null => {
     if (!currentStep) return 'Paso invalido'
 
-    // Validacion generica: verificar que haya respuesta
     const value = answers[currentStep.id]
     if (currentStep.kind === 'numeric') {
       if (typeof value !== 'number' || (value as number) <= 0) {
@@ -109,7 +126,6 @@ export function useWizard(allSteps: WizardStepDef[], initialValues?: Partial<Ans
       }
     }
 
-    // Validacion personalizada del schema
     if (currentStep.validate) {
       return currentStep.validate(value, answers)
     }
@@ -155,7 +171,10 @@ export function useWizard(allSteps: WizardStepDef[], initialValues?: Partial<Ans
   }, [])
 
   const restart = useCallback(() => {
-    setAnswers({})
+    setAnswers((prev) => {
+      const uma = prev.umaInicio
+      return (uma ? { umaInicio: uma } : {}) as Answers
+    })
     setIndex(0)
     setPhase('intro')
     setError(null)
@@ -164,41 +183,9 @@ export function useWizard(allSteps: WizardStepDef[], initialValues?: Partial<Ans
 
   // ---- Ejecutar calculo final ----
   const calculate = useCallback((): string => {
-    console.group(`[DIAG] useWizard.calculate()`)
-    console.log(`answers enviadas al adapter:`, JSON.parse(JSON.stringify(answers)))
-
-    // 1. Sincronizar todas las respuestas con el motor legacy
     syncAllToLegacy(answers)
-    console.log(`window.wizardState DESPUES de syncAllToLegacy:`)
-    const ws = (window as any).wizardState
-    console.log(`  step:`, ws?.step)
-    console.log(`  tipoProceso:`, ws?.tipoProceso)
-    console.log(`  valorUMA:`, ws?.valorUMA)
-    console.log(`  modoTerminacion:`, ws?.modoTerminacion)
-    console.log(`  sentenciaResultado:`, ws?.sentenciaResultado)
-    console.log(`  aperturaPrueba:`, ws?.aperturaPrueba)
-    console.log(`  caducidadCriterio:`, ws?.caducidadCriterio)
-    console.log(`  tuvoExcepciones:`, ws?.tuvoExcepciones)
-    console.log(`  sucesionUnicoLetrado:`, ws?.sucesionUnicoLetrado)
-    console.log(`  medidaOposicion:`, ws?.medidaOposicion)
-    console.log(`  homologacionVivienda:`, ws?.homologacionVivienda)
-    console.log(`  objetoBase:`, ws?.objetoBase)
-    console.log(`  desalojoVivienda:`, ws?.desalojoVivienda)
-    console.log(`  posesoriasTipo:`, ws?.posesoriasTipo)
-    console.log(`  baseValor:`, ws?.baseValor)
-    console.log(`  esProvisorio:`, ws?.esProvisorio)
-    console.log(`  desdeMinimos:`, ws?.desdeMinimos)
-    console.log(`  desdeResultado:`, ws?.desdeResultado)
-    console.log(`window.wizardState === wizardState (let en state.js):`, ws === (window as any).wizardState)
-
-    // 2. Recolectar datos (el motor legacy lee inputs del DOM)
     adapters.recolectarDatos()
-
-    // 3. Ejecutar calculo y capturar HTML
-    const result = adapters.calcularFinalHTML()
-    console.log(`HTML final length:`, result?.length ?? 0)
-    console.groupEnd()
-    return result
+    return adapters.calcularFinalHTML()
   }, [answers])
 
   return {
@@ -208,6 +195,7 @@ export function useWizard(allSteps: WizardStepDef[], initialValues?: Partial<Ans
     answers,
     visibleSteps,
     totalSteps,
+    maxTotalSteps,
     completedSteps,
     errorMessage,
     setAnswer,
@@ -221,9 +209,6 @@ export function useWizard(allSteps: WizardStepDef[], initialValues?: Partial<Ans
 
 // ---- Helpers de sincronizacion ----
 
-/**
- * Sincroniza una respuesta individual con el wizardState del motor legacy.
- */
 function syncToLegacy(stepId: string, value: string | string[] | number | boolean | null) {
   const ws = adapters.getWizardState()
   const mapping: Record<string, keyof WizardState> = {
@@ -250,9 +235,6 @@ function syncToLegacy(stepId: string, value: string | string[] | number | boolea
   }
 }
 
-/**
- * Transforma el formato de respuesta React al formato que espera el motor legacy.
- */
 function transformToLegacy(
   stepId: string,
   value: string | string[] | number | boolean | null,
@@ -299,10 +281,6 @@ function transformToLegacy(
   }
 }
 
-/**
- * Sincroniza todas las respuestas acumuladas con el motor legacy.
- * Se llama antes de calcularFinal().
- */
 function syncAllToLegacy(answers: Answers) {
   for (const [stepId, value] of Object.entries(answers)) {
     if (value !== undefined && value !== null) {

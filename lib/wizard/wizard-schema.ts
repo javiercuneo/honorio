@@ -372,16 +372,18 @@ export const LEGAL_STEPS: WizardStepDef[] = [
     min: 50000,
     max: 200000,
     step: 1,
-    default: 92482,
+    default: 0,
     format: pesos,
     explicacion: {
       brief: 'Ver más',
-      expanded: 'Esta informacion se utiliza para el calculo arancelario.',
-      full: ['Complete los datos segun corresponda.'],
+      expanded: 'Para comprobar el valor podes ingresar en https//www.csjn.gov.ar/decisiones/acordadas y filtrar por las que dicen "Determinar el valor de la Unidad de Medida Arancelaria (UMA)"',
+      full: [
+        'ARTÍCULO 19. Institúyese la Unidad de Medida Arancelaria (UMA) para los honorarios profesionales de los abogados, procuradores y auxiliares de la Justicia, la que equivaldrá al 3 %  de la remuneración básica asignada al cargo de juez federal de primera instancia. La Corte Suprema de Justicia de la Nación suministrará y publicará mensualmente, por el medio a determinar por dicho Alto Tribunal, el valor resultante, eliminando las fracciones decimales, e informará a las diferentes cámaras el valor de la UMA',
+      ],
     },
   },
 
-  // Paso 1: Tipo de proceso
+    // Paso 1: Tipo de proceso
   {
     id: 'tipoProceso',
     kind: 'cards',
