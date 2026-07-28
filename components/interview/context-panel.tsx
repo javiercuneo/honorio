@@ -106,8 +106,7 @@ export function ContextPanel({
       </div>
 
       <p className="px-2 text-[12px] leading-relaxed text-muted-foreground/80">
-        Cada respuesta alimenta el calculo final. Puede revisar cualquier
-        decision desde este panel.
+        Las opciones que elijas se ven reflejadas en este panel
       </p>
     </aside>
   )

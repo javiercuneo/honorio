@@ -22,8 +22,12 @@ const instrumentSerif = Instrument_Serif({
 export const metadata: Metadata = {
   title: 'Honorio',
   description:
-    'Asistente para la regulación de honorarios',
+    'Asistente para la regulaciA3n de honorarios',
   generator: 'v0.app',
+  icons: {
+    icon: '/honorio.png',
+    apple: '/honorio.png',
+  },
 }
 
 export const viewport: Viewport = {

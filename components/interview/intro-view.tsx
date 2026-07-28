@@ -18,13 +18,11 @@ export function IntroView({ onStart }: { onStart: () => void }) {
       </span>
 
       <h1 className="mt-6 text-balance font-serif text-5xl leading-[1.02] tracking-tight text-foreground md:text-6xl">
-        Liquide sus honorarios judiciales paso a paso.
+        Honorio es un asistente para la regulación de honorarios profesionales
       </h1>
 
       <p className="mt-5 max-w-md text-pretty text-[16px] leading-relaxed text-muted-foreground">
-        Responda unas pocas preguntas sobre el proceso y obtenga el calculo
-        completo de honorarios segun la Ley 27.423, con escala, minimos y
-        auxiliares de justicia.
+        A través de la selección de opciones, obtenés el cálculo que corresponde a la ley 27.423
       </p>
 
       <div className="mt-8 flex flex-wrap gap-x-6 gap-y-3">

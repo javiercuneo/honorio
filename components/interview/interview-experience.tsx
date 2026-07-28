@@ -1,4 +1,4 @@
-// ---------------------------------------------------------------
+﻿// ---------------------------------------------------------------
 // components/interview/interview-experience.tsx
 // Orquestador principal del wizard legal.
 // Usa el schema declarativo (ALL_STEPS) y el hook useWizard.
@@ -13,7 +13,7 @@
 
 import { useCallback, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
-import { ArrowLeft, ArrowRight, Scale } from 'lucide-react'
+import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ALL_STEPS, type WizardStepDef } from '@/lib/wizard/wizard-schema'
 import { useWizard } from '@/hooks/useWizard'
@@ -23,15 +23,18 @@ import { ContextPanel } from './context-panel'
 import { StepShell } from './step-shell'
 import { NumericField } from './numeric-field'
 import { CardsField } from './cards-field'
+import { LandingView } from './landing-view'
 import { IntroView } from './intro-view'
 import { DashboardView } from './dashboard-view'
 
 const transition = { duration: 0.4, ease: [0.22, 1, 0.36, 1] as const }
 
 export function InterviewExperience() {
+  const [showLanding, setShowLanding] = useState(true)
   const { umaValorCargado } = useLegacyReady()
   const initialUma = umaValorCargado ? { umaInicio: umaValorCargado } : undefined
   const wizard = useWizard(ALL_STEPS, initialUma)
+
   const [direction, setDirection] = useState(1)
 
   const go = useCallback((dir: number, updater: () => void) => {
@@ -58,6 +61,11 @@ export function InterviewExperience() {
   const hasAnswer = wizard.currentStep
     ? isStepAnswered(wizard.currentStep, wizard.answers)
     : false
+
+  // ---- Landing ----
+  if (showLanding) {
+    return <LandingView onStart={() => setShowLanding(false)} />
+  }
 
   // ---- Dashboard ----
   if (wizard.phase === 'dashboard') {
@@ -94,6 +102,7 @@ export function InterviewExperience() {
         {/* Header */}
         <header className="flex items-center justify-between gap-6 py-6">
           <Brand />
+          {wizard.phase === 'question' ? (
           <div className="hidden w-64 md:block lg:w-80">
             <ProgressRail
               total={wizard.totalSteps}
@@ -101,9 +110,11 @@ export function InterviewExperience() {
               completed={wizard.completedSteps}
             />
           </div>
+          ) : null}
         </header>
 
         {/* Mobile progress */}
+        {wizard.phase === 'question' ? (
         <div className="mb-2 md:hidden">
           <ProgressRail
             total={wizard.totalSteps}
@@ -111,6 +122,7 @@ export function InterviewExperience() {
             completed={wizard.completedSteps}
           />
         </div>
+        ) : null}
 
         {/* Body */}
         <div className="grid flex-1 items-start gap-10 py-8 md:grid-cols-[minmax(0,1fr)_320px] md:gap-14 lg:gap-20">
@@ -223,12 +235,7 @@ export function InterviewExperience() {
 
 function Brand() {
   return (
-    <div className="flex items-center gap-2.5">
-      <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-foreground text-background">
-        <Scale className="h-4 w-4" />
-      </div>
-      <span className="text-[15px] font-medium tracking-tight">Honorio</span>
-    </div>
+    <img src="/honorio.png" alt="Honorio" className="h-8 w-auto" />
   )
 }
 
@@ -241,13 +248,17 @@ function IntroAside() {
       className="hidden rounded-3xl border border-border bg-card p-6 md:block"
     >
       <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-        Como funciona
+        ¿Cómo funciona?
+
       </p>
       <div className="mt-5 space-y-5">
         {[
-          { n: '01', t: 'Un paso a la vez', d: 'Cada pantalla presenta una sola decision clara.' },
-          { n: '02', t: 'El calculo se construye en vivo', d: 'Cada respuesta alimenta el resultado final.' },
-          { n: '03', t: 'Resultado completo', d: 'El asistente genera los honorarios segun la Ley 27.423.' },
+          { n: '01', t: 'Configuración', d: 'Ingresá el valor de la UMA' },
+          { n: '02', t: 'Seleccioná el tipo de proceso', d: 'Ejecutivo, Sucesión y demás' },
+          { n: '03', t: 'Indicá opciones procesles que cambian el cálculo', d: 'El juicio terminó por sentencia, acuerdo, etc.' },
+          { n: '04', t: 'Elegí el objeto del juicio', d: 'Desalojo, Escrituración, u otros' },
+          { n: '05', t: 'Ingresá la base regulatoria', d: 'El monto del juicio' },
+          { n: '06', t: 'Obtené el cálculo', d: 'Según las variables elegidas' },
         ].map((item) => (
           <div key={item.n} className="flex gap-4">
             <span className="font-mono text-[12px] text-muted-foreground/70">{item.n}</span>

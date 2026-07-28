@@ -52,11 +52,10 @@ export function DashboardView({ wizard, onBack, onRestart }: DashboardViewProps)
             Calculo generado
           </span>
           <h1 className="mt-4 text-balance font-serif text-4xl leading-[1.02] tracking-tight text-foreground md:text-5xl">
-            Liquidacion de honorarios
+            Resultados
           </h1>
           <p className="mt-2 max-w-lg text-[15px] leading-relaxed text-muted-foreground">
-            Resultado del calculo de honorarios segun la Ley 27.423 en base a
-            los datos ingresados.
+            Cálculo en base a los datos ingresados
           </p>
         </div>
         <div className="flex shrink-0 items-center gap-2">
@@ -74,7 +73,7 @@ export function DashboardView({ wizard, onBack, onRestart }: DashboardViewProps)
             className="h-10 rounded-full px-5"
           >
             <RotateCcw className="mr-1.5 h-4 w-4" />
-            Nuevo calculo
+            Nuevo cálculo
           </Button>
         </div>
       </motion.header>
