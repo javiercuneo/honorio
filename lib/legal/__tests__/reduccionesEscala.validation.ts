@@ -1,4 +1,4 @@
-// ---------------------------------------------------------------
+﻿// ---------------------------------------------------------------
 // Test de equivalencia: aplicarReduccionesEscala() (TS) vs legacy
 //
 // Verifica que el bloque extraido produzca exactamente los mismos
@@ -9,33 +9,12 @@
 
 import { aplicarReduccionesEscala, type ReduccionesEscalaInput } from '../calculate'
 
-// ---- Legacy reference: logic from calculations.js lineas 139-158 ----
-function legacyFactorEscala(input: {
-  tipoProceso: string
-  sucesionUnicoLetrado?: boolean | null
-  modoTerminacion?: string
-  caducidadCriterio?: string
-  aperturaPrueba?: boolean | null
-}): number {
+// ---- Legacy reference: simplified to domain booleans ----
+function legacyFactorEscala(input: ReduccionesEscalaInput): number {
   let factor = 1
-  if (input.tipoProceso === 'sucesion' && input.sucesionUnicoLetrado) {
-    factor *= 0.5
-  }
-  if (input.tipoProceso === 'ejecucion_sentencia') {
-    factor *= 0.5
-  }
-  if (
-    (input.tipoProceso === 'conocimiento' || input.tipoProceso === 'ejecucion_sentencia' || input.tipoProceso === 'ejecutivo') &&
-    input.modoTerminacion === 'modos_anormales' && input.aperturaPrueba === false
-  ) {
-    factor *= 0.5
-  }
-  if (
-    (input.tipoProceso === 'conocimiento' || input.tipoProceso === 'ejecucion_sentencia' || input.tipoProceso === 'ejecutivo') &&
-    input.modoTerminacion === 'caducidad' && input.caducidadCriterio === 'art25' && input.aperturaPrueba === false
-  ) {
-    factor *= 0.5
-  }
+  if (input.aplicaArt35) { factor *= 0.5 }
+  if (input.aplicaArt41) { factor *= 0.5 }
+  if (input.aplicaArt25) { factor *= 0.5 }
   return factor
 }
 
@@ -50,68 +29,64 @@ interface TestCase {
 const TEST_CASES: TestCase[] = [
   {
     label: 'sin reducciones',
-    input: { tipoProceso: 'conocimiento', modoTerminacion: 'sentencia', aperturaPrueba: null },
+    input: {},
     expectReduccionesCount: 0,
   },
   {
     label: 'unico letrado sucesion -50%',
-    input: { tipoProceso: 'sucesion', sucesionUnicoLetrado: true },
+    input: { aplicaArt35: true },
     expectReduccionesCount: 1,
     expectIds: ['escala-unico-letrado'],
   },
   {
     label: 'ejecucion sentencia -50%',
-    input: { tipoProceso: 'ejecucion_sentencia' },
+    input: { aplicaArt41: true },
     expectReduccionesCount: 1,
     expectIds: ['escala-ejecucion-sentencia'],
   },
   {
-    label: 'modos anormales sin prueba -50%',
-    input: { tipoProceso: 'conocimiento', modoTerminacion: 'modos_anormales', aperturaPrueba: false },
+    label: 'art.25 (modos anormales o caducidad) -50%',
+    input: { aplicaArt25: true },
     expectReduccionesCount: 1,
-    expectIds: ['escala-modos-anormales-sin-prueba'],
+    expectIds: ['escala-art25'],
   },
   {
-    label: 'caducidad art25 sin prueba -50%',
-    input: { tipoProceso: 'ejecutivo', modoTerminacion: 'caducidad', caducidadCriterio: 'art25', aperturaPrueba: false },
+    label: 'art.25 (caducidad art25) -50%',
+    input: { aplicaArt25: true },
     expectReduccionesCount: 1,
-    expectIds: ['escala-caducidad-art25-sin-prueba'],
+    expectIds: ['escala-art25'],
   },
   {
-    label: 'ejecucion + modos anormales (multiplicativo)',
-    input: { tipoProceso: 'ejecucion_sentencia', modoTerminacion: 'modos_anormales', aperturaPrueba: false },
+    label: 'ejecucion + art.25 (multiplicativo)',
+    input: { aplicaArt41: true, aplicaArt25: true },
     expectReduccionesCount: 2,
-    expectIds: ['escala-ejecucion-sentencia', 'escala-modos-anormales-sin-prueba'],
+    expectIds: ['escala-ejecucion-sentencia', 'escala-art25'],
   },
   {
-    label: 'ejecucion + caducidad art25 (multiplicativo)',
-    input: { tipoProceso: 'ejecucion_sentencia', modoTerminacion: 'caducidad', caducidadCriterio: 'art25', aperturaPrueba: false },
+    label: 'art.25 + art.35 (multiplicativo)',
+    input: { aplicaArt35: true, aplicaArt25: true },
     expectReduccionesCount: 2,
-    expectIds: ['escala-ejecucion-sentencia', 'escala-caducidad-art25-sin-prueba'],
+    expectIds: ['escala-unico-letrado', 'escala-art25'],
   },
   {
-    label: 'modos anormales CON prueba => no aplica',
-    input: { tipoProceso: 'conocimiento', modoTerminacion: 'modos_anormales', aperturaPrueba: true },
+    label: 'todos juntos (multiplicativo)',
+    input: { aplicaArt25: true, aplicaArt35: true, aplicaArt41: true },
+    expectReduccionesCount: 3,
+    expectIds: ['escala-unico-letrado', 'escala-ejecucion-sentencia', 'escala-art25'],
+  },
+  {
+    label: 'art.25 false => no aplica',
+    input: { aplicaArt25: false },
     expectReduccionesCount: 0,
   },
   {
-    label: 'caducidad art22 => no aplica reduccion escala',
-    input: { tipoProceso: 'conocimiento', modoTerminacion: 'caducidad', caducidadCriterio: 'art22', aperturaPrueba: false },
+    label: 'art.35 false',
+    input: { aplicaArt35: false },
     expectReduccionesCount: 0,
   },
   {
-    label: 'sucesion sin unico letrado',
-    input: { tipoProceso: 'sucesion', sucesionUnicoLetrado: false },
-    expectReduccionesCount: 0,
-  },
-  {
-    label: 'conocimiento + sentencia admitida',
-    input: { tipoProceso: 'conocimiento', modoTerminacion: 'sentencia', aperturaPrueba: null },
-    expectReduccionesCount: 0,
-  },
-  {
-    label: 'ejecutivo + caducidad art25 + prueba (no aplica)',
-    input: { tipoProceso: 'ejecutivo', modoTerminacion: 'caducidad', caducidadCriterio: 'art25', aperturaPrueba: true },
+    label: 'art.41 false',
+    input: { aplicaArt41: false },
     expectReduccionesCount: 0,
   },
 ]
@@ -126,7 +101,7 @@ console.log('========================================\n')
 
 for (const tc of TEST_CASES) {
   const label = tc.label.padEnd(40)
-  const legacyFactor = legacyFactorEscala(tc.input as any)
+  const legacyFactor = legacyFactorEscala(tc.input)
   const modernResult = aplicarReduccionesEscala(tc.input)
 
   // Compare factorEscala

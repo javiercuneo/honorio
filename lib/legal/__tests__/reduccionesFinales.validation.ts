@@ -6,25 +6,12 @@
 
 import { aplicarReduccionesFinales, type ReduccionesFinalesInput } from '../calculate'
 
-// ---- Legacy reference: logic from calculations.js lineas 160-177 ----
-function legacyFactorFinal(input: {
-  tipoProceso: string
-  tuvoExcepciones?: boolean | null
-  objetoBase?: string
-  posesoriasTipo?: string | null
-}): number {
+// ---- Legacy reference: simplified to domain booleans ----
+function legacyFactorFinal(input: ReduccionesFinalesInput): number {
   let factor = 1
-  if (input.tipoProceso === 'ejecutivo' && input.tuvoExcepciones === false) {
-    factor = 0.9
-  } else if (input.tipoProceso === 'ejecucion_sentencia' && input.tuvoExcepciones === false) {
-    factor = 0.9
-  }
-  if (input.tipoProceso === 'conocimiento' && input.objetoBase === 'posesorias_interdictos' && input.posesoriasTipo === 'beneficio') {
-    factor *= 0.8
-  }
-  if (input.tipoProceso === 'conocimiento' && input.objetoBase === 'incidencia_colectiva') {
-    factor *= 0.75
-  }
+  if (input.aplicaArt34) { factor = 0.9 }
+  if (input.aplicaArt38) { factor *= 0.8 }
+  if (input.aplicaArt49) { factor *= 0.75 }
   return factor
 }
 
@@ -39,61 +26,64 @@ interface TestCase {
 const TEST_CASES: TestCase[] = [
   {
     label: 'sin reducciones',
-    input: { tipoProceso: 'conocimiento', objetoBase: 'sumas_dinero' },
+    input: {},
     expectReduccionesCount: 0,
   },
   {
-    label: 'ejecutivo sin excepciones -10%',
-    input: { tipoProceso: 'ejecutivo', tuvoExcepciones: false },
-    expectReduccionesCount: 1,
-    expectIds: ['final-ejecutivo-sin-excepciones'],
-  },
-  {
-    label: 'ejecucion sentencia sin excepciones -10%',
-    input: { tipoProceso: 'ejecucion_sentencia', tuvoExcepciones: false },
+    label: 'art.34 (ejecutivo/ejecucion sin excepciones) -10%',
+    input: { aplicaArt34: true },
     expectReduccionesCount: 1,
     expectIds: ['final-ejecucion-sin-excepciones'],
   },
   {
-    label: 'posesorias beneficio -20%',
-    input: { tipoProceso: 'conocimiento', objetoBase: 'posesorias_interdictos', posesoriasTipo: 'beneficio' },
+    label: 'art.38 (posesorias beneficio) -20%',
+    input: { aplicaArt38: true },
     expectReduccionesCount: 1,
     expectIds: ['final-posesorias-beneficio'],
   },
   {
-    label: 'incidencia colectiva -25%',
-    input: { tipoProceso: 'conocimiento', objetoBase: 'incidencia_colectiva' },
+    label: 'art.49 (incidencia colectiva) -25%',
+    input: { aplicaArt49: true },
     expectReduccionesCount: 1,
     expectIds: ['final-incidencia-colectiva'],
   },
   {
-    label: 'ejecutivo CON excepciones => no aplica',
-    input: { tipoProceso: 'ejecutivo', tuvoExcepciones: true },
+    label: 'art.34 + art.38 (multiplicativo)',
+    input: { aplicaArt34: true, aplicaArt38: true },
+    expectReduccionesCount: 2,
+    expectIds: ['final-ejecucion-sin-excepciones', 'final-posesorias-beneficio'],
+  },
+  {
+    label: 'art.34 + art.49 (multiplicativo)',
+    input: { aplicaArt34: true, aplicaArt49: true },
+    expectReduccionesCount: 2,
+    expectIds: ['final-ejecucion-sin-excepciones', 'final-incidencia-colectiva'],
+  },
+  {
+    label: 'art.38 + art.49 (multiplicativo)',
+    input: { aplicaArt38: true, aplicaArt49: true },
+    expectReduccionesCount: 2,
+    expectIds: ['final-posesorias-beneficio', 'final-incidencia-colectiva'],
+  },
+  {
+    label: 'todos juntos (multiplicativo)',
+    input: { aplicaArt34: true, aplicaArt38: true, aplicaArt49: true },
+    expectReduccionesCount: 3,
+    expectIds: ['final-ejecucion-sin-excepciones', 'final-posesorias-beneficio', 'final-incidencia-colectiva'],
+  },
+  {
+    label: 'art.34 false => no aplica',
+    input: { aplicaArt34: false },
     expectReduccionesCount: 0,
   },
   {
-    label: 'ejecucion sentencia CON excepciones => no aplica',
-    input: { tipoProceso: 'ejecucion_sentencia', tuvoExcepciones: true },
+    label: 'art.38 false => no aplica',
+    input: { aplicaArt38: false },
     expectReduccionesCount: 0,
   },
   {
-    label: 'ejecutivo con excepciones null => no aplica',
-    input: { tipoProceso: 'ejecutivo', tuvoExcepciones: null },
-    expectReduccionesCount: 0,
-  },
-  {
-    label: 'posesorias otro tipo (demas) => no aplica',
-    input: { tipoProceso: 'conocimiento', objetoBase: 'posesorias_interdictos', posesoriasTipo: 'demas' },
-    expectReduccionesCount: 0,
-  },
-  {
-    label: 'conocimiento + desalojo => no aplica reduccion final',
-    input: { tipoProceso: 'conocimiento', objetoBase: 'desalojo' },
-    expectReduccionesCount: 0,
-  },
-  {
-    label: 'sucesion => no aplica ninguna',
-    input: { tipoProceso: 'sucesion' },
+    label: 'art.49 false => no aplica',
+    input: { aplicaArt49: false },
     expectReduccionesCount: 0,
   },
 ]
@@ -108,7 +98,7 @@ console.log('========================================\n')
 
 for (const tc of TEST_CASES) {
   const label = tc.label.padEnd(40)
-  const legacyFactor = legacyFactorFinal(tc.input as any)
+  const legacyFactor = legacyFactorFinal(tc.input)
   const modernResult = aplicarReduccionesFinales(tc.input)
 
   // Compare factorFinal

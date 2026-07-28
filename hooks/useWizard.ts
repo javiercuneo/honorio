@@ -1,4 +1,4 @@
-// ---------------------------------------------------------------
+﻿// ---------------------------------------------------------------
 // hooks/useWizard.ts
 // Hook de orquestacion del wizard legal.
 // Conecta el schema declarativo con los adapters del motor legacy.
@@ -51,10 +51,10 @@ export function useWizard(allSteps: WizardStepDef[], initialValues?: Partial<Ans
   const visibleSteps = useMemo(() => {
     const tipo = answers.tipoProceso as string | undefined
     const stepIds = tipo ? PROCESS_STEP_MAP[tipo] : undefined
-    if (stepIds) {
-      return allSteps.filter(s => stepIds.includes(s.id))
-    }
-    return allSteps.filter((step) => {
+    const candidates = stepIds
+      ? allSteps.filter(s => stepIds.includes(s.id))
+      : allSteps
+    return candidates.filter((step) => {
       if (!step.condition) return true
       return step.condition(answers)
     })

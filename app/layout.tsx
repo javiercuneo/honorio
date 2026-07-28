@@ -20,9 +20,9 @@ const instrumentSerif = Instrument_Serif({
 })
 
 export const metadata: Metadata = {
-  title: 'Meridian — Guided Setup',
+  title: 'Honorio',
   description:
-    'A calm, guided interview that walks you through one decision at a time.',
+    'Asistente para la regulación de honorarios',
   generator: 'v0.app',
 }
 

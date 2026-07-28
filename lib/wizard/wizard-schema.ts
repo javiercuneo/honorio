@@ -1,4 +1,4 @@
-// ---------------------------------------------------------------
+﻿// ---------------------------------------------------------------
 // lib/wizard/wizard-schema.ts
 // Schema declarativo del wizard legal.
 // Define cada paso, sus opciones, dependencias y validaciones.
@@ -482,7 +482,7 @@ export const STEP_MODO_TERMINACION: CardsStepDef = {
   select: 'single',
   eyebrow: 'Terminacion',
   pregunta: 'Forma de terminacion del proceso',
-  ayuda: 'El modo en que termina el proceso afecta directamente el calculo de honorarios.',
+  ayuda: 'El modo en que termina el proceso tiene un impacto directo en el calculo, ya que afecta tanto la alicuota aplicable como la base economica. Por favor, selecciona la forma de finalizacion para ajustar el resultado a las pautas legales correspondientes',
   resumenLabel: 'Terminacion',
   options: MODOS_TERMINACION,
   dependsOn: ['tipoProceso'],
@@ -490,8 +490,10 @@ export const STEP_MODO_TERMINACION: CardsStepDef = {
     ['conocimiento', 'ejecucion_sentencia', 'ejecutivo'].includes(answers.tipoProceso as string),
   explicacion: {
       brief: 'Seleccione la opcion que corresponda al caso.',
-      expanded: 'Esta informacion se utiliza para el calculo arancelario.',
-      full: ['Complete los datos segun corresponda.'],
+      expanded: 'El modo en que termina el proceso tiene un impacto directo en el calculo, ya que afecta tanto la alicuota aplicable como la base economica. Por favor, selecciona la forma de finalizacion para ajustar el resultado a las pautas legales correspondientes',
+      full: [
+        'Art. 12: Si un profesional se aparta de un proceso o gestion antes de su conclusion normal, puede solicitar regulacion provisoria de honorarios, los que se fijaran en el minimo que le hubiere podido corresponder conforme a las actuaciones cumplidas.',
+      ],
     },
 }
 
@@ -508,8 +510,10 @@ export const STEP_SENTENCIA_RESULTADO: CardsStepDef = {
   condition: (answers) => answers.modoTerminacion === 'sentencia',
   explicacion: {
       brief: 'Seleccione la opcion que corresponda al caso.',
-      expanded: 'Esta informacion se utiliza para el calculo arancelario.',
-      full: ['Complete los datos segun corresponda.'],
+      expanded: 'Cuando la demanda es rechazada, para establecer la base el monto se disminuye en un 30%. Al elegir esta opcion, el monto de la base que ingreses en los pasos siguientes, se reducira en ese porcentaje.',
+      full: [
+        'Art. 22: Si fuere integramente desestimada la demanda o la reconvencion, se tendra como valor del pleito el importe de la misma, actualizado por intereses al momento de la sentencia, si ello correspondiere, disminuido en un 30%',
+      ],
     },
 }
 
@@ -528,8 +532,10 @@ export const STEP_APERTURA_PRUEBA: CardsStepDef = {
     (answers.modoTerminacion === 'caducidad' && answers.caducidadCriterio === 'art25'),
   explicacion: {
       brief: 'Seleccione la opcion que corresponda al caso.',
-      expanded: 'Esta informacion se utiliza para el calculo arancelario.',
-      full: ['Complete los datos segun corresponda.'],
+      expanded: 'En los modos anormales de terminacion (allanamiento, desistimiento, transaccion) y en la caducidad tratada como art. 25, el momento respecto de la apertura a prueba determina si se reduce la escala.',
+      full: [
+        'Art. 25: En caso de allanamiento, desistimiento y transaccion, antes de decretarse la apertura a prueba, los honorarios seran del 50% de la escala del articulo 21. En los demas casos, se aplica el 100% de dicha escala.',
+      ],
     },
 }
 
@@ -539,15 +545,18 @@ export const STEP_CADUCIDAD_CRITERIO: CardsStepDef = {
   select: 'single',
   eyebrow: 'Caducidad',
   pregunta: 'Criterio para la caducidad',
-  ayuda: 'Elija como tratar la caducidad de instancia.',
+  ayuda: 'La caducidad de la instancia (arts. 310 y ss. CPCCN) no se menciona explicitamente como una categoria separada en la ley. Por eso, podes elegir tratarla: i) como "demanda desestimada", en cuyo caso la base se va a reducir en un 30%; ii) o bien como los demas modos anormales de terminacion del proceso (allanamiento, desistimiento y transaccion) que si menciona la ley en el art. 25. En este ultimo caso, si el juicio no se abrio a prueba, los honorarios son el 50% de la escala del art. 21.',
   resumenLabel: 'Caducidad',
   options: CADUCIDAD_CRITERIO,
   dependsOn: ['modoTerminacion'],
   condition: (answers) => answers.modoTerminacion === 'caducidad',
   explicacion: {
       brief: 'Seleccione la opcion que corresponda al caso.',
-      expanded: 'Esta informacion se utiliza para el calculo arancelario.',
-      full: ['Complete los datos segun corresponda.'],
+      expanded: 'La caducidad puede tratarse como demanda desestimada (art. 22) reduciendo la base en un 30%, o como modo anormal (art. 25) reduciendo la escala al 50% si ocurre antes de la apertura a prueba.',
+      full: [
+        'Art. 22: Si fuere integramente desestimada la demanda o la reconvencion, se tendra como valor del pleito el importe de la misma, actualizado por intereses al momento de la sentencia, si ello correspondiere, disminuido en un 30%',
+        'Art. 25: En caso de allanamiento, desistimiento y transaccion, antes de decretarse la apertura a prueba, los honorarios seran del 50% de la escala del articulo 21. En los demas casos, se aplica el 100% de dicha escala.',
+      ],
     },
 }
 
@@ -557,7 +566,7 @@ export const STEP_EXCEPCIONES: CardsStepDef = {
   select: 'single',
   eyebrow: 'Excepciones',
   pregunta: 'Se dedujeron excepciones?',
-  ayuda: 'En ejecuciones, la ausencia de excepciones reduce los honorarios en un 10%.',
+  ayuda: 'La oposicion de excepciones es un factor determinante en los procesos de ejecucion, ya que su ausencia genera una reduccion directa del 10% sobre el monto que corresponderia regular.',
   resumenLabel: 'Excepciones',
   options: EXCEPCIONES,
   dependsOn: ['tipoProceso'],
@@ -565,8 +574,11 @@ export const STEP_EXCEPCIONES: CardsStepDef = {
     ['ejecucion_sentencia', 'ejecutivo'].includes(answers.tipoProceso as string),
   explicacion: {
       brief: 'Seleccione la opcion que corresponda al caso.',
-      expanded: 'Esta informacion se utiliza para el calculo arancelario.',
-      full: ['Complete los datos segun corresponda.'],
+      expanded: 'En las ejecuciones, si no se dedujeron excepciones los honorarios se reducen en un 10%.',
+      full: [
+        'Art. 34: En los juicios ejecutivos y ejecuciones especiales, no habiendo excepciones, los honorarios se reduciran en un 10%',
+        'Art. 41: En el procedimiento de ejecucion de sentencias, no habiendo excepciones, los honorarios se reduciran en un 10%',
+      ],
     },
 }
 
@@ -576,15 +588,17 @@ export const STEP_SUCESION_LETRADO: CardsStepDef = {
   select: 'single',
   eyebrow: 'Letrado',
   pregunta: 'Cuantos abogados intervienen?',
-  ayuda: 'Si un solo letrado patrocina a todos los herederos, los honorarios se reducen al 50%.',
+  ayuda: 'En los procesos sucesorios, la existencia de un abogado unico para todos los herederos es un factor determinante ya que segun el art. 35, los honorarios deben regularse en la mitad de la escala del art. 21. Es necesario que indiques si hubo uno o mas letrados para aplicar este tope especifico.',
   resumenLabel: 'Unico letrado',
   options: SUCESION_LETRADO,
   dependsOn: ['tipoProceso'],
   condition: (answers) => answers.tipoProceso === 'sucesion',
   explicacion: {
       brief: 'Seleccione la opcion que corresponda al caso.',
-      expanded: 'Esta informacion se utiliza para el calculo arancelario.',
-      full: ['Complete los datos segun corresponda.'],
+      expanded: 'Si un solo abogado patrocina a todos los herederos, los honorarios se reducen al 50% de la escala.',
+      full: [
+        'Art. 35: En el proceso sucesorio, si 1 solo abogado patrocina o representa a todos los herederos o interesados, sus honorarios se regularan en la mitad del minimo y del maximo de la escala establecida en el art. 21.',
+      ],
     },
 }
 
@@ -594,15 +608,17 @@ export const STEP_CAUTELAR_OPOSICION: CardsStepDef = {
   select: 'single',
   eyebrow: 'Oposicion',
   pregunta: 'Hubo oposicion en la cautelar?',
-  ayuda: 'La existencia de controversia modifica el porcentaje de la escala aplicable.',
+  ayuda: 'En las medidas cautelares, la existencia de oposicion o controversia tiene un impacto directo en el calculo de los honorarios, ya que modifica el porcentaje de la escala aplicable. Sin oposicion: los honorarios se regulan tomando como base el 25% de la escala del art. 21. Con oposicion: la base para el calculo se eleva al 50% de dicha escala.',
   resumenLabel: 'Oposicion',
   options: CAUTELAR_OPOSICION,
   dependsOn: ['tipoProceso'],
   condition: (answers) => answers.tipoProceso === 'medida_cautelar',
   explicacion: {
       brief: 'Seleccione la opcion que corresponda al caso.',
-      expanded: 'Esta informacion se utiliza para el calculo arancelario.',
-      full: ['Complete los datos segun corresponda.'],
+      expanded: 'Sin oposicion: 25% de la escala. Con oposicion: 50% de la escala.',
+      full: [
+        'Art. 37: En las medidas cautelares, ya sea que estas tramiten autonomamente, en forma incidental o dentro del proceso, los honorarios se regularan sobre el monto que se pretende asegurar, aplicandose como base el 25% de la escala del art. 21; salvo casos de controversia u oposicion, en que la base se elevara al 50%',
+      ],
     },
 }
 
@@ -612,15 +628,17 @@ export const STEP_HOMOLOGACION_VIVIENDA: CardsStepDef = {
   select: 'single',
   eyebrow: 'Vivienda',
   pregunta: 'La locacion era para vivienda?',
-  ayuda: 'Si era para vivienda, la base se reduce en un 20% adicional.',
+  ayuda: 'Seleccione el tipo de locacion:',
   resumenLabel: 'Tipo vivienda',
   options: HOMOLOGACION_VIVIENDA,
   dependsOn: ['tipoProceso'],
   condition: (answers) => answers.tipoProceso === 'homologacion_desocupacion',
   explicacion: {
       brief: 'Seleccione la opcion que corresponda al caso.',
-      expanded: 'Esta informacion se utiliza para el calculo arancelario.',
-      full: ['Complete los datos segun corresponda.'],
+      expanded: 'Si la locacion era para vivienda, la base se reduce en un 20%.',
+      full: [
+        'Art. 40: En los procesos de desalojo se fijaran los honorarios de acuerdo con la escala del art. 21, tomando como base el total de los alquileres del contrato. En el caso de que la locacion sea para vivienda y/o habitacion, tal monto se reducira en un 20%',
+      ],
     },
 }
 
@@ -630,14 +648,9 @@ export const STEP_HOMOLOGACION_VIVIENDA: CardsStepDef = {
 export const PROCESS_STEP_MAP: Record<string, string[]> = {
   exhorto: ['umaInicio', 'tipoProceso'],
   incidente: ['umaInicio', 'tipoProceso', 'base'],
-  conocimiento: ['umaInicio', 'tipoProceso', 'modoTerminacion',
-    'sentenciaResultado', 'caducidadCriterio', 'aperturaPrueba', 'objeto', 'base'],
-  ejecucion_sentencia: ['umaInicio', 'tipoProceso', 'modoTerminacion',
-    'sentenciaResultado', 'caducidadCriterio', 'aperturaPrueba',
-    'tuvoExcepciones', 'base'],
-  ejecutivo: ['umaInicio', 'tipoProceso', 'modoTerminacion',
-    'sentenciaResultado', 'caducidadCriterio', 'aperturaPrueba',
-    'tuvoExcepciones', 'base'],
+  conocimiento: ['umaInicio', 'tipoProceso', 'modoTerminacion', 'sentenciaResultado', 'caducidadCriterio', 'aperturaPrueba', 'objeto', 'base'],
+  ejecucion_sentencia: ['umaInicio', 'tipoProceso', 'modoTerminacion', 'sentenciaResultado', 'caducidadCriterio', 'aperturaPrueba', 'tuvoExcepciones', 'base'],
+  ejecutivo: ['umaInicio', 'tipoProceso', 'modoTerminacion', 'sentenciaResultado', 'caducidadCriterio', 'aperturaPrueba', 'tuvoExcepciones', 'base'],
   sucesion: ['umaInicio', 'tipoProceso', 'sucesionUnicoLetrado', 'base'],
   medida_cautelar: ['umaInicio', 'tipoProceso', 'medidaOposicion', 'base'],
   homologacion_desocupacion: ['umaInicio', 'tipoProceso', 'homologacionVivienda', 'base'],
