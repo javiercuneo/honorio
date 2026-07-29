@@ -1,81 +1,111 @@
-import type { CalculoResultado } from "@/lib/legal/types"
+﻿import type { CalculoResultado, Rango, Transformacion, SegundaInstanciaRol } from "@/lib/legal/types"
 import { ResumenCalculo } from "./ResumenCalculo"
-import { EscalaIndicator } from "./EscalaIndicator"
 import { NormativaStrip } from "./NormativaStrip"
-import { ProfessionalCard } from "./ProfessionalCard"
+import { PanelControlHonorarios } from "./PanelControlHonorarios"
 import { AuxiliaresSection } from "./AuxiliaresSection"
+import { PartidorSection } from "./PartidorSection"
+import { ExhortoResult } from "./ExhortoResult"
+import { IncidenteResult } from "./IncidenteResult"
 
 interface DashboardProps {
   resultado: CalculoResultado
   modoTerminacion?: string
   sentenciaResultado?: string
   objetoBase?: string
+  tuvoExcepciones?: string
+  sucesionUnicoLetrado?: string
+  medidaOposicion?: string
+  homologacionVivienda?: string
+  caducidadCriterio?: string
+  aperturaPrueba?: string
 }
 
-export function Dashboard({ resultado, modoTerminacion, sentenciaResultado, objetoBase }: DashboardProps) {
+interface RoleInput {
+  rol: "patrocinante" | "apoderado" | "procurador"
+  label: string
+  rango: Rango
+  transformaciones: Transformacion[]
+  segundaInstancia: SegundaInstanciaRol | undefined
+}
+
+export function Dashboard({ resultado, modoTerminacion, sentenciaResultado, objetoBase, tuvoExcepciones, sucesionUnicoLetrado, medidaOposicion, homologacionVivienda, caducidadCriterio, aperturaPrueba }: DashboardProps) {
+  if (resultado.tipoProceso === "exhorto") {
+    return <ExhortoResult resultado={resultado} />
+  }
+  if (resultado.tipoProceso === "incidente") {
+    return <IncidenteResult resultado={resultado} />
+  }
+
   const { patrocinante, apoderado, procurador } = resultado.honorarios
   const hasApoderado = (apoderado?.rango?.maxPesos ?? 0) > 0
 
+  const roles: RoleInput[] = [
+    {
+      rol: "patrocinante",
+      label: "Patrocinante",
+      rango: patrocinante.rango,
+      transformaciones: resultado.transformaciones.filter(
+        (t) => t.visible && (t.id.includes("patrocinante") || t.etapa !== "base")
+      ),
+      segundaInstancia: resultado.segundaInstancia?.patrocinante,
+    },
+  ]
+
+  if (hasApoderado) {
+    roles.push({
+      rol: "apoderado",
+      label: "Apoderado",
+      rango: apoderado.rango,
+      transformaciones: resultado.transformaciones.filter(
+        (t) => t.visible && (t.id.includes("apoderado") || t.etapa !== "base")
+      ),
+      segundaInstancia: resultado.segundaInstancia?.apoderado,
+    })
+  }
+
+  if (procurador?.rango) {
+    roles.push({
+      rol: "procurador",
+      label: "Procurador",
+      rango: procurador.rango,
+      transformaciones: resultado.transformaciones.filter(
+        (t) => t.visible && (t.id.includes("procurador") || t.etapa !== "base")
+      ),
+      segundaInstancia: resultado.segundaInstancia?.procurador,
+    })
+  }
+
   return (
     <div className="mx-auto max-w-5xl space-y-5">
-      <div className="grid gap-5 md:grid-cols-2 md:items-stretch">
-        <ResumenCalculo
-          tipoProceso={resultado.tipoProceso}
-          modoTerminacion={modoTerminacion}
-          sentenciaResultado={sentenciaResultado}
-          esProvisorio={resultado.esProvisorio}
-          objetoBase={objetoBase}
-          baseOriginal={resultado.baseOriginal}
-          baseFinal={resultado.baseFinal}
-          valorUMA={resultado.valorUMA}
-        />
-
-        {resultado.escala && (
-          <EscalaIndicator escala={resultado.escala} />
-        )}
-      </div>
+      <ResumenCalculo
+        tipoProceso={resultado.tipoProceso}
+        modoTerminacion={modoTerminacion}
+        sentenciaResultado={sentenciaResultado}
+        esProvisorio={resultado.esProvisorio}
+        objetoBase={objetoBase}
+        baseOriginal={resultado.baseOriginal}
+        baseFinal={resultado.baseFinal}
+        valorUMA={resultado.valorUMA}
+        tuvoExcepciones={tuvoExcepciones}
+        sucesionUnicoLetrado={sucesionUnicoLetrado}
+        medidaOposicion={medidaOposicion}
+        homologacionVivienda={homologacionVivienda}
+        caducidadCriterio={caducidadCriterio}
+        aperturaPrueba={aperturaPrueba}
+        escala={resultado.escala}
+        transformaciones={resultado.transformaciones}
+      />
 
       <NormativaStrip transformaciones={resultado.transformaciones} />
 
-      <ProfessionalCard
-        rol="patrocinante"
-        label="Patrocinante"
-        rango={patrocinante.rango}
-        transformaciones={resultado.transformaciones.filter(
-          (t) => t.visible && (t.id.includes("patrocinante") || t.etapa !== "base")
-        )}
-        segundaInstancia={resultado.segundaInstancia?.patrocinante}
-      />
+      <PanelControlHonorarios roles={roles} esProvisorio={resultado.esProvisorio} />
 
-      {(hasApoderado || procurador?.rango) && (
-        <div className="grid gap-5 md:grid-cols-2">
-          {hasApoderado && (
-            <ProfessionalCard
-              rol="apoderado"
-              label="Apoderado"
-              rango={apoderado.rango}
-              transformaciones={resultado.transformaciones.filter(
-                (t) => t.visible && (t.id.includes("apoderado") || t.etapa !== "base")
-              )}
-              segundaInstancia={resultado.segundaInstancia?.apoderado}
-            />
-          )}
-          {procurador?.rango && (
-            <ProfessionalCard
-              rol="procurador"
-              label="Procurador"
-              rango={procurador.rango}
-              transformaciones={resultado.transformaciones.filter(
-                (t) => t.visible && (t.id.includes("procurador") || t.etapa !== "base")
-              )}
-              segundaInstancia={resultado.segundaInstancia?.procurador}
-            />
-          )}
-        </div>
+      {resultado.partidor && (
+        <PartidorSection partidor={resultado.partidor} esProvisorio={resultado.esProvisorio} />
       )}
 
       {resultado.auxiliares && (
-        <AuxiliaresSection rango={resultado.auxiliares} />
+        <AuxiliaresSection rango={resultado.auxiliares} esProvisorio={resultado.esProvisorio} />
       )}
     </div>
   )

@@ -14,6 +14,7 @@ import type {
   EscalaResult,
   GrupoResult,
   MinimosModo,
+  CalculoResultado,
 } from './types'
 import { buildCalculationResult, PROCESS_REGISTRY } from './calculate'
 import { renderLegacyHTML } from './render-legacy'
@@ -112,7 +113,20 @@ export function calcularHonorariosPorGrupo(
 }
 
 /**
+ * Construye el resultado estructurado del calculo de honorarios.
+ * Retorna CalculoResultado directamente desde el motor TS puro,
+ * sin pasar por renderizado HTML.
+ * Usado por el Dashboard React como fuente unica de datos.
+ */
+export function calcularResultadoEstructurado(): CalculoResultado {
+  const state = getWizardState()
+  return buildCalculationResult(state)
+}
+
+/**
  * Ejecuta calcularFinal() del motor legacy.
+ * Se mantiene temporalmente como fallback de validacion
+ * contra la salida del Dashboard React.
  */
 export function calcularFinalHTML(): string {
   const resultadoId = 'resultadosDinamicos'

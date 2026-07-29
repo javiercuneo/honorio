@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { motion } from 'motion/react'
 
@@ -8,10 +8,11 @@ type ProgressRailProps = {
   current: number
   /** how many steps have a saved answer */
   completed: number
+  /** show a numeric "completed/total" label next to the bar */
   showFraction?: boolean
 }
 
-export function ProgressRail({ total, current, completed, showFraction = true }: ProgressRailProps) {
+export function ProgressRail({ total, current, completed, showFraction }: ProgressRailProps) {
   return (
     <div className="flex items-center gap-4">
       <div className="flex flex-1 items-center gap-1.5" aria-hidden="true">
@@ -41,13 +42,11 @@ export function ProgressRail({ total, current, completed, showFraction = true }:
           )
         })}
       </div>
-      {showFraction ? (
-        <span className="shrink-0 font-mono text-xs tabular-nums tracking-wider text-muted-foreground">
-          {String(Math.min(current + 1, total)).padStart(2, '0')}
-          <span className="mx-0.5 opacity-40">/</span>
-          {String(total).padStart(2, '0')}
+      {showFraction && (
+        <span className="shrink-0 font-mono text-[11px] tabular-nums text-muted-foreground">
+          {completed}/{total}
         </span>
-      ) : null}
+      )}
     </div>
   )
 }

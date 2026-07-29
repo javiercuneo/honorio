@@ -10,8 +10,8 @@ type ContextPanelProps = {
   steps: WizardStepDef[]
   answers: Answers
   currentIndex: number
+  maxTotalSteps: number
   onJump: (index: number) => void
-  maxTotalSteps?: number
 }
 
 function isStepAnswered(step: WizardStepDef, answers: Answers): boolean {
@@ -25,10 +25,10 @@ export function ContextPanel({
   steps,
   answers,
   currentIndex,
-  onJump,
   maxTotalSteps,
+  onJump,
 }: ContextPanelProps) {
-  const answered = steps.filter((s) => isStepAnswered(s, answers)).length
+  const answeredCount = steps.filter((step) => isStepAnswered(step, answers)).length
   const showGeneric = !answers.tipoProceso
   const displaySteps = showGeneric && currentIndex < steps.length - 1
     ? steps.slice(0, Math.min(currentIndex + 1, steps.length)).concat({ id: "pending", resumenLabel: "Siguiente paso", pregunta: "", ayuda: "", explicacion: { brief: "", expanded: "", full: [] }, eyebrow: "" } as any)
@@ -42,7 +42,7 @@ export function ContextPanel({
             Resumen del caso
           </h2>
           <span className="font-mono text-[11px] tabular-nums text-muted-foreground">
-            {answers.tipoProceso ? `${answered}/${maxTotalSteps ?? steps.length}` : ''}
+            {answers.tipoProceso ? `${answeredCount}/${maxTotalSteps}` : ''}
           </span>
         </div>
 

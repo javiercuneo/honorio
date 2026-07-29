@@ -1,4 +1,4 @@
-export function pesos(value: number): string {
+﻿export function pesos(value: number): string {
   if (!isFinite(value)) return 'N/A'
   return "$" + value.toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 }
@@ -33,7 +33,7 @@ export const TERMINACION_LABEL: Record<string, string> = {
 
 export const SENTENCIA_LABEL: Record<string, string> = {
   admitida: "Demanda admitida",
-  rechazada: "Demanda rechazada",
+  rechazada: "Demanda desestimada",
 }
 
 export const OBJETO_LABEL: Record<string, string> = {
@@ -49,4 +49,45 @@ export const OBJETO_LABEL: Record<string, string> = {
   familia_liquidacion: "Liquidacion de sociedad conyugal",
   posesorias_interdictos: "Posesorias e interdictos",
   incidencia_colectiva: "Incidencia colectiva",
+}
+
+export const EXCEPCIONES_LABEL: Record<string, string> = {
+  si: "Con excepciones",
+  no: "Sin excepciones",
+}
+
+export const CADUCIDAD_CRITERIO_LABEL: Record<string, string> = {
+  art22: "Caducidad como demanda desestimada",
+  art25: "Caducidad como modo anormal",
+}
+
+export const APERTURA_PRUEBA_LABEL: Record<string, string> = {
+  antes: "Antes de apertura a prueba",
+  despues: "Despues de apertura a prueba",
+}
+
+export const SUCESION_LETRADO_LABEL: Record<string, string> = {
+  unico: "Unico letrado",
+  varios: "Varios letrados",
+}
+
+export const MEDIDA_OPOSICION_LABEL: Record<string, string> = {
+  con: "Con oposicion",
+  sin: "Sin oposicion",
+}
+
+export const HOMOLOGACION_VIVIENDA_LABEL: Record<string, string> = {
+  vivienda: "Alquiler vivienda",
+  otros: "Demas casos",
+}
+
+export const DESALOJO_TIPO_LABEL: Record<string, string> = {
+  vivienda: "Alquiler vivienda",
+  civil: "Desalojo civil",
+  laboral: "Desalojo laboral",
+}
+
+export const POSESORIAS_TIPO_LABEL: Record<string, string> = {
+  beneficio: "Beneficio exclusivo",
+  demas: "Demas casos",
 }

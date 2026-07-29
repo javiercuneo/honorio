@@ -1,8 +1,8 @@
-'use client'
+﻿'use client'
 
 import { useMemo } from "react"
 import { motion } from "motion/react"
-import { ArrowLeft, RotateCcw } from "lucide-react"
+import { ArrowLeft, RotateCcw, FileSpreadsheet } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import type { UseWizardReturn } from "@/hooks/useWizard"
 import { calcularResultadoEstructurado } from "@/lib/legal/adapters"
@@ -18,7 +18,7 @@ type DashboardViewProps = {
 }
 
 export function DashboardView({ wizard, onBack, onRestart, onShowMinimos }: DashboardViewProps) {
-  const { resultado, modoTerminacion, sentenciaResultado, objetoBase } = useMemo(() => {
+  const { resultado, modoTerminacion, sentenciaResultado, objetoBase, tuvoExcepciones, sucesionUnicoLetrado, medidaOposicion, homologacionVivienda, caducidadCriterio, aperturaPrueba } = useMemo(() => {
     try {
       wizard.calculate()
       const result = calcularResultadoEstructurado()
@@ -27,6 +27,12 @@ export function DashboardView({ wizard, onBack, onRestart, onShowMinimos }: Dash
         modoTerminacion: wizard.answers.modoTerminacion as string | undefined,
         sentenciaResultado: wizard.answers.sentenciaResultado as string | undefined,
         objetoBase: wizard.answers.objeto as string | undefined,
+        tuvoExcepciones: wizard.answers.tuvoExcepciones as string | undefined,
+        sucesionUnicoLetrado: wizard.answers.sucesionUnicoLetrado as string | undefined,
+        medidaOposicion: wizard.answers.medidaOposicion as string | undefined,
+        homologacionVivienda: wizard.answers.homologacionVivienda as string | undefined,
+        caducidadCriterio: wizard.answers.caducidadCriterio as string | undefined,
+        aperturaPrueba: wizard.answers.aperturaPrueba as string | undefined,
       }
     } catch (e: unknown) {
       return { resultado: null, modoTerminacion: undefined, sentenciaResultado: undefined }
@@ -39,19 +45,11 @@ export function DashboardView({ wizard, onBack, onRestart, onShowMinimos }: Dash
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease }}
-        className="flex flex-col gap-4 border-b border-border py-8 md:flex-row md:items-end md:justify-between"
+        className="flex items-center justify-between border-b border-border py-8"
       >
-        <div>
-          <span className="inline-flex items-center gap-2 rounded-full bg-accent px-3 py-1 font-mono text-[11px] uppercase tracking-[0.18em] text-accent-foreground">
-            Calculo generado
-          </span>
-          <h1 className="mt-4 text-balance font-serif text-4xl leading-[1.02] tracking-tight text-foreground md:text-5xl">
-            Resultados
-          </h1>
-          <p className="mt-2 max-w-lg text-[15px] leading-relaxed text-muted-foreground">
-            Calculo en base a los datos ingresados
-          </p>
-        </div>
+        <h1 className="font-serif text-4xl leading-[1.02] tracking-tight text-foreground md:text-5xl">
+          Resultados
+        </h1>
         <div className="flex shrink-0 items-center gap-2">
           <Button
             variant="ghost"
@@ -62,19 +60,20 @@ export function DashboardView({ wizard, onBack, onRestart, onShowMinimos }: Dash
             Revisar
           </Button>
           <Button
+            variant="ghost"
+            onClick={onShowMinimos}
+            className="h-10 rounded-full px-4 text-muted-foreground"
+          >
+            <FileSpreadsheet className="mr-1.5 h-4 w-4" />
+            Ver mínimos
+          </Button>
+          <Button
             variant="outline"
             onClick={onRestart}
             className="h-10 rounded-full px-5"
           >
             <RotateCcw className="mr-1.5 h-4 w-4" />
             Nuevo calculo
-          </Button>
-          <Button
-            variant="ghost"
-            onClick={onShowMinimos}
-            className="h-10 rounded-full px-5"
-          >
-            Ver minimos
           </Button>
         </div>
       </motion.header>
@@ -91,6 +90,12 @@ export function DashboardView({ wizard, onBack, onRestart, onShowMinimos }: Dash
               modoTerminacion={modoTerminacion}
               sentenciaResultado={sentenciaResultado}
               objetoBase={objetoBase}
+              tuvoExcepciones={tuvoExcepciones}
+              sucesionUnicoLetrado={sucesionUnicoLetrado}
+              medidaOposicion={medidaOposicion}
+              homologacionVivienda={homologacionVivienda}
+              caducidadCriterio={caducidadCriterio}
+              aperturaPrueba={aperturaPrueba}
             />
           ) : (
             <div className="rounded-2xl border border-border bg-card p-10 text-center">

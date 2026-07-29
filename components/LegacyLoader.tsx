@@ -9,6 +9,7 @@
 
 import { useEffect, useState, createContext, useContext, type ReactNode } from 'react'
 import * as adapters from '@/lib/legal/adapters'
+import { withBasePath } from '@/lib/basePath'
 
 interface LegacyContextType {
   ready: boolean
@@ -22,7 +23,7 @@ export function useLegacyReady() {
   return useContext(LegacyContext)
 }
 
-const SCRIPTS = ['/legacy/core.js', '/legacy/state.js', '/legacy/calculations.js']
+const SCRIPTS = ['/legacy/core.js', '/legacy/state.js', '/legacy/calculations.js'].map(withBasePath)
 
 async function loadScript(src: string): Promise<void> {
   const response = await fetch(src)

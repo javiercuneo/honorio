@@ -1,6 +1,7 @@
 ﻿import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import { Geist, Geist_Mono, Instrument_Serif } from 'next/font/google'
+import { withBasePath } from '@/lib/basePath'
 import './globals.css'
 
 const geistSans = Geist({
@@ -22,11 +23,11 @@ const instrumentSerif = Instrument_Serif({
 export const metadata: Metadata = {
   title: 'Honorio',
   description:
-    'Asistente para la regulaciA3n de honorarios',
+    'Asistente para la regulación de honorarios',
   generator: 'v0.app',
   icons: {
-    icon: '/honorio.png',
-    apple: '/honorio.png',
+    icon: withBasePath('/honorio.png'),
+    apple: withBasePath('/honorio.png'),
   },
 }
 
@@ -42,7 +43,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="es"
       className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} bg-background`}
     >
       <body className="font-sans antialiased">

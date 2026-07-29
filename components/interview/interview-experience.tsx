@@ -18,6 +18,7 @@ import { Button } from '@/components/ui/button'
 import { ALL_STEPS, type WizardStepDef } from '@/lib/wizard/wizard-schema'
 import { useWizard } from '@/hooks/useWizard'
 import { useLegacyReady } from '@/components/LegacyLoader'
+import { withBasePath } from '@/lib/basePath'
 import { ProgressRail } from './progress-rail'
 import { ContextPanel } from './context-panel'
 import { StepShell } from './step-shell'
@@ -302,7 +303,7 @@ export function InterviewExperience() {
 
 function Brand() {
   return (
-    <img src="/honorio.png" alt="Honorio" width="147" className="h-auto" />
+    <img src={withBasePath('/honorio.png')} alt="Honorio" width="147" className="h-auto" />
   )
 }
 
