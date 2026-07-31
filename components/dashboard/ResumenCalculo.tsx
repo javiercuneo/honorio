@@ -1,6 +1,10 @@
+"use client"
+
+import { useState } from "react"
 import { TrendingDown, ChevronDown } from "lucide-react"
-import { pesos, porcentaje, PROCESO_LABEL, TERMINACION_LABEL, SENTENCIA_LABEL, OBJETO_LABEL, EXCEPCIONES_LABEL, CADUCIDAD_CRITERIO_LABEL, APERTURA_PRUEBA_LABEL, SUCESION_LETRADO_LABEL, MEDIDA_OPOSICION_LABEL, HOMOLOGACION_VIVIENDA_LABEL } from "./format"
+import { pesos, porcentaje, formatNumberImpactful, PROCESO_LABEL, TERMINACION_LABEL, SENTENCIA_LABEL, OBJETO_LABEL, EXCEPCIONES_LABEL, CADUCIDAD_CRITERIO_LABEL, APERTURA_PRUEBA_LABEL, SUCESION_LETRADO_LABEL, MEDIDA_OPOSICION_LABEL, HOMOLOGACION_VIVIENDA_LABEL, DESALOJO_TIPO_LABEL, POSESORIAS_TIPO_LABEL } from "./format"
 import type { ProcesoTipo, EscalaAplicada, Transformacion } from "@/lib/legal/types"
+import { ScaleBreakdownModal } from "./ScaleBreakdownModal"
 
 interface ResumenCalculoProps {
   tipoProceso: ProcesoTipo
@@ -17,34 +21,75 @@ interface ResumenCalculoProps {
   homologacionVivienda?: string
   caducidadCriterio?: string
   aperturaPrueba?: string
+  desalojoVivienda?: string
+  posesoriasTipo?: string
   escala?: EscalaAplicada
   transformaciones?: Transformacion[]
-}
-
-function abrev(value: number): string {
-  if (!isFinite(value) || value === 0) return "$0"
-  if (value >= 1_000_000_000) return "$" + (value / 1_000_000_000).toFixed(1).replace(".0", "") + "B"
-  if (value >= 1_000_000) return "$" + (value / 1_000_000).toFixed(1).replace(".0", "") + "M"
-  return "$" + value.toLocaleString("es-AR", { minimumFractionDigits: 0, maximumFractionDigits: 0 })
 }
 
 function pct(v: number): string {
   return v + "%"
 }
 
-const ESCALAS_ART21 = [
-  { num: 1, rango: "Hasta 15", minPct: 22, maxPct: 33 },
-  { num: 2, rango: "16 a 45", minPct: 20, maxPct: 26 },
-  { num: 3, rango: "46 a 90", minPct: 18, maxPct: 24 },
-  { num: 4, rango: "91 a 150", minPct: 17, maxPct: 22 },
-  { num: 5, rango: "151 a 450", minPct: 15, maxPct: 20 },
-  { num: 6, rango: "451 a 750", minPct: 13, maxPct: 17 },
-  { num: 7, rango: "+751", minPct: 12, maxPct: 15 },
-]
+// Eje del calculo que cada decision del wizard afecta.
+// Se corresponde con resolveReglas() / las etapas de Transformacion:
+//   base       -> reduce la base regulatoria (art. 22, 40)
+//   escala     -> modifica los porcentajes de la escala (art. 25, 35, 37, 41)
+//   honorarios -> ajusta el honorario final o el reparto por etapas (art. 34, 38, 49)
+// Sin eje = dato estructural o de contexto (no altera importes por si mismo).
+type Axis = 'base' | 'escala' | 'honorarios' | null
 
-function Chip({ label }: { label: string }) {
+const CHIP_AXIS: Record<string, Axis> = {
+  tipoProceso: null,
+  objetoBase: 'base',
+  desalojoVivienda: 'base',
+  homologacionVivienda: 'base',
+  sentenciaResultado: 'base',
+  caducidadCriterio: 'base',
+  aperturaPrueba: 'escala',
+  sucesionUnicoLetrado: 'escala',
+  medidaOposicion: 'escala',
+  modoTerminacion: 'honorarios',
+  tuvoExcepciones: 'honorarios',
+  posesoriasTipo: 'honorarios',
+}
+
+// Clases completas y estaticas (Tailwind no puede resolver nombres compuestos).
+const CHIP_AXIS_CLASS: Record<Exclude<Axis, null>, string> = {
+  base: 'border-transparent bg-axis-base-tint text-axis-base-tint-foreground',
+  escala: 'border-transparent bg-axis-escala-tint text-axis-escala-tint-foreground',
+  honorarios: 'border-transparent bg-axis-honorarios-tint text-axis-honorarios-tint-foreground',
+}
+
+const CHIP_NEUTRAL_CLASS = 'border-border bg-muted/30 text-muted-foreground'
+
+const AXIS_TITLE: Record<Exclude<Axis, null>, string> = {
+  base: 'Incide en la base regulatoria',
+  escala: 'Incide en la escala aplicable',
+  honorarios: 'Incide en el honorario final',
+}
+
+const AXIS_LEGEND: Record<Exclude<Axis, null>, string> = {
+  base: 'Base',
+  escala: 'Escala',
+  honorarios: 'Honorarios',
+}
+
+const AXIS_DOT_CLASS: Record<Exclude<Axis, null>, string> = {
+  base: 'bg-axis-base',
+  escala: 'bg-axis-escala',
+  honorarios: 'bg-axis-honorarios',
+}
+
+const AXIS_ORDER: Exclude<Axis, null>[] = ['base', 'escala', 'honorarios']
+
+function Chip({ label, axis = null, title }: { label: string; axis?: Axis; title?: string }) {
+  const tone = axis ? CHIP_AXIS_CLASS[axis] : CHIP_NEUTRAL_CLASS
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-muted/30 px-3 py-1 font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
+    <span
+      title={title}
+      className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-1 font-mono text-[11px] uppercase tracking-wider ${tone}`}
+    >
       {label}
     </span>
   )
@@ -65,9 +110,12 @@ export function ResumenCalculo({
   homologacionVivienda,
   caducidadCriterio,
   aperturaPrueba,
+  desalojoVivienda,
+  posesoriasTipo,
   escala,
   transformaciones,
 }: ResumenCalculoProps) {
+  const [scaleModalOpen, setScaleModalOpen] = useState(false)
   const label = PROCESO_LABEL[tipoProceso] ?? tipoProceso
   const sentenciaLabel = sentenciaResultado ? SENTENCIA_LABEL[sentenciaResultado] : null
   const baseEnUMA = valorUMA > 0 ? baseFinal / valorUMA : 0
@@ -100,23 +148,46 @@ export function ResumenCalculo({
     sucesionUnicoLetrado: sucesionUnicoLetrado ? SUCESION_LETRADO_LABEL[sucesionUnicoLetrado] : undefined,
     medidaOposicion: medidaOposicion ? MEDIDA_OPOSICION_LABEL[medidaOposicion] : undefined,
     homologacionVivienda: homologacionVivienda ? HOMOLOGACION_VIVIENDA_LABEL[homologacionVivienda] : undefined,
+    desalojoVivienda: desalojoVivienda ? DESALOJO_TIPO_LABEL[desalojoVivienda] : undefined,
+    posesoriasTipo: posesoriasTipo ? POSESORIAS_TIPO_LABEL[posesoriasTipo] : undefined,
   }
 
-  const escalera = escala?.escalera
-  const scaleMatch = escala?.titulo.match(/\d+/)
-  const currentScale = scaleMatch ? parseInt(scaleMatch[0], 10) : null
+  const ejesPresentes = AXIS_ORDER.filter((axis) =>
+    Object.entries(answerValues).some(([key, v]) => Boolean(v) && CHIP_AXIS[key] === axis),
+  )
 
   return (
     <div className="flex h-full flex-col rounded-2xl border border-border bg-card px-6 pb-6 pt-6 md:px-8 md:pb-8 md:pt-8">
       <h2 className="text-xl font-bold text-foreground">Datos del caso</h2>
 
       <div className="mt-4 flex flex-wrap items-start gap-2">
-        {Object.values(answerValues).filter(Boolean).map((v, i) => (
-          <Chip key={i} label={v!} />
-        ))}
+        {Object.entries(answerValues)
+          .filter(([, v]) => Boolean(v))
+          .map(([key, v]) => {
+            const axis = CHIP_AXIS[key] ?? null
+            return (
+              <Chip
+                key={key}
+                label={v!}
+                axis={axis}
+                title={axis ? AXIS_TITLE[axis] : undefined}
+              />
+            )
+          })}
         <Chip label={"UMA: " + pesos(valorUMA)} />
         {esProvisorio && <Chip label="Provisorio" />}
       </div>
+
+      {ejesPresentes.length > 1 && (
+        <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+          {ejesPresentes.map((axis) => (
+            <span key={axis} className="inline-flex items-center gap-1.5">
+              <span className={`h-2 w-2 rounded-full ${AXIS_DOT_CLASS[axis]}`} />
+              {AXIS_LEGEND[axis]}
+            </span>
+          ))}
+        </div>
+      )}
 
       <div className="mt-6 grid grid-cols-[auto_1fr] gap-x-10 gap-y-8 items-center">
         <div className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
@@ -138,7 +209,9 @@ export function ResumenCalculo({
             </div>
           )}
           <div className="text-2xl font-bold tracking-tight text-foreground">
-            {abrev(baseFinal)}&nbsp;&nbsp;&nbsp;{baseEnUMA.toFixed(0)} UMA
+            <span title={pesos(baseFinal)}>{formatNumberImpactful(baseFinal).abrev}</span>
+            &nbsp;&nbsp;&nbsp;
+            <span>{baseEnUMA.toFixed(0)} UMA</span>
           </div>
           <div className="text-[13px] text-muted-foreground">
             ({pesos(baseFinal)})&nbsp;&nbsp;&nbsp;({baseEnUMA.toFixed(2)} UMA)
@@ -181,83 +254,23 @@ export function ResumenCalculo({
       </div>
 
       {escala && (
-        <details className="group mt-6 border-t border-border pt-4">
-          <summary className="flex cursor-pointer list-none items-center gap-2 font-mono text-[11px] uppercase tracking-wider text-muted-foreground transition-colors hover:text-foreground">
-            <ChevronDown className="h-3.5 w-3.5 transition-transform group-open:rotate-180" />
-            ¿Cómo se calcula el mínimo? (art. 21)
-          </summary>
-          <div className="mt-3 space-y-2 pl-5 text-[13px] leading-relaxed text-muted-foreground">
-            <p>
-              La escala del art. 21 se aplica por tramos: cada grado toma el máximo
-              acumulado del grado anterior y le suma la alícuota del tramo actual
-              sobre el excedente.
-            </p>
-            {escalera && escalera.maximoEscalaAnterior > 0 ? (
-              <p>
-                En este caso, el grado inmediato anterior acumula{" "}
-                <span className="font-medium text-foreground">
-                  {escalera.maximoEscalaAnterior.toFixed(2)} UMA
-                </span>{" "}
-                hasta{" "}
-                <span className="font-medium text-foreground">
-                  {escalera.limiteAnterior.toFixed(0)} UMA
-                </span>
-                . La base de este cálculo excede ese límite en{" "}
-                <span className="font-medium text-foreground">
-                  {escalera.excedente.toFixed(2)} UMA
-                </span>
-                , que es lo que se regula a la alícuota del tramo{" "}
-                {escala.titulo.split(":")[0]}.
-              </p>
-            ) : (
-              <p>
-                Esta base cae dentro del primer tramo de la escala, por lo que
-                no hay excedente de un grado anterior que sumar.
-              </p>
-            )}
+        <div className="mt-6 border-t border-border pt-4">
+          <button
+            onClick={() => setScaleModalOpen(true)}
+            className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <ChevronDown className="h-3.5 w-3.5" />
+            Ver desglose de escala (art. 21)
+          </button>
+        </div>
+      )}
 
-            <div className="mt-4 overflow-x-auto rounded-xl border border-border/60">
-              <table className="w-full border-collapse font-mono text-[11px]">
-                <thead>
-                  <tr className="border-b border-border/50 text-[10px] uppercase tracking-wider text-muted-foreground/50">
-                    <th className="px-3 py-2 text-left font-medium">Escala</th>
-                    <th className="px-3 py-2 text-right font-medium">UMA</th>
-                    <th className="px-3 py-2 text-right font-medium">Alícuotas</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {ESCALAS_ART21.map((row) => {
-                    const isActive = row.num === currentScale
-                    return (
-                      <tr
-                        key={row.num}
-                        className={
-                          isActive
-                            ? "border-l-2 border-axis-escala bg-axis-escala-tint font-semibold text-axis-escala-tint-foreground"
-                            : "text-muted-foreground/50"
-                        }
-                      >
-                        <td className="whitespace-nowrap px-3 py-1.5 text-left">
-                          {row.num}
-                        </td>
-                        <td className="px-3 py-1.5 text-right">
-                          {isActive && escala?.baseEnUMA != null
-                            ? escala.baseEnUMA.toFixed(0)
-                            : row.rango}
-                        </td>
-                        <td className="whitespace-nowrap px-3 py-1.5 text-right">
-                          {isActive
-                            ? `${pct(escala!.porcentajeMinAplicado)} a ${pct(escala!.porcentajeMaxAplicado)}`
-                            : `${row.minPct}% a ${row.maxPct}%`}
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </details>
+      {escala && (
+        <ScaleBreakdownModal
+          isOpen={scaleModalOpen}
+          onClose={() => setScaleModalOpen(false)}
+          escala={escala}
+        />
       )}
     </div>
   )

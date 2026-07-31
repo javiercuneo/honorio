@@ -1,6 +1,4 @@
-import { Scale } from "lucide-react"
-import { FormattedAmount } from "./FormattedAmount"
-import { umas } from "./format"
+import { pesos, formatNumberImpactful } from "./format"
 import type { Rango } from "@/lib/legal/types"
 
 interface AuxiliaresSectionProps {
@@ -10,42 +8,50 @@ interface AuxiliaresSectionProps {
 
 export function AuxiliaresSection({ rango, esProvisorio }: AuxiliaresSectionProps) {
   return (
-    <div>
-      <div className="mb-3 flex items-center gap-2">
-        <div className="h-px flex-1 bg-border" />
-        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground/40">
-          Auxiliares de justicia
-        </span>
-        <div className="h-px flex-1 bg-border" />
-      </div>
-
-      <div className="rounded-2xl border border-dashed border-border bg-card/50 p-5 md:p-6">
-        <div className="flex items-start gap-3">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-muted/40">
-            <Scale className="h-4 w-4 text-muted-foreground/60" />
-          </div>
-          <div className="flex-1">
-            <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-muted-foreground/60">
-              Regulacion de auxiliares
-            </p>
-            <div className="mt-2 flex items-end gap-6">
-              <div>
-                <FormattedAmount value={rango.minPesos} />
-                <p className="mt-0.5 font-mono text-[11px] text-muted-foreground/50">
-                  {umas(rango.minUMA)} minimo
-                </p>
-              </div>
-              {!esProvisorio && (
-                <div>
-                  <FormattedAmount value={rango.maxPesos} />
-                  <p className="mt-0.5 font-mono text-[11px] text-muted-foreground/50">
-                    {umas(rango.maxUMA)} maximo
-                  </p>
+    <div className="rounded-2xl border border-border bg-card">
+      <div className="overflow-x-auto">
+        <table className="w-full border-collapse font-mono text-[12px]">
+          <thead>
+            <tr className="border-b border-border/50 text-[10px] uppercase tracking-wider text-muted-foreground/50">
+              <th className="px-4 py-3 text-left font-medium">Auxiliares de justicia</th>
+              <th className="px-4 py-3 text-right font-medium">Monto</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border/30">
+            <tr>
+              <td className="px-4 py-3 text-left text-muted-foreground">
+                {esProvisorio ? "Mínimo" : "Rango"}
+              </td>
+              <td className="px-4 py-3">
+                <div className="text-right">
+                  <div className="whitespace-nowrap font-mono text-[12px]">
+                    <span className="text-value-min" title={pesos(rango.minPesos)}>
+                      {formatNumberImpactful(rango.minPesos).abrev}
+                    </span>
+                    {!esProvisorio && (
+                      <>
+                        {" / "}
+                        <span className="text-value-max" title={pesos(rango.maxPesos)}>
+                          {formatNumberImpactful(rango.maxPesos).abrev}
+                        </span>
+                      </>
+                    )}
+                  </div>
+                  <div className="whitespace-nowrap text-[10px] font-mono text-muted-foreground/70">
+                    {rango.minUMA.toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} UMA
+                    {!esProvisorio && (
+                      <>
+                        {" / "}
+                        {rango.maxUMA.toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}{" "}
+                        UMA
+                      </>
+                    )}
+                  </div>
                 </div>
-              )}
-            </div>
-          </div>
-        </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   )

@@ -650,13 +650,51 @@ export const STEP_HOMOLOGACION_VIVIENDA: CardsStepDef = {
     },
 }
 
+export const STEP_DESALOJO_TIPO: CardsStepDef = {
+  id: 'desalojoVivienda',
+  kind: 'cards',
+  select: 'single',
+  eyebrow: 'Tipo de desalojo',
+  pregunta: 'Especifique el tipo de desalojo',
+  ayuda: 'El cálculo se modifica según el tipo de desalojo (vivienda, civil o laboral)',
+  resumenLabel: 'Tipo de desalojo',
+  options: DESALOJO_TIPO,
+  dependsOn: ['objeto'],
+  condition: (answers) => answers.objeto === 'desalojo',
+  explicacion: {
+      brief: 'Ver más',
+      expanded: 'Los desalojos de vivienda tienen una reducción del 20% en la base regulatoria',
+      full: ['Complete el tipo de desalojo para continuar.'],
+    },
+}
+
+export const STEP_POSESORIAS_TIPO: CardsStepDef = {
+  id: 'posesoriasTipo',
+  kind: 'cards',
+  select: 'single',
+  eyebrow: 'Tipo de posesoria',
+  pregunta: 'Especifique el tipo de posesoria',
+  ayuda: 'Distingue entre beneficio exclusivo y demás casos',
+  resumenLabel: 'Tipo de posesoria',
+  options: POSESORIAS_TIPO,
+  dependsOn: ['objeto'],
+  condition: (answers) => answers.objeto === 'posesorias_interdictos',
+  explicacion: {
+      brief: 'Ver más',
+      expanded: 'Las posesorías tienen diferentes regulaciones según el tipo',
+      full: ['Complete el tipo de posesoria para continuar.'],
+    },
+}
+
 // ---- Mapa de pasos por tipo de proceso ----
 // Declara explicitamente que pasos necesita cada proceso.
 // Reemplaza gradualmente las conditions en cada step.
 export const PROCESS_STEP_MAP: Record<string, string[]> = {
   exhorto: ['umaInicio', 'tipoProceso'],
   incidente: ['umaInicio', 'tipoProceso', 'base'],
-  conocimiento: ['umaInicio', 'tipoProceso', 'modoTerminacion', 'sentenciaResultado', 'caducidadCriterio', 'aperturaPrueba', 'objeto', 'base'],
+  // desalojoVivienda y posesoriasTipo son sub-pasos mutuamente excluyentes de 'objeto':
+  // ambos se declaran aca y su `condition` decide cual se muestra.
+  conocimiento: ['umaInicio', 'tipoProceso', 'modoTerminacion', 'sentenciaResultado', 'caducidadCriterio', 'aperturaPrueba', 'objeto', 'desalojoVivienda', 'posesoriasTipo', 'base'],
   ejecucion_sentencia: ['umaInicio', 'tipoProceso', 'modoTerminacion', 'sentenciaResultado', 'caducidadCriterio', 'aperturaPrueba', 'tuvoExcepciones', 'base'],
   ejecutivo: ['umaInicio', 'tipoProceso', 'modoTerminacion', 'sentenciaResultado', 'caducidadCriterio', 'aperturaPrueba', 'tuvoExcepciones', 'base'],
   sucesion: ['umaInicio', 'tipoProceso', 'sucesionUnicoLetrado', 'base'],
@@ -678,5 +716,7 @@ export const ALL_STEPS: WizardStepDef[] = [
   STEP_CAUTELAR_OPOSICION,
   STEP_HOMOLOGACION_VIVIENDA,
   LEGAL_STEPS[2], // objeto
+  STEP_DESALOJO_TIPO,
+  STEP_POSESORIAS_TIPO,
   LEGAL_STEPS[3], // base
 ]

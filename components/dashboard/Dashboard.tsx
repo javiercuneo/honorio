@@ -18,6 +18,8 @@ interface DashboardProps {
   homologacionVivienda?: string
   caducidadCriterio?: string
   aperturaPrueba?: string
+  desalojoVivienda?: string
+  posesoriasTipo?: string
 }
 
 interface RoleInput {
@@ -28,7 +30,7 @@ interface RoleInput {
   segundaInstancia: SegundaInstanciaRol | undefined
 }
 
-export function Dashboard({ resultado, modoTerminacion, sentenciaResultado, objetoBase, tuvoExcepciones, sucesionUnicoLetrado, medidaOposicion, homologacionVivienda, caducidadCriterio, aperturaPrueba }: DashboardProps) {
+export function Dashboard({ resultado, modoTerminacion, sentenciaResultado, objetoBase, tuvoExcepciones, sucesionUnicoLetrado, medidaOposicion, homologacionVivienda, caducidadCriterio, aperturaPrueba, desalojoVivienda, posesoriasTipo }: DashboardProps) {
   if (resultado.tipoProceso === "exhorto") {
     return <ExhortoResult resultado={resultado} />
   }
@@ -92,11 +94,11 @@ export function Dashboard({ resultado, modoTerminacion, sentenciaResultado, obje
         homologacionVivienda={homologacionVivienda}
         caducidadCriterio={caducidadCriterio}
         aperturaPrueba={aperturaPrueba}
+        desalojoVivienda={desalojoVivienda}
+        posesoriasTipo={posesoriasTipo}
         escala={resultado.escala}
         transformaciones={resultado.transformaciones}
       />
-
-      <NormativaStrip transformaciones={resultado.transformaciones} />
 
       <PanelControlHonorarios roles={roles} esProvisorio={resultado.esProvisorio} />
 

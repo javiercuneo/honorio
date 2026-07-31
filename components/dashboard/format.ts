@@ -13,6 +13,23 @@ export function porcentaje(value: number): string {
   return (value * 100).toFixed(1) + "%"
 }
 
+export function formatNumberImpactful(value: number): { abrev: string; full: string } {
+  if (!isFinite(value) || value === 0) return { abrev: "$0", full: "$0" }
+
+  let abrev: string
+  if (value >= 1_000_000_000) {
+    abrev = "$" + (value / 1_000_000_000).toFixed(1).replace(".0", "") + "B"
+  } else if (value >= 1_000_000) {
+    abrev = "$" + (value / 1_000_000).toFixed(1).replace(".0", "") + "M"
+  } else if (value >= 1_000) {
+    abrev = "$" + (value / 1_000).toFixed(0) + "K"
+  } else {
+    abrev = pesos(value)
+  }
+
+  return { abrev, full: pesos(value) }
+}
+
 export const PROCESO_LABEL: Record<string, string> = {
   conocimiento: "Juicio de conocimiento",
   ejecucion_sentencia: "Ejecucion de sentencia",

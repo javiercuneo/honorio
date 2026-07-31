@@ -2,7 +2,7 @@
 // hooks/useWizard.ts
 // Hook de orquestacion del wizard legal.
 // Conecta el schema declarativo con los adapters del motor legacy.
-// NO contiene reglas juridicas — solo Orquestacion.
+// NO contiene reglas juridicas ï¿½ solo Orquestacion.
 //
 // Responsabilidades:
 // - Computar la lista de pasos visibles (segun condiciones del schema)
@@ -75,11 +75,29 @@ export function useWizard(allSteps: WizardStepDef[], initialValues?: Partial<Ans
   }, [allSteps, answers])
 
   const totalSteps = visibleSteps.length
+  // Total de pasos posibles para el proceso elegido.
+  // Se descuentan los pasos cuya condicion ya es definitivamente falsa
+  // (sus dependencias estan respondidas y no la cumplen), de modo que
+  // sub-pasos mutuamente excluyentes no inflen el total.
   const maxTotalSteps = useMemo(() => {
     const tipo = answers.tipoProceso as string | undefined
     if (!tipo) return visibleSteps.length
-    return PROCESS_STEP_MAP[tipo]?.length ?? visibleSteps.length
-  }, [answers.tipoProceso, visibleSteps.length])
+    const stepIds = PROCESS_STEP_MAP[tipo]
+    if (!stepIds) return visibleSteps.length
+    const visibleIds = new Set(visibleSteps.map((s) => s.id))
+    return allSteps.filter((step) => {
+      if (!stepIds.includes(step.id)) return false
+      if (!step.condition) return true
+      if (step.condition(answers)) return true
+      // Condicion aun indefinida: alguna dependencia esta visible y sin responder.
+      const deps = step.dependsOn ?? []
+      return deps.some((dep) => {
+        if (!visibleIds.has(dep)) return false
+        const v = answers[dep]
+        return v === undefined || v === null || v === ''
+      })
+    }).length
+  }, [allSteps, answers, visibleSteps.length])
   const completedSteps = visibleSteps.filter((s) => {
     const v = answers[s.id]
     return v !== undefined && v !== null && v !== ''
@@ -92,9 +110,22 @@ export function useWizard(allSteps: WizardStepDef[], initialValues?: Partial<Ans
     (value: string | string[] | number | boolean | null) => {
       if (!currentStep) return
       setError(null)
-      setAnswers((prev) => ({ ...prev, [currentStep.id]: value }))
+      setAnswers((prev) => {
+        const nextAnswers = { ...prev, [currentStep.id]: value } as Answers
+        // Al cambiar el objeto, la sub-opcion del objeto anterior deja de
+        // aplicar (equivalente a wizard.js: nulea el campo hermano).
+        if (currentStep.id === 'objeto') {
+          if (value !== 'desalojo') delete nextAnswers.desalojoVivienda
+          if (value !== 'posesorias_interdictos') delete nextAnswers.posesoriasTipo
+        }
+        return nextAnswers
+      })
 
       syncToLegacy(currentStep.id, value)
+      if (currentStep.id === 'objeto') {
+        if (value !== 'desalojo') syncToLegacy('desalojoVivienda', null)
+        if (value !== 'posesorias_interdictos') syncToLegacy('posesoriasTipo', null)
+      }
     },
     [currentStep],
   )
@@ -223,6 +254,8 @@ function syncToLegacy(stepId: string, value: string | string[] | number | boolea
     medidaOposicion: 'medidaOposicion',
     homologacionVivienda: 'homologacionVivienda',
     objeto: 'objetoBase',
+    desalojoVivienda: 'desalojoVivienda',
+    posesoriasTipo: 'posesoriasTipo',
     base: 'baseValor',
   }
 
@@ -260,6 +293,12 @@ function transformToLegacy(
 
     case 'caducidadCriterio':
       return typeof value === 'string' ? value : ''
+
+    // Sub-opciones de objeto: el motor espera el id crudo ('vivienda' |
+    // 'civil' | 'laboral') o null, igual que wizardState del motor clasico.
+    case 'desalojoVivienda':
+    case 'posesoriasTipo':
+      return typeof value === 'string' && value ? value : null
 
     case 'tuvoExcepciones':
       return value === 'si' ? true : value === 'no' ? false : null

@@ -18,7 +18,7 @@ type DashboardViewProps = {
 }
 
 export function DashboardView({ wizard, onBack, onRestart, onShowMinimos }: DashboardViewProps) {
-  const { resultado, modoTerminacion, sentenciaResultado, objetoBase, tuvoExcepciones, sucesionUnicoLetrado, medidaOposicion, homologacionVivienda, caducidadCriterio, aperturaPrueba } = useMemo(() => {
+  const { resultado, modoTerminacion, sentenciaResultado, objetoBase, tuvoExcepciones, sucesionUnicoLetrado, medidaOposicion, homologacionVivienda, caducidadCriterio, aperturaPrueba, desalojoVivienda, posesoriasTipo } = useMemo(() => {
     try {
       wizard.calculate()
       const result = calcularResultadoEstructurado()
@@ -33,6 +33,8 @@ export function DashboardView({ wizard, onBack, onRestart, onShowMinimos }: Dash
         homologacionVivienda: wizard.answers.homologacionVivienda as string | undefined,
         caducidadCriterio: wizard.answers.caducidadCriterio as string | undefined,
         aperturaPrueba: wizard.answers.aperturaPrueba as string | undefined,
+        desalojoVivienda: wizard.answers.desalojoVivienda as string | undefined,
+        posesoriasTipo: wizard.answers.posesoriasTipo as string | undefined,
       }
     } catch (e: unknown) {
       return { resultado: null, modoTerminacion: undefined, sentenciaResultado: undefined }
@@ -96,6 +98,8 @@ export function DashboardView({ wizard, onBack, onRestart, onShowMinimos }: Dash
               homologacionVivienda={homologacionVivienda}
               caducidadCriterio={caducidadCriterio}
               aperturaPrueba={aperturaPrueba}
+              desalojoVivienda={desalojoVivienda}
+              posesoriasTipo={posesoriasTipo}
             />
           ) : (
             <div className="rounded-2xl border border-border bg-card p-10 text-center">
