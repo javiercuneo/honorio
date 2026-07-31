@@ -101,7 +101,7 @@ export function IntroView({ onStart, onShowMinimos }: { onStart: () => void; onS
                   <ul className="mt-2 list-disc space-y-1.5 pl-4 text-[13px] leading-relaxed text-muted-foreground">
                     <li>Vigencia: La ley 27423 se publicó en el BO el 22/12/17.</li>
                     <li>Te sirve si seguís el criterio de aplicación inmediata a todos los juicios en trámite, incluidos los iniciados antes de su entrada en vigencia</li>
-                    <li>Si seguís el precedente <a href="hhttps://sjconsulta.csjn.gov.ar/sjconsulta/documentos/verDocumentoByIdLinksJSP.html?idDocumento=7473801&cache=1551129603472" target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-foreground">"Establecimiento Las Marías" (CSJN, 04/09/2018)</a> podes usarlo para las etapas con principio de ejecución bajo la nueva ley.</li>                  </ul>
+                    <li>Si seguís el precedente <a href="https://sjconsulta.csjn.gov.ar/sjconsulta/documentos/verDocumentoByIdLinksJSP.html?idDocumento=7473801&cache=1551129603472" target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-foreground">"Establecimiento Las Marías" (CSJN, 04/09/2018)</a> podes usarlo para las etapas con principio de ejecución bajo la nueva ley.</li>                  </ul>
                 </div>
                 <div>
                   <h4 className="text-[13px] font-medium text-foreground/85">Restricciones y exclusiones del cálculo</h4>
