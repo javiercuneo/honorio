@@ -49,7 +49,7 @@ export function DashboardView({ wizard, onBack, onRestart, onShowMinimos }: Dash
         transition={{ duration: 0.5, ease }}
         className="flex items-center justify-between border-b border-border py-8"
       >
-        <h1 className="font-serif text-4xl leading-[1.02] tracking-tight text-foreground md:text-5xl">
+        <h1 className="font-meter text-4xl leading-[1.02] tracking-tight text-foreground md:text-5xl">
           Resultados
         </h1>
         <div className="flex shrink-0 items-center gap-2">

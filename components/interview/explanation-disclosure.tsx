@@ -76,7 +76,7 @@ export function ExplanationDisclosure({
                       {explanation.full.map((line, i) => (
                         <li
                           key={i}
-                          className="flex gap-2.5 text-[13px] leading-relaxed text-muted-foreground"
+                          className="flex gap-2.5 font-law text-[15px] leading-relaxed text-muted-foreground"
                         >
                           <span
                             className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-foreground/40"

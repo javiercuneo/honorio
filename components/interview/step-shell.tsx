@@ -24,7 +24,7 @@ export function StepShell({
       <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-accent-foreground">
         {eyebrow}
       </span>
-      <h1 className="mt-4 text-pretty font-serif text-4xl leading-[1.05] tracking-tight text-foreground md:text-5xl">
+      <h1 className="mt-4 text-pretty font-meter text-4xl leading-[1.05] tracking-tight text-foreground md:text-5xl">
         {question}
       </h1>
       <p className="mt-3 max-w-md text-[15px] leading-relaxed text-muted-foreground">

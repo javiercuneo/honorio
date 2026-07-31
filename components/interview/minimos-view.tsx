@@ -21,7 +21,7 @@ const OPTIONS: { value: string; label: string }[] = [
 function CategoriaTable({ categoria, umaValor }: { categoria: MinimoCategoria; umaValor: number }) {
   return (
     <div className="mt-6 space-y-6">
-      <h3 className="font-serif text-lg tracking-tight text-foreground">{categoria.titulo}</h3>
+      <h3 className="font-meter text-lg tracking-tight text-foreground">{categoria.titulo}</h3>
 
       {categoria.grupos.map((grupo, gi) => (
         <div key={gi} className="overflow-hidden rounded-xl border border-border">
@@ -82,7 +82,7 @@ export function MinimosView({ onBack, umaValor }: { onBack: () => void; umaValor
         </header>
 
         <div className="rounded-2xl border border-border bg-card p-6 md:p-8">
-          <h2 className="font-serif text-2xl tracking-tight text-foreground md:text-3xl">
+          <h2 className="font-meter text-2xl tracking-tight text-foreground md:text-3xl">
             Mínimos arancelarios previstos en la Ley 27.423
           </h2>
 

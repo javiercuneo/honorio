@@ -4,10 +4,24 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ------------------------------------------------------------------
+   Sistema visual "instrumento de medicion".
+   Tres roles tipograficos con significado estructural:
+     font-meter  cifras y preguntas  -> es el instrumento
+     font-sans   interfaz y lectura
+     font-law    texto de la ley     -> si ves serif, estas leyendo la norma
+     font-mono   etiquetas, unidades y citas de articulos
+   Dos colores con significado no negociable:
+     accent (cobalto) marca lo activo, lo enfocado y lo seleccionado
+     axis-*           marca el eje del calculo que una regla modifica
+   ------------------------------------------------------------------ */
+
 @theme inline {
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
-  --font-serif: var(--font-instrument-serif), ui-serif, Georgia, serif;
+  --font-meter: var(--font-archivo), 'DIN Alternate', 'Segoe UI', sans-serif;
+  --font-law: var(--font-source-serif), ui-serif, Georgia, serif;
+  --font-serif: var(--font-source-serif), ui-serif, Georgia, serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -59,111 +73,139 @@
   --color-axis-honorarios-tint-foreground: var(--axis-honorarios-tint-foreground);
   --color-value-min: var(--value-min);
   --color-value-max: var(--value-max);
+
+  /* Neutros propios del sistema */
+  --color-faint: var(--faint);
+  --color-hair: var(--hair);
 }
 
 :root {
   color-scheme: light;
-  --background: oklch(0.986 0.003 95);
-  --foreground: oklch(0.24 0.008 75);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.24 0.008 75);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.24 0.008 75);
-  --primary: oklch(0.26 0.01 75);
-  --primary-foreground: oklch(0.98 0.004 95);
-  --secondary: oklch(0.965 0.004 95);
-  --secondary-foreground: oklch(0.26 0.01 75);
-  --muted: oklch(0.965 0.004 95);
-  --muted-foreground: oklch(0.55 0.008 75);
-  --accent: oklch(0.93 0.04 150);
-  --accent-foreground: oklch(0.36 0.06 152);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.915 0.004 90);
-  --input: oklch(0.915 0.004 90);
-  --ring: oklch(0.62 0.08 150);
-  --chart-1: oklch(0.6 0.09 150);
-  --chart-2: oklch(0.76 0.12 76);
-  --chart-3: oklch(0.6 0.08 235);
-  --chart-4: oklch(0.66 0.13 44);
-  --chart-5: oklch(0.52 0.07 195);
-  --radius: 0.85rem;
-  --sidebar: oklch(0.975 0.004 95);
-  --sidebar-foreground: oklch(0.24 0.008 75);
-  --sidebar-primary: oklch(0.26 0.01 75);
-  --sidebar-primary-foreground: oklch(0.98 0.004 95);
-  --sidebar-accent: oklch(0.93 0.04 150);
-  --sidebar-accent-foreground: oklch(0.36 0.06 152);
-  --sidebar-border: oklch(0.915 0.004 90);
-  --sidebar-ring: oklch(0.62 0.08 150);
 
-  /* Eje: base regulatoria (naranja) */
-  --axis-base: oklch(0.64 0.17 50);
-  --axis-base-tint: oklch(0.95 0.045 55);
-  --axis-base-tint-foreground: oklch(0.4 0.11 45);
+  /* Neutro frio elegido, no heredado: el gris tiene sesgo azul hacia el acento */
+  --background: #e9ebee;
+  --foreground: #12161c;
+  --card: #ffffff;
+  --card-foreground: #12161c;
+  --popover: #ffffff;
+  --popover-foreground: #12161c;
 
-  /* Eje: escala del art. 21 (morado) */
-  --axis-escala: oklch(0.55 0.18 322);
-  --axis-escala-tint: oklch(0.95 0.035 322);
-  --axis-escala-tint-foreground: oklch(0.42 0.14 322);
+  /* Accion primaria = el acento. Un solo color activo en toda la app. */
+  --primary: #1e45ce;
+  --primary-foreground: #ffffff;
 
-  /* Eje: honorarios finales (rojo) */
-  --axis-honorarios: oklch(0.58 0.19 25);
-  --axis-honorarios-tint: oklch(0.95 0.04 25);
-  --axis-honorarios-tint-foreground: oklch(0.42 0.15 25);
+  /* Superficie hundida: cabeceras de tabla, celdas de total, controles segmentados */
+  --secondary: #f2f4f6;
+  --secondary-foreground: #12161c;
+  --muted: #f2f4f6;
+  --muted-foreground: #5a626e;
+  --faint: #8b93a0;
 
-  /* Valores: piso y techo de un mismo rango (dos profundidades de azul) */
-  --value-min: oklch(0.7 0.12 220);
-  --value-max: oklch(0.4 0.15 255);
+  /* accent = tinte del acento (fondos), accent-foreground = el acento como tinta */
+  --accent: rgb(30 69 206 / 0.1);
+  --accent-foreground: #1e45ce;
+
+  --destructive: #a8482b;
+  --border: rgb(18 22 28 / 0.13);
+  --hair: rgb(18 22 28 / 0.07);
+  --input: rgb(18 22 28 / 0.13);
+  --ring: #1e45ce;
+
+  --chart-1: #1e45ce;
+  --chart-2: #9a6b12;
+  --chart-3: #6b3fbf;
+  --chart-4: #a8482b;
+  --chart-5: #5a626e;
+
+  /* Radio corto: el rounded-lg parejo era parte del look de plantilla */
+  --radius: 0.375rem;
+
+  --sidebar: #f2f4f6;
+  --sidebar-foreground: #12161c;
+  --sidebar-primary: #1e45ce;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: rgb(30 69 206 / 0.1);
+  --sidebar-accent-foreground: #1e45ce;
+  --sidebar-border: rgb(18 22 28 / 0.13);
+  --sidebar-ring: #1e45ce;
+
+  /* Eje 1: base regulatoria (ocre) — arts. 22, 40 */
+  --axis-base: #9a6b12;
+  --axis-base-tint: rgb(154 107 18 / 0.11);
+  --axis-base-tint-foreground: #7a5410;
+
+  /* Eje 2: escala del art. 21 (violeta) — arts. 25, 35, 37, 41 */
+  --axis-escala: #6b3fbf;
+  --axis-escala-tint: rgb(107 63 191 / 0.11);
+  --axis-escala-tint-foreground: #573198;
+
+  /* Eje 3: honorario final (oxido) — arts. 34, 38, 49 */
+  --axis-honorarios: #a8482b;
+  --axis-honorarios-tint: rgb(168 72 43 / 0.11);
+  --axis-honorarios-tint-foreground: #863a22;
+
+  /* Piso y techo de un rango: misma tinta, dos profundidades. No son dos cosas distintas. */
+  --value-min: #5a626e;
+  --value-max: #12161c;
 }
 
 .dark {
   color-scheme: dark;
-  --background: oklch(0.19 0.006 75);
-  --foreground: oklch(0.95 0.004 95);
-  --card: oklch(0.23 0.007 75);
-  --card-foreground: oklch(0.95 0.004 95);
-  --popover: oklch(0.23 0.007 75);
-  --popover-foreground: oklch(0.95 0.004 95);
-  --primary: oklch(0.95 0.004 95);
-  --primary-foreground: oklch(0.23 0.007 75);
-  --secondary: oklch(0.27 0.008 75);
-  --secondary-foreground: oklch(0.95 0.004 95);
-  --muted: oklch(0.27 0.008 75);
-  --muted-foreground: oklch(0.68 0.008 80);
-  --accent: oklch(0.32 0.04 152);
-  --accent-foreground: oklch(0.88 0.05 150);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 9%);
-  --input: oklch(1 0 0 / 12%);
-  --ring: oklch(0.6 0.08 150);
-  --chart-1: oklch(0.66 0.09 150);
-  --chart-2: oklch(0.79 0.12 78);
-  --chart-3: oklch(0.66 0.08 235);
-  --chart-4: oklch(0.7 0.13 46);
-  --chart-5: oklch(0.62 0.07 195);
-  --sidebar: oklch(0.21 0.006 75);
-  --sidebar-foreground: oklch(0.95 0.004 95);
-  --sidebar-primary: oklch(0.95 0.004 95);
-  --sidebar-primary-foreground: oklch(0.23 0.007 75);
-  --sidebar-accent: oklch(0.32 0.04 152);
-  --sidebar-accent-foreground: oklch(0.88 0.05 150);
-  --sidebar-border: oklch(1 0 0 / 9%);
-  --sidebar-ring: oklch(0.6 0.08 150);
 
-  --axis-base: oklch(0.72 0.15 55);
-  --axis-base-tint: oklch(0.32 0.05 50);
-  --axis-base-tint-foreground: oklch(0.85 0.08 55);
+  --background: #0d0f13;
+  --foreground: #edeff3;
+  --card: #16191f;
+  --card-foreground: #edeff3;
+  --popover: #16191f;
+  --popover-foreground: #edeff3;
 
-  --axis-escala: oklch(0.7 0.16 322);
-  --axis-escala-tint: oklch(0.3 0.06 322);
-  --axis-escala-tint-foreground: oklch(0.86 0.09 322);
+  --primary: #7a99ff;
+  --primary-foreground: #0d0f13;
 
-  --axis-honorarios: oklch(0.68 0.17 25);
-  --axis-honorarios-tint: oklch(0.3 0.06 25);
-  --axis-honorarios-tint-foreground: oklch(0.86 0.09 25);
+  --secondary: #101318;
+  --secondary-foreground: #edeff3;
+  --muted: #101318;
+  --muted-foreground: #99a1ae;
+  --faint: #6b7381;
 
-  --value-min: oklch(0.75 0.1 220);
-  --value-max: oklch(0.62 0.15 255);
+  --accent: rgb(122 153 255 / 0.14);
+  --accent-foreground: #7a99ff;
+
+  --destructive: #e09070;
+  --border: rgb(237 239 243 / 0.15);
+  --hair: rgb(237 239 243 / 0.08);
+  --input: rgb(237 239 243 / 0.15);
+  --ring: #7a99ff;
+
+  --chart-1: #7a99ff;
+  --chart-2: #e0b45c;
+  --chart-3: #b99bff;
+  --chart-4: #e09070;
+  --chart-5: #99a1ae;
+
+  --sidebar: #101318;
+  --sidebar-foreground: #edeff3;
+  --sidebar-primary: #7a99ff;
+  --sidebar-primary-foreground: #0d0f13;
+  --sidebar-accent: rgb(122 153 255 / 0.14);
+  --sidebar-accent-foreground: #7a99ff;
+  --sidebar-border: rgb(237 239 243 / 0.15);
+  --sidebar-ring: #7a99ff;
+
+  --axis-base: #e0b45c;
+  --axis-base-tint: rgb(224 180 92 / 0.14);
+  --axis-base-tint-foreground: #e8c47e;
+
+  --axis-escala: #b99bff;
+  --axis-escala-tint: rgb(185 155 255 / 0.14);
+  --axis-escala-tint-foreground: #cbb5ff;
+
+  --axis-honorarios: #e09070;
+  --axis-honorarios-tint: rgb(224 144 112 / 0.14);
+  --axis-honorarios-tint-foreground: #e9a992;
+
+  --value-min: #99a1ae;
+  --value-max: #edeff3;
 }
 
 @layer base {

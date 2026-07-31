@@ -36,7 +36,7 @@ export function NumericField({ step, value, onChange }: NumericFieldProps) {
     <div className="max-w-lg">
       <div className="flex items-end gap-2">
         {step.prefix ? (
-          <span className="pb-2 font-serif text-4xl leading-none text-muted-foreground md:text-5xl">
+          <span className="pb-2 font-meter text-4xl leading-none text-muted-foreground md:text-5xl">
             {step.prefix}
           </span>
         ) : null}
@@ -55,12 +55,12 @@ export function NumericField({ step, value, onChange }: NumericFieldProps) {
             }
           }}
           className={cn(
-            'w-full min-w-0 bg-transparent font-serif text-6xl leading-none tracking-tight text-foreground outline-none md:text-7xl',
+            'w-full min-w-0 bg-transparent font-meter text-6xl leading-none tracking-tight text-foreground outline-none md:text-7xl',
             'caret-foreground selection:bg-accent',
           )}
         />
         {step.suffix ? (
-          <span className="pb-2 font-serif text-4xl leading-none text-muted-foreground md:text-5xl">
+          <span className="pb-2 font-meter text-4xl leading-none text-muted-foreground md:text-5xl">
             {step.suffix}
           </span>
         ) : null}

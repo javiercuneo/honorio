@@ -21,7 +21,7 @@ export function IntroView({ onStart, onShowMinimos }: { onStart: () => void; onS
         Calculo de honorarios
       </span>
 
-      <h1 className="mt-6 text-balance font-serif text-5xl leading-[1.02] tracking-tight text-foreground md:text-6xl">
+      <h1 className="mt-6 text-balance font-meter text-5xl leading-[1.02] tracking-tight text-foreground md:text-6xl">
         Honorio es un asistente para la regulación de honorarios profesionales
       </h1>
 

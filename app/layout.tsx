@@ -1,6 +1,6 @@
 ﻿import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
-import { Geist, Geist_Mono, Instrument_Serif } from 'next/font/google'
+import { Archivo, Geist, Geist_Mono, Source_Serif_4 } from 'next/font/google'
 import { withBasePath } from '@/lib/basePath'
 import './globals.css'
 
@@ -14,17 +14,24 @@ const geistMono = Geist_Mono({
   variable: '--font-geist-mono',
 })
 
-const instrumentSerif = Instrument_Serif({
+// Archivo (Omnibus-Type, Buenos Aires): grotesca de raiz DIN con cifras
+// tabulares. Es la voz de las cifras y de las preguntas del wizard.
+const archivo = Archivo({
   subsets: ['latin'],
-  weight: '400',
-  variable: '--font-instrument-serif',
+  variable: '--font-archivo',
+})
+
+// Source Serif se reserva al texto de la ley: si aparece serif, se esta
+// leyendo la norma y no la interfaz.
+const sourceSerif = Source_Serif_4({
+  subsets: ['latin'],
+  variable: '--font-source-serif',
 })
 
 export const metadata: Metadata = {
   title: 'Honorio',
   description:
     'Asistente para la regulación de honorarios',
-  generator: 'v0.app',
   icons: {
     icon: withBasePath('/honorio.png'),
     apple: withBasePath('/honorio.png'),
@@ -33,7 +40,7 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   colorScheme: 'light',
-  themeColor: [{ media: '(prefers-color-scheme: light)', color: '#f7f6f2' }],
+  themeColor: [{ media: '(prefers-color-scheme: light)', color: '#e9ebee' }],
 }
 
 export default function RootLayout({
@@ -44,7 +51,7 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} bg-background`}
+      className={`${geistSans.variable} ${geistMono.variable} ${archivo.variable} ${sourceSerif.variable} bg-background`}
     >
       <body className="font-sans antialiased">
         {children}
