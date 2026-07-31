@@ -93,8 +93,7 @@ export function IntroView({ onStart, onShowMinimos }: { onStart: () => void; onS
                   <h4 className="text-[13px] font-medium text-foreground/85">Naturaleza de la herramienta</h4>
                   <ul className="mt-2 list-disc space-y-1.5 pl-4 text-[13px] leading-relaxed text-muted-foreground">
                     <li>Esta herramienta es de carácter referencial; no sustituye el criterio del juez ni debe considerarse un dictamen profesional</li>
-                    <li>Los resultados se basan en interpretaciones de la Ley 27.423 que podrían diferir de tu criterio o del de los distintos tribunales</li>
-                    <li>En cada paso, intentaremos explicitar el fundamento jurídico y su impacto en el cálculo</li>
+<li>Los resultados se basan en interpretaciones de la <a href="https://servicios.infoleg.gob.ar/infolegInternet/anexos/305000-309999/305057/texact.htm" target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-foreground">Ley 27.423 </a>que podrían diferir de tu criterio o del de los distintos tribunales</li>                    <li>En cada paso, intentaremos explicitar el fundamento jurídico y su impacto en el cálculo</li>
                   </ul>
                 </div>
                 <div>
@@ -102,14 +101,14 @@ export function IntroView({ onStart, onShowMinimos }: { onStart: () => void; onS
                   <ul className="mt-2 list-disc space-y-1.5 pl-4 text-[13px] leading-relaxed text-muted-foreground">
                     <li>Vigencia: La ley 27423 se publicó en el BO el 22/12/17.</li>
                     <li>Te sirve si seguís el criterio de aplicación inmediata a todos los juicios en trámite, incluidos los iniciados antes de su entrada en vigencia</li>
-                    <li>Si seguís el precedente "Establecimiento Las Marías" (CSJN, 04/09/2018) podes usarlo para las etapas con principio de ejecución bajo la nueva ley.</li>
-                  </ul>
+                    <li>Si seguís el precedente <a href="hhttps://sjconsulta.csjn.gov.ar/sjconsulta/documentos/verDocumentoByIdLinksJSP.html?idDocumento=7473801&cache=1551129603472" target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-foreground">"Establecimiento Las Marías" (CSJN, 04/09/2018)</a> podes usarlo para las etapas con principio de ejecución bajo la nueva ley.</li>                  </ul>
                 </div>
                 <div>
                   <h4 className="text-[13px] font-medium text-foreground/85">Restricciones y exclusiones del cálculo</h4>
                   <ul className="mt-2 list-disc space-y-1.5 pl-4 text-[13px] leading-relaxed text-muted-foreground">
                     <li>Mínimos arancelarios: El asistente no aplica automáticamente los mínimos de los arts. 58, 61, etc. Si el resultado es menor a dichos mínimos y los consideras aplicables, desestimá el cálculo o hace clic en "ver mínimos"</li>
-                    <li>Reducciones y topes: no se contemplan las limitaciones por prorrateo (art. 730 CCyCN), reajuste de precio (art. 1255 CCyCN), ejecución hipotecaria especial (art. 60 Ley 24.441) o régimen de vivienda (art. 254 CCyCN / art. 48 Ley 14.394).</li>
+                    <li>Reducciones y topes: no se contemplan las limitaciones por prorrateo (art. 730 CCyCN), reajuste de precio (art. 1255 CCyCN), ejecución hipotecaria especial (art. 60 <a href="https://servicios.infoleg.gob.ar/infolegInternet/anexos/0-4999/812/texact.htm
+" target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-foreground"> Ley 24.441 </a>) o régimen de vivienda (art. 254 CCyCN / art. 48 Ley 14.394).</li>
                     <li>Materias excluidas: la herramienta no está pensada para juicios penales. Solo menciona algunos mínimos para referencia</li>
                     <li>Asuntos no susceptibles de apreciación pecuniaria: para algunos casos sin monto determinado (por ejemplo convocatoria de asamblea), no es posible un cálculo matemático; debes recurrir a las pautas del art. 16. Si haces clic en "ver mínimos" podes ver algunos valores para referencia</li>
                   </ul>
@@ -117,9 +116,9 @@ export function IntroView({ onStart, onShowMinimos }: { onStart: () => void; onS
                 <div>
                   <h4 className="text-[13px] font-medium text-foreground/85">Auxiliares de justicia</h4>
                   <ul className="mt-2 list-disc space-y-1.5 pl-4 text-[13px] leading-relaxed text-muted-foreground">
-                    <li>Leyes especiales: no se incluyen las pautas de las leyes especiales que reglamenten cada actividad profesional (art. 1, 2° párrafo de la ley 27423) ni las modificaciones de la Ley 27.802 (Modernización Laboral) pero se muestran algunas reglas incorporadas por ésta.</li>
+                    <li>Leyes especiales: no se incluyen las pautas de las leyes especiales que reglamenten cada actividad profesional (art. 1, 2° párrafo de la ley 27423) ni las modificaciones de la <a href="https://servicios.infoleg.gob.ar/infolegInternet/anexos/420000-424999/423680/norma.htm" target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-foreground"> Ley 27.802 (Modernización Laboral)</a> pero se muestran algunas reglas incorporadas por ésta.</li> 
                     <li>Excluidos: no contempla los cálculos de los honorarios de los administradores judiciales, interventores o veedores, interventores recaudadores, liquidadores judiciales, árbitros, mediadores o amigables componedores (art. 32).</li>
-                    <li>Mediadores: tienen normativa propia (Ley 26.589 y Decretos 2536/15 y 696/2025). Puede utilizar nuestra calculadora web (<a href="https://javiercuneo.github.io/Herramientas-Judiciales-IA/calculadoras/honorarios-mediacion.html" target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-foreground">link</a>).</li>
+                    <li>Mediadores: tienen normativa propia (<a href="http://servicios.infoleg.gob.ar/infolegInternet/anexos/165000-169999/166999/texact.htm" target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-foreground"> Ley 26.589</a> y Decretos <a href="http://servicios.infoleg.gob.ar/infolegInternet/anexos/255000-259999/255741/norma.htm" target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-foreground"> 2536/15 </a>y <a href="https://servicios.infoleg.gob.ar/infolegInternet/anexos/415000-419999/418049/norma.htm" target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-foreground">696/2025</a>). Puede utilizar nuestra <a href="https://javiercuneo.github.io/Herramientas-Judiciales-IA/calculadoras/honorarios-mediacion.html" target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-foreground">calculadora</a>.</li>
                   </ul>
                 </div>
                 <div>
