@@ -11,6 +11,12 @@ export interface MinimoItem {
   uma: number
   /** Texto a mostrar en la columna UMA en vez de "N UMA" (ej: "1/4 de UMA") */
   umaLabel?: string
+  /**
+   * Palabras por las que alguien buscaria este concepto y que no estan
+   * en la letra de la ley. Se agregan solo cuando el nombre legal y el
+   * nombre de tribunal no coinciden: no es un diccionario de sinonimos.
+   */
+  alias?: string[]
 }
 
 export interface MinimoGrupo {
@@ -24,6 +30,8 @@ export interface MinimoCategoria {
   articulo: string
   textoLegal: string
   grupos: MinimoGrupo[]
+  /** Idem MinimoItem.alias, a nivel de categoria. */
+  alias?: string[]
 }
 
 export const MINIMOS_JUDICIAL: MinimoCategoria = {
@@ -31,13 +39,14 @@ export const MINIMOS_JUDICIAL: MinimoCategoria = {
   titulo: 'Mínimos en asuntos judiciales no susceptibles de apreciación pecuniaria (art. 19 inc. a)',
   articulo: 'Art. 19',
   textoLegal: 'ARTÍCULO 19.- Cuando no fuere posible apreciar el valor pecuniario del asunto, los jueces fijarán los honorarios teniendo en cuenta la naturaleza de las actuaciones y la gestión profesional desarrollada, con arreglo a las siguientes pautas: a) En asuntos judiciales:',
+  alias: ['sin monto', 'monto indeterminado'],
   grupos: [{
     items: [
       { label: 'Divorcio', uma: 10 },
       { label: 'Acción sobre efectos del divorcio y responsabilidad parental', uma: 25 },
       { label: 'Adopción', uma: 20 },
       { label: 'Tutela', uma: 20 },
-      { label: 'Restricciones a la capacidad e inhabilitación', uma: 25 },
+      { label: 'Restricciones a la capacidad e inhabilitación', uma: 25, alias: ['insania', 'curatela', 'salud mental'] },
       { label: 'Reclamación e impugnación de filiación', uma: 25 },
       { label: 'Acciones de estado y familia', uma: 25 },
       { label: 'Veeduría', uma: 10 },
@@ -84,6 +93,7 @@ export const MINIMOS_ART58: MinimoCategoria = {
   titulo: 'Mínimos del art. 58 (juicios susceptibles de apreciación pecuniaria no previstos en otros artículos)',
   articulo: 'Art. 58',
   textoLegal: 'Art. 58: Mínimo establecido para regular honorarios de juicios susceptibles de apreciación pecuniaria que no estuviesen previstos en otros artículos.',
+  alias: ['con monto', 'ordinario', 'daños y perjuicios'],
   grupos: [{
     items: [
       { label: 'a) Procesos de conocimiento', uma: 10 },
@@ -163,3 +173,23 @@ export const MINIMOS_CATEGORIAS: Record<string, MinimoCategoria> = {
   acciones_48: MINIMOS_ACCIONES_48,
   contencioso_44: MINIMOS_CONTENCIOSO_44,
 }
+
+/**
+ * Orden de lectura: el del articulado. El inciso a) del art. 19 antes
+ * que el b), y los articulos de menor a mayor. El orden anterior venia
+ * del `<select>` del asistente clasico, donde era el orden en que se
+ * fueron agregando las opciones.
+ *
+ * Las tres primeras categorias son las que no tienen monto, que es el
+ * caso por el que se consulta esta pantalla: cuando la escala del
+ * art. 21 no se puede aplicar.
+ */
+export const MINIMOS_ORDENADOS: MinimoCategoria[] = [
+  MINIMOS_JUDICIAL,          // art. 19 inc. a
+  MINIMOS_EXTRAJUDICIAL,     // art. 19 inc. b
+  MINIMOS_RECURSOS_CSJN,     // art. 31
+  MINIMOS_CONTENCIOSO_44,    // art. 44
+  MINIMOS_ACCIONES_48,       // art. 48
+  MINIMOS_ART58,             // art. 58
+  MINIMOS_AUXILIARES_JUSTICIA, // arts. 58, 60 y 61 bis
+]

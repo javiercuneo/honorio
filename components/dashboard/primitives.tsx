@@ -236,7 +236,7 @@ export function CardHeader({
   children,
   className,
 }: {
-  titulo: string
+  titulo: ReactNode
   articulo?: string
   children?: ReactNode
   className?: string
