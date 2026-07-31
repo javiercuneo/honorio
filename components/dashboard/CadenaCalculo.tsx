@@ -8,7 +8,7 @@
 //
 // Cada bloque muestra el valor con el que entra, las reglas que lo
 // modifican, y el valor con el que sale. El fundamento de cada regla
-// vive detras del unico "por que" de la app.
+// vive detras del unico "por qué" de la app.
 // ---------------------------------------------------------------
 
 import { useState, type ReactNode } from "react"
@@ -27,6 +27,8 @@ import {
   Disclosure,
   EnUMA,
   LedgerRow,
+  Insignia,
+  ROL_TINT,
   Total,
   useUma,
 } from "./primitives"
@@ -181,7 +183,7 @@ export function CadenaCalculo({
 
   return (
     <Card>
-      <CardHeader titulo="Como se llega a ese numero">
+      <CardHeader titulo="Cómo se llega a ese número">
         {escala ? (
           <button
             type="button"
@@ -316,19 +318,14 @@ export function CadenaCalculo({
               <Disclosure
                 concepto={
                   <span className="text-foreground">
-                    Actuacion como {rolLabel.toLowerCase()}
+                    Actuación como {rolLabel.toLowerCase()}
                   </span>
                 }
                 articulo="art. 20"
                 valor={
-                  <span
-                    className={cn(
-                      "inline-flex items-baseline rounded-sm px-1.5 py-0.5 font-mono text-[11px] tabular-nums",
-                      AXIS_TINT.honorarios,
-                    )}
-                  >
+                  <Insignia tono={ROL_TINT}>
                     {ajusteDesdeFactor(cadena.factorRol)}
-                  </span>
+                  </Insignia>
                 }
               >
                 <p>{notaRol}</p>

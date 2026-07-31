@@ -132,13 +132,13 @@ export function useWizard(allSteps: WizardStepDef[], initialValues?: Partial<Ans
 
   // ---- Validar paso actual ----
   const validateCurrent = useCallback((): string | null => {
-    if (!currentStep) return 'Paso invalido'
+    if (!currentStep) return 'Paso inválido'
 
     const value = answers[currentStep.id]
     if (currentStep.kind === 'numeric') {
       if (typeof value !== 'number' || (value as number) <= 0) {
         if (currentStep.id === 'base') {
-          return 'Debe ingresar un monto valido para la base regulatoria.'
+          return 'Debe ingresar un monto válido para la base regulatoria.'
         }
       }
       return null
@@ -147,12 +147,12 @@ export function useWizard(allSteps: WizardStepDef[], initialValues?: Partial<Ans
     if (currentStep.kind === 'cards') {
       if (currentStep.select === 'single') {
         if (!value || (typeof value === 'string' && value.length === 0)) {
-          return 'Debe seleccionar una opcion.'
+          return 'Debe seleccionar una opción.'
         }
       }
       if (currentStep.select === 'multi') {
         if (!Array.isArray(value) || value.length === 0) {
-          return 'Debe seleccionar al menos una opcion.'
+          return 'Debe seleccionar al menos una opción.'
         }
       }
     }

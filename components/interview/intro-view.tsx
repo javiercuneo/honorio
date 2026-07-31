@@ -5,10 +5,12 @@ import { AnimatePresence, motion } from 'motion/react'
 import { ArrowRight, Scale, FileText, ShieldCheck, HelpCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
+// No describen los pasos —eso ya lo cuenta el panel de la derecha—
+// sino lo que la herramienta hace distinto: declarar cada regla.
 const notes = [
-  { icon: FileText, label: 'Seleccion del tipo de proceso' },
-  { icon: Scale, label: 'Calculo segun Ley 27.423' },
-  { icon: ShieldCheck, label: 'Resultado detallado' },
+  { icon: Scale, label: 'Cada regla, con su artículo' },
+  { icon: FileText, label: 'Base, escala y honorario por separado' },
+  { icon: ShieldCheck, label: 'Sin caja negra: se ve cómo se llega' },
 ]
 
 export function IntroView({ onStart, onShowMinimos }: { onStart: () => void; onShowMinimos: () => void }) {
@@ -18,11 +20,11 @@ export function IntroView({ onStart, onShowMinimos }: { onStart: () => void; onS
     <div className="max-w-lg">
       <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
         <span className="h-1.5 w-1.5 rounded-full bg-chart-1" aria-hidden="true" />
-        Calculo de honorarios
+        Cálculo de honorarios
       </span>
 
       <h1 className="mt-6 text-balance font-meter text-5xl leading-[1.02] tracking-tight text-foreground md:text-6xl">
-        Honorio es un asistente para la regulación de honorarios profesionales
+        HONORIO. Asistente para la regulación de honorarios profesionales
       </h1>
 
       <p className="mt-5 max-w-md text-pretty text-[16px] leading-relaxed text-muted-foreground">
@@ -44,14 +46,14 @@ export function IntroView({ onStart, onShowMinimos }: { onStart: () => void; onS
       <Button
         size="lg"
         onClick={onStart}
-        className="group mt-9 h-12 rounded-full px-6 text-[15px]"
+        className="group mt-9 h-12 px-6 text-[15px]"
       >
         Comenzar
         <ArrowRight className="ml-1 h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
       </Button>
 
       <p className="mt-10 text-[13px] text-muted-foreground">
-        ¿Necesitás ver solo los minimos arancelarios?
+        ¿Necesitás ver solo los mínimos arancelarios?
         <button
           onClick={onShowMinimos}
           className="ml-2 underline underline-offset-2 hover:text-foreground"
@@ -60,19 +62,19 @@ export function IntroView({ onStart, onShowMinimos }: { onStart: () => void; onS
         </button>
       </p>
 
-      <div className="mt-6 rounded-2xl border border-border/80 bg-secondary/40">
+      <div className="mt-6 rounded-lg border border-border bg-secondary">
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
-          className="flex w-full items-center gap-2.5 rounded-2xl px-4 py-3 text-left transition-colors hover:bg-secondary/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="flex w-full items-center gap-2.5 rounded-lg px-4 py-3 text-left transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <HelpCircle className="h-4 w-4 shrink-0 text-muted-foreground" />
           <span className="flex-1 text-[13px] leading-snug text-muted-foreground">
             Información adicional
           </span>
-          <span className="shrink-0 font-mono text-[11px] uppercase tracking-wider text-muted-foreground/80">
-            {open ? 'Cerrar' : 'Ver más'}
+          <span className="shrink-0 font-mono text-[11px] uppercase tracking-wider text-accent-foreground">
+            {open ? 'Cerrar' : 'por qué'}
           </span>
         </button>
 

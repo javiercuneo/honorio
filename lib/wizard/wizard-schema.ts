@@ -71,7 +71,7 @@ export const TIPOS_PROCESO: CardOption[] = [
     id: 'conocimiento',
     label: 'Juicio de conocimiento',
     description: 'Ordinario o sumarísimo',
-    hint: 'Art. 21 y sig.',
+    hint: 'Art. 29, b)',
   },
   {
     id: 'ejecucion_sentencia',
@@ -113,7 +113,7 @@ export const TIPOS_PROCESO: CardOption[] = [
     id: 'incidente',
     label: 'Incidente',
     description: 'Esta opción incluye los Beneficios (BLSG)',
-    hint: 'Art. 29 inc. g',
+    hint: 'Art. 29, g)',
   },
 ]
 

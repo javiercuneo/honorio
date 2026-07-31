@@ -37,7 +37,7 @@ export function ScaleBreakdownModal({
       className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 p-4"
       role="dialog"
       aria-modal="true"
-      aria-label="Escala del articulo 21"
+      aria-label="Escala del artículo 21"
       onClick={onClose}
     >
       <div
@@ -71,7 +71,7 @@ export function ScaleBreakdownModal({
                   <Etiqueta>Base en UMA</Etiqueta>
                 </th>
                 <th className="pb-2 text-right">
-                  <Etiqueta>Alicuota del tramo</Etiqueta>
+                  <Etiqueta>Alícuota del tramo</Etiqueta>
                 </th>
               </tr>
             </thead>
@@ -104,15 +104,15 @@ export function ScaleBreakdownModal({
 
           <div className="mt-5 space-y-3 border-t border-hair pt-4 text-[13px] leading-relaxed text-muted-foreground">
             <p className="font-law text-[15px] leading-relaxed">
-              &ldquo;En ningun caso los honorarios podran ser inferiores al
-              maximo del grado inmediato anterior de la escala, con mas el
-              incremento por aplicacion al excedente de la alicuota que
+              &ldquo;En ningún caso los honorarios podrán ser inferiores al
+              máximo del grado inmediato anterior de la escala, con más el
+              incremento por aplicación al excedente de la alícuota que
               corresponde al grado siguiente.&rdquo;
             </p>
             <p>
-              Es la regla del excedente. Por eso la alicuota del tramo no se
-              aplica a toda la base: se toma como piso el maximo que acumula el
-              grado anterior y solo lo que excede ese limite tributa la alicuota
+              Es la regla del excedente. Por eso la alícuota del tramo no se
+              aplica a toda la base: se toma como piso el máximo que acumula el
+              grado anterior y solo lo que excede ese límite tributa la alícuota
               del tramo en curso.
             </p>
             {escala.escalera ? (
@@ -121,9 +121,9 @@ export function ScaleBreakdownModal({
                 <span className="font-mono tabular-nums text-foreground">
                   {umaNum(escala.escalera.maximoEscalaAnterior)} UMA
                 </span>{" "}
-                —el maximo hasta{" "}
+                —el máximo hasta{" "}
                 {umaNum(escala.escalera.limiteAnterior, 0)} UMA— y el excedente
-                sujeto a alicuota es de{" "}
+                sujeto a alícuota es de{" "}
                 <span className="font-mono tabular-nums text-foreground">
                   {umaNum(escala.escalera.excedente)} UMA
                 </span>
@@ -131,8 +131,8 @@ export function ScaleBreakdownModal({
               </p>
             ) : (
               <p>
-                La base de este calculo cae en el primer tramo, de modo que no
-                hay grado anterior que acumular: la alicuota se aplica sobre el
+                La base de este cálculo cae en el primer tramo, de modo que no
+                hay grado anterior que acumular: la alícuota se aplica sobre el
                 total.
               </p>
             )}

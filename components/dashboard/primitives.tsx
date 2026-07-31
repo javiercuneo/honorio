@@ -8,7 +8,7 @@
 //   1. Los numeros no se ocultan nunca; las frases, siempre.
 //      Por eso Cifra siempre esta a la vista y todo fundamento va
 //      dentro de <Disclosure>.
-//   2. El "por que" es un unico signo: mismo texto, mismo tamano,
+//   2. El "por qué" es un unico signo: mismo texto, mismo tamano,
 //      mismo lugar. Si cada explicacion tuviera su propia forma, el
 //      mecanismo para bajar ruido seria la fuente de ruido.
 //
@@ -51,6 +51,54 @@ export const AXIS_TINT: Record<Axis, string> = {
   base: "bg-axis-base-tint text-axis-base-tint-foreground",
   escala: "bg-axis-escala-tint text-axis-escala-tint-foreground",
   honorarios: "bg-axis-honorarios-tint text-axis-honorarios-tint-foreground",
+}
+
+/**
+ * El ajuste por rol (art. 20) no es una reduccion por una razon
+ * procesal: ubica al rol respecto del patrocinante. Por eso vive fuera
+ * del sistema de tres ejes y no se confunde con el oxido.
+ */
+export const ROL_TINT = "bg-rol-tint text-rol-tint-foreground"
+
+/** Prosa: justificada y con particion de palabras. */
+export function Prosa({
+  children,
+  className,
+}: {
+  children: ReactNode
+  className?: string
+}) {
+  return (
+    <p
+      lang="es"
+      className={cn(
+        "hyphens-auto text-justify text-[13px] leading-relaxed text-muted-foreground",
+        className,
+      )}
+    >
+      {children}
+    </p>
+  )
+}
+
+/** Insignia compacta: un factor, un ajuste, una quita. */
+export function Insignia({
+  tono,
+  children,
+}: {
+  tono: string
+  children: ReactNode
+}) {
+  return (
+    <span
+      className={cn(
+        "inline-flex shrink-0 items-baseline rounded-sm px-1.5 py-0.5 font-mono text-[11px] tabular-nums",
+        tono,
+      )}
+    >
+      {children}
+    </span>
+  )
 }
 
 // ---- Formateadores atados a las preferencias de lectura ----
@@ -328,10 +376,13 @@ export function Disclosure({
         <span className={PUNTEADO} aria-hidden="true" />
         {valor ? <span className="shrink-0 text-right">{valor}</span> : null}
         <span className="shrink-0 font-mono text-[10px] uppercase tracking-wider text-accent-foreground">
-          por que
+          por qué
         </span>
       </summary>
-      <div className="max-w-2xl pb-3 pr-8 text-[13px] leading-relaxed text-muted-foreground">
+      <div
+        lang="es"
+        className="max-w-2xl hyphens-auto pb-3 pr-8 text-justify text-[13px] leading-relaxed text-muted-foreground"
+      >
         {children}
       </div>
     </details>

@@ -26,7 +26,7 @@ export function IncidenteResult({ resultado }: IncidenteResultProps) {
 
         <div className="grid divide-y divide-hair sm:grid-cols-2 sm:divide-x sm:divide-y-0">
           <div className="px-6 py-5">
-            <Etiqueta>Minimo · {pct(inc.porcentajeMin)}</Etiqueta>
+            <Etiqueta>Mínimo · {pct(inc.porcentajeMin)}</Etiqueta>
             <div className="mt-2">
               <Cifra
                 value={rango.minPesos}
@@ -42,7 +42,7 @@ export function IncidenteResult({ resultado }: IncidenteResultProps) {
 
           {!resultado.esProvisorio && (
             <div className="px-6 py-5">
-              <Etiqueta>Maximo · {pct(inc.porcentajeMax)}</Etiqueta>
+              <Etiqueta>Máximo · {pct(inc.porcentajeMax)}</Etiqueta>
               <div className="mt-2">
                 <Cifra
                   value={rango.maxPesos}
@@ -61,13 +61,13 @@ export function IncidenteResult({ resultado }: IncidenteResultProps) {
         <details className="border-t border-hair px-6 py-4">
           <summary className="cursor-pointer list-none">
             <Etiqueta className="transition-colors hover:text-foreground">
-              Texto del articulo
+              Texto del artículo
             </Etiqueta>
           </summary>
           <p className="mt-3 max-w-3xl font-law text-[15px] leading-relaxed text-muted-foreground">
-            &ldquo;Los incidentes se dividiran en 2 etapas; la primera se compone
+            &ldquo;Los incidentes se dividirán en 2 etapas; la primera se compone
             del planteo que lo origine, sea verbal o escrito, y la segunda, del
-            desarrollo hasta su conclusion.&rdquo;
+            desarrollo hasta su conclusión.&rdquo;
           </p>
         </details>
       </Card>

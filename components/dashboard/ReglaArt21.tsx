@@ -152,7 +152,7 @@ export function BarraExcedente({
 
       <div className="mt-2 flex flex-wrap justify-between gap-x-6 gap-y-1 font-mono text-[11px] text-faint">
         <span>
-          Maximo hasta {Math.round(limiteAnterior)} UMA{" "}
+          Máximo hasta {Math.round(limiteAnterior)} UMA{" "}
           <span className="tabular-nums text-foreground">{money(pisoUMA * valorUMA)}</span>
         </span>
         <span>

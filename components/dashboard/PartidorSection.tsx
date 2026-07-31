@@ -23,7 +23,7 @@ export function PartidorSection({ partidor, esProvisorio }: PartidorSectionProps
 
       <div className="grid gap-3 sm:grid-cols-2">
         <Tile
-          etiqueta={`Minimo · ${pct(partidor.minPorcentaje)}`}
+          etiqueta={`Mínimo · ${pct(partidor.minPorcentaje)}`}
           valor={
             <Cifra value={partidor.minPesos} size="xl" className="text-value-min" />
           }
@@ -31,7 +31,7 @@ export function PartidorSection({ partidor, esProvisorio }: PartidorSectionProps
         />
         {!esProvisorio && (
           <Tile
-            etiqueta={`Maximo · ${pct(partidor.maxPorcentaje)}`}
+            etiqueta={`Máximo · ${pct(partidor.maxPorcentaje)}`}
             valor={
               <Cifra value={partidor.maxPesos} size="xl" className="text-value-max" />
             }

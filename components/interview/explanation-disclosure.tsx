@@ -1,7 +1,7 @@
 'use client'
 
 // ---------------------------------------------------------------
-// El fundamento juridico de cada paso, detras del mismo "por que" que
+// El fundamento juridico de cada paso, detras del mismo "por qué" que
 // usa el dashboard. Una sola forma de esconder informacion en toda la
 // app: misma palabra, mismo tamano, mismo lugar.
 // ---------------------------------------------------------------
@@ -11,7 +11,7 @@ import type { Explanation } from '@/lib/legal/types'
 const VACIO = 'Complete los datos segun corresponda.'
 
 // Varios pasos traen "Ver más" como brief: era el rotulo del boton
-// viejo, no un resumen. Al lado de "por que" queda repetido, asi que se
+// viejo, no un resumen. Al lado de "por qué" queda repetido, asi que se
 // reemplaza por algo que describa el contenido. El schema no se toca.
 const GENERICOS = new Set(['ver más', 'ver mas', 'ver más +', ''])
 
@@ -32,7 +32,7 @@ export function ExplanationDisclosure({
           {resumen}
         </span>
         <span className="shrink-0 font-mono text-[10px] uppercase tracking-wider text-accent-foreground">
-          por que
+          por qué
         </span>
       </summary>
 

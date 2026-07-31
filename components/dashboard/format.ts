@@ -1,4 +1,4 @@
-﻿export function pesos(value: number, centavos = true): string {
+export function pesos(value: number, centavos = true): string {
   if (!isFinite(value)) return 'N/A'
   const d = centavos ? 2 : 0
   return "$" + value.toLocaleString("es-AR", { minimumFractionDigits: d, maximumFractionDigits: d })
@@ -57,18 +57,18 @@ export function pct(value: number, digits = 0): string {
 
 export const PROCESO_LABEL: Record<string, string> = {
   conocimiento: "Juicio de conocimiento",
-  ejecucion_sentencia: "Ejecucion de sentencia",
+  ejecucion_sentencia: "Ejecución de sentencia",
   ejecutivo: "Juicio ejecutivo",
-  sucesion: "Sucesion",
+  sucesion: "Sucesión",
   medida_cautelar: "Medida cautelar",
-  homologacion_desocupacion: "Homologacion de desocupacion",
+  homologacion_desocupacion: "Homologación de desocupación",
   exhorto: "Exhorto",
   incidente: "Incidente",
 }
 
 export const TERMINACION_LABEL: Record<string, string> = {
   sentencia: "Sentencia",
-  modos_anormales: "Modo anormal de terminacion",
+  modos_anormales: "Modo anormal de terminación",
   caducidad: "Caducidad de instancia",
   provisorios: "Honorarios provisorios",
 }
@@ -83,12 +83,12 @@ export const OBJETO_LABEL: Record<string, string> = {
   desalojo: "Desalojo",
   inmuebles: "Reclamo de inmuebles",
   derechos_crediticios: "Derechos crediticios",
-  titulos_acciones: "Titulos y acciones",
+  titulos_acciones: "Títulos y acciones",
   establecimientos: "Establecimientos",
-  uso_habitacion: "Uso y habitacion",
-  escrituracion: "Escrituracion",
+  uso_habitacion: "Uso y habitación",
+  escrituracion: "Escrituración",
   familia_alimentos: "Alimentos",
-  familia_liquidacion: "Liquidacion de sociedad conyugal",
+  familia_liquidacion: "Liquidación de sociedad conyugal",
   posesorias_interdictos: "Posesorias e interdictos",
   incidencia_colectiva: "Incidencia colectiva",
 }
@@ -105,22 +105,22 @@ export const CADUCIDAD_CRITERIO_LABEL: Record<string, string> = {
 
 export const APERTURA_PRUEBA_LABEL: Record<string, string> = {
   antes: "Antes de apertura a prueba",
-  despues: "Despues de apertura a prueba",
+  despues: "Después de apertura a prueba",
 }
 
 export const SUCESION_LETRADO_LABEL: Record<string, string> = {
-  unico: "Unico letrado",
+  unico: "Único letrado",
   varios: "Varios letrados",
 }
 
 export const MEDIDA_OPOSICION_LABEL: Record<string, string> = {
-  con: "Con oposicion",
-  sin: "Sin oposicion",
+  con: "Con oposición",
+  sin: "Sin oposición",
 }
 
 export const HOMOLOGACION_VIVIENDA_LABEL: Record<string, string> = {
   vivienda: "Alquiler vivienda",
-  otros: "Demas casos",
+  otros: "Demás casos",
 }
 
 export const DESALOJO_TIPO_LABEL: Record<string, string> = {
@@ -131,7 +131,7 @@ export const DESALOJO_TIPO_LABEL: Record<string, string> = {
 
 export const POSESORIAS_TIPO_LABEL: Record<string, string> = {
   beneficio: "Beneficio exclusivo",
-  demas: "Demas casos",
+  demas: "Demás casos",
 }
 
 /**
@@ -154,32 +154,32 @@ export const REGLA_LABEL: Record<string, { titulo: string; motivo: string }> = {
   "base-caducidad-art22": {
     titulo: "Caducidad tratada como demanda desestimada",
     motivo:
-      "La ley no previo la caducidad de instancia. Este calculo adopta el criterio de asimilarla a una demanda desestimada (art. 22).",
+      "La ley no previó la caducidad de instancia. Este cálculo adopta el criterio de asimilarla a una demanda desestimada (art. 22).",
   },
   "escala-unico-letrado": {
-    titulo: "Unico letrado en la sucesion",
+    titulo: "Único letrado en la sucesión",
     motivo:
       "El art. 35 reduce a la mitad la escala cuando un solo letrado interviene por todos los herederos.",
   },
   "escala-ejecucion-sentencia": {
-    titulo: "Ejecucion de sentencia",
+    titulo: "Ejecución de sentencia",
     motivo:
-      "El art. 41 fija los honorarios de la ejecucion en el 50% de la escala del art. 21.",
+      "El art. 41 fija los honorarios de la ejecución en el 50% de la escala del art. 21.",
   },
   "escala-art25": {
-    titulo: "Termino antes de la apertura a prueba",
+    titulo: "Terminó antes de la apertura a prueba",
     motivo:
-      "El art. 25 reduce la escala a la mitad cuando el proceso concluyo por un modo anormal —o por caducidad, si se adopta ese criterio— antes de abrirse la causa a prueba.",
+      "El art. 25 reduce la escala a la mitad cuando el proceso concluyó por un modo anormal —o por caducidad, si se adopta ese criterio— antes de abrirse la causa a prueba.",
   },
   "escala-cautelar": {
     titulo: "Medida cautelar",
     motivo:
-      "El art. 29 inc. e regula la cautelar en un porcentaje de la escala, segun haya mediado o no oposicion.",
+      "El art. 29 inc. e regula la cautelar en un porcentaje de la escala, según haya mediado o no oposición.",
   },
   "escala-homologacion": {
-    titulo: "Homologacion de desocupacion",
+    titulo: "Homologación de desocupación",
     motivo:
-      "El art. 40 regula el acuerdo de desocupacion en el 50% de la escala.",
+      "El art. 40 regula el acuerdo de desocupación en el 50% de la escala.",
   },
   "final-ejecucion-sin-excepciones": {
     titulo: "No se opusieron excepciones",

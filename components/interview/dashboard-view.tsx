@@ -84,7 +84,7 @@ export function DashboardView({ wizard, onBack, onRestart, onShowMinimos }: Dash
         </Button>
         <Button variant="outline" size="sm" onClick={onRestart} className="h-8 text-[13px]">
           <RotateCcw className="mr-1.5 h-3.5 w-3.5" />
-          Nuevo calculo
+          Nuevo cálculo
         </Button>
       </AppTopbar>
 
@@ -112,7 +112,7 @@ export function DashboardView({ wizard, onBack, onRestart, onShowMinimos }: Dash
         ) : (
           <div className="rounded-lg border border-border bg-card p-10 text-center">
             <p className="text-[13px] text-muted-foreground">
-              No se pudo generar el calculo. Revise los datos ingresados.
+              No se pudo generar el cálculo. Revise los datos ingresados.
             </p>
           </div>
         )}

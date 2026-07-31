@@ -22,7 +22,7 @@ export function AuxiliaresSection({ rango, esProvisorio }: AuxiliaresSectionProp
 
       <div className="grid gap-3 sm:grid-cols-2">
         <Tile
-          etiqueta="Minimo · 5%"
+          etiqueta="Mínimo · 5%"
           valor={
             <Cifra value={rango.minPesos} size="xl" className="text-value-min" />
           }
@@ -30,7 +30,7 @@ export function AuxiliaresSection({ rango, esProvisorio }: AuxiliaresSectionProp
         />
         {!esProvisorio && (
           <Tile
-            etiqueta="Maximo · 10%"
+            etiqueta="Máximo · 10%"
             valor={
               <Cifra value={rango.maxPesos} size="xl" className="text-value-max" />
             }

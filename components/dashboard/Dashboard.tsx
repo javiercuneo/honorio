@@ -128,7 +128,6 @@ function DashboardGeneral({
         escala={escala}
         cadena={cadena}
         valorUMA={resultado.valorUMA}
-        baseFinal={resultado.baseFinal}
         alicuota={alicuota}
         ingenuo={ingenuo}
       >

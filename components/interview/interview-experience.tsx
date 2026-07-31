@@ -1,4 +1,4 @@
-﻿// ---------------------------------------------------------------
+// ---------------------------------------------------------------
 // components/interview/interview-experience.tsx
 // Orquestador principal del wizard legal.
 // Usa el schema declarativo (ALL_STEPS) y el hook useWizard.
@@ -69,9 +69,17 @@ export function InterviewExperience() {
   const currentStepDef = wizard.currentStep as WizardStepDef | null
   const esUltimoPaso = wizard.index === wizard.visibleSteps.length - 1
 
-  // Auto-avance en seleccion unica. No corre en el ultimo paso: disparar
-  // el calculo tiene que ser un acto deliberado. El retardo alcanza para
-  // que la tarjeta se vea marcada antes de que la pantalla cambie.
+  // El avance diferido no puede cerrar sobre `wizard`: cuando el timeout
+  // corre, ese objeto quedo con las respuestas del render anterior y
+  // validateCurrent no ve la opcion recien elegida, de ahi el "debe
+  // seleccionar una opcion" con una opcion ya seleccionada. La ref
+  // siempre apunta al wizard del ultimo render.
+  const wizardRef = useRef(wizard)
+  wizardRef.current = wizard
+
+  // Auto-avance solo por teclado: quien tipea una letra esta en modo
+  // rapido y espera que la pantalla siga. Con el mouse no avanza, para
+  // que equivocarse de tarjeta no te saque de la pregunta.
   const avanceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   useEffect(() => () => {
     if (avanceRef.current) clearTimeout(avanceRef.current)
@@ -80,8 +88,8 @@ export function InterviewExperience() {
   const autoAvanzar = useCallback(() => {
     if (esUltimoPaso) return
     if (avanceRef.current) clearTimeout(avanceRef.current)
-    avanceRef.current = setTimeout(() => go(1, () => wizard.next()), 260)
-  }, [esUltimoPaso, go, wizard])
+    avanceRef.current = setTimeout(() => go(1, () => wizardRef.current.next()), 260)
+  }, [esUltimoPaso, go])
 
   // Teclado: la letra de cada tarjeta la selecciona, Enter avanza,
   // flecha izquierda vuelve. Las letras se muestran desde siempre; hasta
@@ -151,7 +159,7 @@ export function InterviewExperience() {
         <div className="text-center">
           <div className="mb-4 h-8 w-8 animate-spin rounded-full border-2 border-foreground border-t-transparent mx-auto" />
           <p className="font-mono text-[13px] text-muted-foreground">
-            Cargando motor juridico...
+            Cargando motor jurídico...
           </p>
         </div>
       </div>
@@ -163,7 +171,7 @@ export function InterviewExperience() {
       <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
         <div className="text-center max-w-md">
           <p className="font-mono text-[13px] text-destructive">
-            Error al cargar el motor juridico: {legacyError}
+            Error al cargar el motor jurídico: {legacyError}
           </p>
           <p className="mt-2 text-[12px] text-muted-foreground">
             Verifique que los archivos en /public/legacy/ existen.
@@ -180,7 +188,7 @@ export function InterviewExperience() {
         <div className="text-center">
           <div className="mb-4 h-8 w-8 animate-spin rounded-full border-2 border-foreground border-t-transparent mx-auto" />
           <p className="font-mono text-[13px] text-muted-foreground">
-            Cargando motor juridico...
+            Cargando motor jurídico...
           </p>
         </div>
       </div>
@@ -284,7 +292,6 @@ export function InterviewExperience() {
                           step={currentStep}
                           value={wizard.answers[currentStep.id] as string | string[] | undefined}
                           onChange={wizard.setAnswer}
-                          onElegir={autoAvanzar}
                         />
                       )}
                     </StepShell>

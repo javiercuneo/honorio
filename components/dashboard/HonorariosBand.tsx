@@ -1,7 +1,7 @@
 "use client"
 
 // ---------------------------------------------------------------
-// La banda principal contesta tres cosas sin un solo parrafo:
+// La banda principal contesta tres cosas sin un solo parrafo suelto:
 //   cuanto es, por que no es lo que la tabla sugiere, y como se
 //   reparte entre etapas y entre profesionales.
 //
@@ -22,19 +22,21 @@ import {
   Disclosure,
   EnUMA,
   Etiqueta,
-  LedgerRow,
+  Insignia,
   Norma,
+  ROL_TINT,
   Segmented,
+  Tile,
   useUma,
 } from "./primitives"
 import { BarraExcedente, ReglaArt21 } from "./ReglaArt21"
 
 type EtapaKey = "full" | "dos" | "una"
 
-const ETAPAS: { key: EtapaKey; factor: number; label: string; corto: string }[] = [
-  { key: "full", factor: 1, label: "Proceso completo", corto: "Completo" },
-  { key: "dos", factor: 2 / 3, label: "Dos etapas", corto: "2/3" },
-  { key: "una", factor: 1 / 3, label: "Una etapa", corto: "1/3" },
+const ETAPAS: { key: EtapaKey; factor: number; corto: string }[] = [
+  { key: "full", factor: 1, corto: "Completo" },
+  { key: "dos", factor: 2 / 3, corto: "2/3" },
+  { key: "una", factor: 1 / 3, corto: "1/3" },
 ]
 
 interface HonorariosBandProps {
@@ -44,7 +46,6 @@ interface HonorariosBandProps {
   escala?: EscalaAplicada
   cadena: CadenaDerivada
   valorUMA: number
-  baseFinal: number
   alicuota: string
   /** Lo que arrojaria leer la alicuota del tramo como si fuera directa. */
   ingenuo: number | null
@@ -74,14 +75,50 @@ function Par({ rango, esProvisorio }: { rango: Rango; esProvisorio: boolean }) {
   )
 }
 
+/** Un extremo del rango: rotulo, cifra grande, UMA y % efectivo. */
+function Extremo({
+  etiqueta,
+  pesos,
+  uma,
+  efectivo,
+  tono,
+  ajuste,
+}: {
+  etiqueta: string
+  pesos: number
+  uma: number
+  efectivo?: number
+  tono: string
+  ajuste?: string
+}) {
+  return (
+    <div>
+      <div className="flex items-baseline gap-2.5">
+        <Etiqueta>{etiqueta}</Etiqueta>
+        {ajuste ? <Insignia tono={ROL_TINT}>{ajuste}</Insignia> : null}
+      </div>
+      <div className="mt-2.5">
+        <Cifra value={pesos} size="hero" className={tono} />
+      </div>
+      <div className="mt-2 font-mono text-[12px] text-faint">
+        <EnUMA value={uma} />
+        {efectivo !== undefined ? (
+          <>
+            <span className="mx-2">·</span>
+            <span className="tabular-nums">{pct(efectivo, 1)} efectivo</span>
+          </>
+        ) : null}
+      </div>
+    </div>
+  )
+}
+
 export function HonorariosBand({
   rango,
-  rolLabel,
   esProvisorio,
   escala,
   cadena,
   valorUMA,
-  baseFinal,
   alicuota,
   ingenuo,
   children,
@@ -95,6 +132,7 @@ export function HonorariosBand({
   const a = porcentajeA / 100
 
   const ajustaPorRol = Math.abs(cadena.factorRol - 1) > 0.001
+  const ajuste = ajustaPorRol ? ajusteDesdeFactor(cadena.factorRol) : undefined
   const efectivo = cadena.porcentajeEfectivo
 
   return (
@@ -102,50 +140,64 @@ export function HonorariosBand({
       <CardHeader titulo="Honorarios · primera instancia">{children}</CardHeader>
 
       {/* Cifra principal */}
-      <div className="grid gap-8 px-7 py-8 sm:grid-cols-2">
-        <div>
-          <div className="flex items-baseline gap-2.5">
-            <Etiqueta>{esProvisorio ? "Provisorio" : "Minimo"}</Etiqueta>
-            {ajustaPorRol ? (
-              <span
-                className={`inline-flex items-baseline rounded-sm px-1.5 py-0.5 font-mono text-[10px] tabular-nums ${AXIS_TINT.honorarios}`}
-              >
-                {ajusteDesdeFactor(cadena.factorRol)}
-              </span>
-            ) : null}
-          </div>
-          <div className="mt-2.5">
-            <Cifra value={rango.minPesos} size="hero" className="text-value-min" />
-          </div>
-          <div className="mt-2 font-mono text-[12px] text-faint">
-            <EnUMA value={rango.minUMA} />
-            {efectivo ? (
-              <>
-                <span className="mx-2">·</span>
-                <span className="tabular-nums">{pct(efectivo.min, 1)} efectivo</span>
-              </>
-            ) : null}
-          </div>
-        </div>
+      <div
+        className={
+          esProvisorio ? "px-7 py-8" : "grid gap-8 px-7 py-8 sm:grid-cols-2"
+        }
+      >
+        <Extremo
+          etiqueta={esProvisorio ? "Honorario provisorio" : "Mínimo"}
+          pesos={rango.minPesos}
+          uma={rango.minUMA}
+          efectivo={efectivo?.min}
+          tono="text-value-min"
+          ajuste={ajuste}
+        />
 
         {!esProvisorio && (
           <div className="border-t border-hair pt-6 sm:border-l sm:border-t-0 sm:pl-8 sm:pt-0">
-            <Etiqueta>Maximo</Etiqueta>
-            <div className="mt-2.5">
-              <Cifra value={rango.maxPesos} size="hero" className="text-value-max" />
-            </div>
-            <div className="mt-2 font-mono text-[12px] text-faint">
-              <EnUMA value={rango.maxUMA} />
-              {efectivo ? (
-                <>
-                  <span className="mx-2">·</span>
-                  <span className="tabular-nums">{pct(efectivo.max, 1)} efectivo</span>
-                </>
-              ) : null}
-            </div>
+            <Extremo
+              etiqueta="Máximo"
+              pesos={rango.maxPesos}
+              uma={rango.maxUMA}
+              efectivo={efectivo?.max}
+              tono="text-value-max"
+              ajuste={ajuste}
+            />
           </div>
         )}
       </div>
+
+      {/* Provisorio: por que no hay maximo */}
+      {esProvisorio ? (
+        <div className="border-t border-hair px-7">
+          <Disclosure
+            concepto={
+              <span className="flex items-baseline gap-2 text-foreground">
+                <Insignia tono={AXIS_TINT.honorarios}>Sin máximo</Insignia>
+                Esta regulación se practica en el mínimo
+              </span>
+            }
+            articulo="art. 12"
+          >
+            <div className="space-y-2.5">
+              <Norma>
+                &ldquo;Si un profesional se aparta de un proceso o gestión antes
+                de su conclusión normal, puede solicitar regulación provisoria de
+                honorarios, los que se fijarán en el mínimo que le hubiere podido
+                corresponder conforme a las actuaciones cumplidas.&rdquo;
+              </Norma>
+              <p>
+                Por eso acá no hay un rango sino un solo valor, y tampoco hay
+                reparto por etapas: la regulación definitiva se practica al
+                concluir el proceso, sobre la labor efectivamente cumplida, y
+                puede resultar mayor. El importe de arriba es un piso, no una
+                estimación de lo que finalmente se regule.
+              </p>
+            </div>
+          </Disclosure>
+        </div>
+      ) : null}
 
       {/* El contrafactico: el numero que espera quien lee solo la tabla */}
       {ingenuo !== null && escala ? (
@@ -160,19 +212,18 @@ export function HonorariosBand({
           >
             <div className="space-y-2.5">
               <Norma>
-                &ldquo;En ningun caso los honorarios podran ser inferiores al
-                maximo del grado inmediato anterior de la escala, con mas el
-                incremento por aplicacion al excedente de la alicuota que
+                &ldquo;En ningún caso los honorarios podrán ser inferiores al
+                máximo del grado inmediato anterior de la escala, con más el
+                incremento por aplicación al excedente de la alícuota que
                 corresponde al grado siguiente.&rdquo;
               </Norma>
               <p>
-                Multiplicar la alicuota del tramo ({alicuota}) por la base da
-                ese numero, y es lo que casi todo el mundo calcula. Pero la
-                escala no funciona asi:
-                arranca en el maximo del grado anterior y la alicuota solo toca
-                el excedente. Sobre ese resultado recien despues actuan las
-                reducciones. Por eso el numero final no guarda relacion directa
-                con el porcentaje del tramo.
+                Multiplicar la alícuota del tramo ({alicuota}) por la base da ese
+                número, y es lo que casi todo el mundo calcula. Pero la escala no
+                funciona así: arranca en el máximo del grado anterior y la
+                alícuota solo toca el excedente. Sobre ese resultado recién
+                después actúan las reducciones. Por eso el número final no guarda
+                relación directa con el porcentaje del tramo.
               </p>
             </div>
           </Disclosure>
@@ -194,9 +245,8 @@ export function HonorariosBand({
             />
           ) : (
             <p className="font-mono text-[11px] text-faint">
-              Base de {uma(escala.baseEnUMA)} UMA en el primer tramo: la
-              alicuota se aplica sobre el total, sin grado anterior que
-              acumular.
+              Base de {uma(escala.baseEnUMA)} UMA en el primer tramo: la alícuota
+              se aplica sobre el total, sin grado anterior que acumular.
             </p>
           )}
         </div>
@@ -205,18 +255,23 @@ export function HonorariosBand({
       {/* Etapas: el completo ya esta arriba, no se repite */}
       {!esProvisorio && (
         <div className="border-t border-border px-7 py-5">
-          <Etiqueta>Por etapa</Etiqueta>
-          <div className="mt-1.5">
+          <Etiqueta>Por etapas</Etiqueta>
+          <div className="mt-2.5 grid gap-3 sm:grid-cols-2">
             {ETAPAS.filter((e) => e.key !== "full").map((e) => {
               const r = escalar(rango, e.factor)
               return (
-                <LedgerRow
+                <Tile
                   key={e.key}
-                  concepto={e.label}
-                  articulo={e.corto}
-                  valor={<Par rango={r} esProvisorio={esProvisorio} />}
+                  etiqueta={e.corto}
+                  valor={
+                    <span className="inline-flex flex-wrap items-baseline gap-1.5">
+                      <Cifra value={r.minPesos} size="lg" className="text-value-min" />
+                      <span className="font-mono text-[10px] text-faint">a</span>
+                      <Cifra value={r.maxPesos} size="lg" className="text-value-max" />
+                    </span>
+                  }
                   sub={
-                    <span className="font-mono text-[10px] text-faint">
+                    <span>
                       {uma(r.minUMA)} a <EnUMA value={r.maxUMA} />
                     </span>
                   }
@@ -248,7 +303,7 @@ export function HonorariosBand({
               step={5}
               value={porcentajeA}
               onChange={(e) => setPorcentajeA(Number(e.target.value))}
-              aria-label="Proporcion del primer profesional"
+              aria-label="Proporción del primer profesional"
               className="h-1 flex-1 cursor-pointer accent-primary"
             />
             <input

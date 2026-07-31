@@ -74,6 +74,12 @@
   --color-value-min: var(--value-min);
   --color-value-max: var(--value-max);
 
+  /* Ajuste por rol (art. 20). No es una reduccion: es la posicion
+     relativa de cada rol, y por eso no comparte color con los ejes. */
+  --color-rol: var(--rol);
+  --color-rol-tint: var(--rol-tint);
+  --color-rol-tint-foreground: var(--rol-tint-foreground);
+
   /* Neutros propios del sistema */
   --color-faint: var(--faint);
   --color-hair: var(--hair);
@@ -147,6 +153,12 @@
   /* Piso y techo de un rango: misma tinta, dos profundidades. No son dos cosas distintas. */
   --value-min: #5a626e;
   --value-max: #12161c;
+
+  /* Ajuste por rol (art. 20): verde, fuera del sistema de tres ejes,
+     porque no reduce por una razon procesal sino que ubica al rol. */
+  --rol: #1f7a4d;
+  --rol-tint: rgb(31 122 77 / 0.11);
+  --rol-tint-foreground: #19613d;
 }
 
 .dark {
@@ -206,6 +218,10 @@
 
   --value-min: #99a1ae;
   --value-max: #edeff3;
+
+  --rol: #5fc08a;
+  --rol-tint: rgb(95 192 138 / 0.14);
+  --rol-tint-foreground: #86d3a8;
 }
 
 @layer base {

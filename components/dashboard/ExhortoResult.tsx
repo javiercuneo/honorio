@@ -67,20 +67,20 @@ export function ExhortoResult({ resultado }: ExhortoResultProps) {
         <details className="border-t border-hair px-6 py-4">
           <summary className="cursor-pointer list-none">
             <Etiqueta className="transition-colors hover:text-foreground">
-              Texto del articulo
+              Texto del artículo
             </Etiqueta>
           </summary>
           <p className="mt-3 max-w-3xl font-law text-[15px] leading-relaxed text-muted-foreground">
             Los honorarios por diligenciamiento de exhortos u oficios
-            contemplados en la ley 22.172 seran regulados de conformidad a las
+            contemplados en la ley 22.172 serán regulados de conformidad a las
             siguientes pautas: a) si se tratare de notificaciones o actos
-            semejantes, los honorarios no podran ser inferiores a 3 UMA; b) si se
+            semejantes, los honorarios no podrán ser inferiores a 3 UMA; b) si se
             solicitaren inscripciones de dominios, hijuelas, testamentos,
-            gravamenes, secuestros, embargos, inhibiciones, inventarios, remates,
+            gravámenes, secuestros, embargos, inhibiciones, inventarios, remates,
             desalojos, o cualquier otro acto registral, los honorarios se
-            regularan en una escala entre 10 y 20 UMA; c) si se tratare de
-            diligencias de prueba y se hubiera intervenido en su produccion o
-            contralor, el juez exhortado regulara los honorarios
+            regularán en una escala entre 10 y 20 UMA; c) si se tratare de
+            diligencias de prueba y se hubiera intervenido en su producción o
+            contralor, el juez exhortado regulará los honorarios
             proporcionalmente a la labor desarrollada, en una escala entre 7 y 30
             UMA.
           </p>

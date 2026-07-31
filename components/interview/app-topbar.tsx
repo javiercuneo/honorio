@@ -122,15 +122,15 @@ function Ajustes() {
             />
           </div>
           <p className="mt-3 border-t border-hair pt-3 text-[12px] leading-relaxed text-faint">
-            Solo cambia como se escribe la cifra. El calculo es siempre el
+            Solo cambia cómo se escribe la cifra. El cálculo es siempre el
             mismo.
           </p>
           <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.16em] text-faint">
             Colores
           </p>
           <p className="mt-1.5 text-[12px] leading-relaxed text-faint">
-            Cada regla esta pintada segun el eje que modifica: ocre la base,
-            violeta la escala, oxido el honorario.
+            Cada regla está pintada según el eje que modifica: ocre la base,
+            violeta la escala, óxido el honorario.
           </p>
         </div>
       ) : null}
