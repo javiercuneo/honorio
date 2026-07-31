@@ -1,4 +1,4 @@
-﻿// ---------------------------------------------------------------
+// ---------------------------------------------------------------
 // lib/legal/calculate.ts
 // Motor juridico puro: calcula honorarios sin side effects.
 // Unico punto de entrada: buildCalculationResult(state)
@@ -513,6 +513,21 @@ export function calcularPartidor(basePesos: number, valorUMA: number): Partidor 
 }
 
 /**
+ * Art. 12: si el profesional se aparta antes de la conclusion del proceso,
+ * la regulacion provisoria se fija "en el minimo que le hubiere podido
+ * corresponder". No cambia ningun factor del calculo: cambia que solo el
+ * minimo tiene sentido, y el maximo no debe enunciarse.
+ *
+ * Se deriva de `modoTerminacion` y no se lee solo de la bandera, para que
+ * cualquier consumidor del motor (wizard, API, otra app) obtenga el mismo
+ * resultado mandando unicamente el modo de terminacion. La bandera se
+ * respeta si viene puesta, por compatibilidad con el motor clasico.
+ */
+export function esRegulacionProvisoria(state: WizardState): boolean {
+  return state.esProvisorio === true || state.modoTerminacion === 'provisorios'
+}
+
+/**
  * Construye el resultado estructurado del calculo de honorarios.
  * Entry point unico: delega internamente segun el tipo de proceso.
  */
@@ -716,7 +731,7 @@ export function buildMedidaCautelar(state: WizardState): CalculoResultado {
 
   return {
     tipoProceso: 'medida_cautelar',
-    esProvisorio: state.esProvisorio,
+    esProvisorio: esRegulacionProvisoria(state),
     baseOriginal: base,
     baseFinal: base,
     valorUMA: uma,
@@ -764,7 +779,7 @@ export function buildHomologacion(state: WizardState): CalculoResultado {
 
   return {
     tipoProceso: 'homologacion_desocupacion',
-    esProvisorio: state.esProvisorio,
+    esProvisorio: esRegulacionProvisoria(state),
     baseOriginal: state.baseValor,
     baseFinal,
     valorUMA: uma,
@@ -930,7 +945,7 @@ export function buildGeneral(state: WizardState): CalculoResultado {
 
   return {
     tipoProceso: tipo,
-    esProvisorio: state.esProvisorio,
+    esProvisorio: esRegulacionProvisoria(state),
     baseOriginal: state.baseValor,
     baseFinal,
     valorUMA: uma,
@@ -965,7 +980,7 @@ export function buildGeneral(state: WizardState): CalculoResultado {
 function buildEmpty(state: WizardState): CalculoResultado {
   return {
     tipoProceso: state.tipoProceso,
-    esProvisorio: state.esProvisorio,
+    esProvisorio: esRegulacionProvisoria(state),
     baseOriginal: state.baseValor,
     baseFinal: state.baseValor,
     valorUMA: state.valorUMA,
