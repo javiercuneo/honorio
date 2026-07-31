@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 L. Javier Cuneo Libarona
 // ---------------------------------------------------------------
 // lib/legal/adapters.ts
 // Capa de adaptacion framework-agnostica.

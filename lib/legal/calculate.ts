@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 L. Javier Cuneo Libarona
 // ---------------------------------------------------------------
 // lib/legal/calculate.ts
 // Motor juridico puro: calcula honorarios sin side effects.

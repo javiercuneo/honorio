@@ -1,4 +1,6 @@
-﻿// ---------------------------------------------------------------
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 L. Javier Cuneo Libarona
+// ---------------------------------------------------------------
 // lib/legal/types.ts
 // Interfaces del motor juridico — Framework-agnostic
 // Refleja el contrato publico de core.js + state.js + calculations.js
@@ -237,4 +239,3 @@ export interface Explanation {
 
 // ---- Respuestas del wizard (formato generico) ----
 export type Answers = Record<string, string | string[] | number | boolean | null>
-

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 L. Javier Cuneo Libarona
 // ---------------------------------------------------------------
 // lib/legal/minimos-data.ts
 // Datos de referencia de los minimos arancelarios (Ley 27.423).
