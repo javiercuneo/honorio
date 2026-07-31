@@ -1,6 +1,12 @@
-﻿'use client'
+'use client'
 
-import { motion } from 'motion/react'
+// ---------------------------------------------------------------
+// Tarjeta de opcion. La letra de la izquierda no es decorativa: es la
+// tecla que selecciona esa opcion, y por eso se compone como una tecla.
+// Seleccionado usa el acento, el mismo color que marca foco y estado
+// activo en el resto de la app.
+// ---------------------------------------------------------------
+
 import { Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { CardOption } from '@/lib/legal/types'
@@ -13,6 +19,8 @@ type OptionCardProps = {
   onSelect: () => void
 }
 
+export const LETRAS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+
 export function OptionCard({
   option,
   selected,
@@ -20,42 +28,46 @@ export function OptionCard({
   multi = false,
   onSelect,
 }: OptionCardProps) {
+  const letra = LETRAS[index]
+
   return (
     <button
       type="button"
       onClick={onSelect}
       role={multi ? 'checkbox' : 'radio'}
       aria-checked={selected}
+      aria-keyshortcuts={letra}
       className={cn(
-        'group relative flex h-full w-full flex-col items-start gap-3 rounded-2xl border bg-card p-4 text-left transition-all duration-200',
-        'hover:-translate-y-0.5 hover:shadow-[0_12px_30px_-18px_rgba(0,0,0,0.28)]',
+        'group relative flex h-full w-full flex-col items-start gap-3 rounded-lg border p-4 text-left',
+        'transition-colors duration-150',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
         selected
-          ? 'border-foreground/25 shadow-[0_16px_40px_-24px_rgba(0,0,0,0.35)]'
-          : 'border-border hover:border-foreground/15',
+          ? 'border-accent-foreground bg-accent'
+          : 'border-border bg-card hover:border-foreground/25',
       )}
     >
       <span className="flex w-full items-center justify-between gap-2">
         <span
           className={cn(
-            'flex h-6 w-6 shrink-0 items-center justify-center border text-[11px] font-medium transition-colors duration-200',
-            multi ? 'rounded-md' : 'rounded-full',
+            'flex h-6 min-w-6 shrink-0 items-center justify-center rounded-sm border px-1 font-mono text-[11px] transition-colors',
             selected
-              ? 'border-transparent bg-foreground text-background'
-              : 'border-border text-muted-foreground group-hover:border-foreground/30',
+              ? 'border-transparent bg-accent-foreground text-primary-foreground'
+              : 'border-border bg-secondary text-faint group-hover:text-muted-foreground',
           )}
         >
           {selected ? (
             <Check className="h-3.5 w-3.5" strokeWidth={2.5} />
           ) : (
-            String.fromCharCode(65 + index)
+            letra
           )}
         </span>
         {option.hint ? (
           <span
             className={cn(
-              'shrink-0 rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider transition-colors',
-              selected ? 'bg-accent text-accent-foreground' : 'bg-secondary text-muted-foreground',
+              'shrink-0 rounded-sm px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wider transition-colors',
+              selected
+                ? 'bg-card/70 text-accent-foreground'
+                : 'bg-secondary text-faint',
             )}
           >
             {option.hint}
@@ -64,7 +76,12 @@ export function OptionCard({
       </span>
 
       <span className="flex-1">
-        <span className="block text-[15px] font-medium leading-tight text-card-foreground">
+        <span
+          className={cn(
+            'block text-[15px] font-medium leading-tight',
+            selected ? 'text-accent-foreground' : 'text-card-foreground',
+          )}
+        >
           {option.label}
         </span>
         <span className="mt-1 block text-[13px] leading-relaxed text-muted-foreground">

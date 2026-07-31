@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import type { ReactNode } from 'react'
 import { ExplanationDisclosure } from './explanation-disclosure'
@@ -12,6 +12,8 @@ type StepShellProps = {
   children: ReactNode
 }
 
+const VACIO = 'Complete los datos segun corresponda.'
+
 export function StepShell({
   eyebrow,
   question,
@@ -19,22 +21,28 @@ export function StepShell({
   explanation,
   children,
 }: StepShellProps) {
+  const tieneFundamento =
+    explanation.full?.some((line) => line && line !== VACIO) ?? false
+
   return (
     <div>
-      <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-accent-foreground">
+      <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-accent-foreground">
         {eyebrow}
       </span>
-      <h1 className="mt-4 text-pretty font-meter text-4xl leading-[1.05] tracking-tight text-foreground md:text-5xl">
+      <h1 className="mt-3 text-pretty font-meter text-[34px] leading-[1.05] tracking-tight text-foreground md:text-[42px]">
         {question}
       </h1>
-      <p className="mt-3 max-w-md text-[15px] leading-relaxed text-muted-foreground">
+      <p className="mt-3 max-w-lg text-[15px] leading-relaxed text-muted-foreground">
         {helper}
       </p>
 
       <div className="mt-8">{children}</div>
 
-      {explanation.full && explanation.full.length > 0 && explanation.full.some(line => line !== 'Complete los datos segun corresponda.') ? (
-        <ExplanationDisclosure explanation={explanation} />) : null}
+      {tieneFundamento ? (
+        <div className="mt-8">
+          <ExplanationDisclosure explanation={explanation} />
+        </div>
+      ) : null}
     </div>
   )
 }

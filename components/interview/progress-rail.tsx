@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { motion } from 'motion/react'
 
@@ -15,25 +15,18 @@ type ProgressRailProps = {
 export function ProgressRail({ total, current, completed, showFraction }: ProgressRailProps) {
   return (
     <div className="flex items-center gap-4">
-      <div className="flex flex-1 items-center gap-1.5" aria-hidden="true">
+      <div className="flex flex-1 items-center gap-1" aria-hidden="true">
         {Array.from({ length: total }).map((_, i) => {
           const state =
             i < completed ? 'done' : i === current ? 'active' : 'upcoming'
           return (
-            <div
-              key={i}
-              className="relative h-1 flex-1 overflow-hidden rounded-full bg-border/70"
-            >
+            <div key={i} className="relative h-[3px] flex-1 overflow-hidden rounded-full bg-hair">
               <motion.span
-                className="absolute inset-y-0 left-0 rounded-full bg-foreground"
+                className="absolute inset-y-0 left-0 rounded-full bg-accent-foreground"
                 initial={false}
                 animate={{
                   width:
-                    state === 'done'
-                      ? '100%'
-                      : state === 'active'
-                        ? '45%'
-                        : '0%',
+                    state === 'done' ? '100%' : state === 'active' ? '45%' : '0%',
                   opacity: state === 'upcoming' ? 0 : 1,
                 }}
                 transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
@@ -43,7 +36,7 @@ export function ProgressRail({ total, current, completed, showFraction }: Progre
         })}
       </div>
       {showFraction && (
-        <span className="shrink-0 font-mono text-[11px] tabular-nums text-muted-foreground">
+        <span className="shrink-0 font-mono text-[10px] tabular-nums text-faint">
           {completed}/{total}
         </span>
       )}

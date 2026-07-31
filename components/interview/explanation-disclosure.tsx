@@ -1,98 +1,59 @@
-﻿'use client'
+'use client'
 
-import { useState } from 'react'
-import { AnimatePresence, motion } from 'motion/react'
-import { HelpCircle, Plus } from 'lucide-react'
-import { cn } from '@/lib/utils'
+// ---------------------------------------------------------------
+// El fundamento juridico de cada paso, detras del mismo "por que" que
+// usa el dashboard. Una sola forma de esconder informacion en toda la
+// app: misma palabra, mismo tamano, mismo lugar.
+// ---------------------------------------------------------------
+
 import type { Explanation } from '@/lib/legal/types'
+
+const VACIO = 'Complete los datos segun corresponda.'
+
+// Varios pasos traen "Ver más" como brief: era el rotulo del boton
+// viejo, no un resumen. Al lado de "por que" queda repetido, asi que se
+// reemplaza por algo que describa el contenido. El schema no se toca.
+const GENERICOS = new Set(['ver más', 'ver mas', 'ver más +', ''])
 
 export function ExplanationDisclosure({
   explanation,
 }: {
   explanation: Explanation
 }) {
-  const [open, setOpen] = useState(false)
-  const [showFull, setShowFull] = useState(false)
+  const articulado = explanation.full.filter((l) => l && l !== VACIO)
+  const resumen = GENERICOS.has(explanation.brief.trim().toLowerCase())
+    ? 'Qué dice la ley sobre este paso'
+    : explanation.brief
 
   return (
-    <div className="rounded-2xl border border-border/80 bg-secondary/40">
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        aria-expanded={open}
-        className="flex w-full items-center gap-2.5 rounded-2xl px-4 py-3 text-left transition-colors hover:bg-secondary/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-      >
-        <HelpCircle className="h-4 w-4 shrink-0 text-muted-foreground" />
+    <details className="group border-t border-hair pt-3">
+      <summary className="flex cursor-pointer list-none items-baseline gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
         <span className="flex-1 text-[13px] leading-snug text-muted-foreground">
-          {explanation.brief}
+          {resumen}
         </span>
-        <span className="shrink-0 font-mono text-[11px] uppercase tracking-wider text-muted-foreground/80">
-          {open ? 'Cerrar' : 'Fundamento legal'}
+        <span className="shrink-0 font-mono text-[10px] uppercase tracking-wider text-accent-foreground">
+          por que
         </span>
-      </button>
+      </summary>
 
-      <AnimatePresence initial={false}>
-        {open ? (
-          <motion.div
-            key="body"
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-            className="overflow-hidden"
-          >
-            <div className="border-t border-border/70 px-4 pb-4 pt-3.5">
-              <p className="text-[13px] leading-relaxed text-foreground/75">
-                {explanation.expanded}
-              </p>
+      <div className="max-w-2xl pb-1 pt-3">
+        <p className="text-[13px] leading-relaxed text-muted-foreground">
+          {explanation.expanded}
+        </p>
 
-              <button
-                type="button"
-                onClick={() => setShowFull((v) => !v)}
-                aria-expanded={showFull}
-                className={cn(
-                  'mt-3 inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-wider text-muted-foreground transition-colors hover:text-foreground',
-                )}
+        {articulado.length > 0 ? (
+          <ul className="mt-3 space-y-2 border-l-2 border-hair pl-4">
+            {articulado.map((line, i) => (
+              <li
+                key={i}
+                className="font-law text-[15px] leading-relaxed text-foreground/80"
               >
-                <Plus
-                  className={cn(
-                    'h-3.5 w-3.5 transition-transform duration-300',
-                    showFull && 'rotate-45',
-                  )}
-                />
-                {showFull ? 'Ocultar detalles' : 'Ver articulado completo'}
-              </button>
-
-              <AnimatePresence initial={false}>
-                {showFull ? (
-                  <motion.ul
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-                    className="overflow-hidden"
-                  >
-                    <div className="mt-3 space-y-2.5">
-                      {explanation.full.map((line, i) => (
-                        <li
-                          key={i}
-                          className="flex gap-2.5 font-law text-[15px] leading-relaxed text-muted-foreground"
-                        >
-                          <span
-                            className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-foreground/40"
-                            aria-hidden="true"
-                          />
-                          {line}
-                        </li>
-                      ))}
-                    </div>
-                  </motion.ul>
-                ) : null}
-              </AnimatePresence>
-            </div>
-          </motion.div>
+                {line}
+              </li>
+            ))}
+          </ul>
         ) : null}
-      </AnimatePresence>
-    </div>
+      </div>
+    </details>
   )
 }

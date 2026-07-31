@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { OptionCard } from './option-card'
 import { cn } from '@/lib/utils'
@@ -8,9 +8,11 @@ type CardsFieldProps = {
   step: CardsStepDef
   value: string | string[] | undefined
   onChange: (value: string | string[] | number) => void
+  /** Se dispara al elegir en un paso de seleccion unica. */
+  onElegir?: () => void
 }
 
-export function CardsField({ step, value, onChange }: CardsFieldProps) {
+export function CardsField({ step, value, onChange, onElegir }: CardsFieldProps) {
   const multi = step.select === 'multi'
   const selectedIds = multi
     ? Array.isArray(value)
@@ -23,6 +25,7 @@ export function CardsField({ step, value, onChange }: CardsFieldProps) {
   const handleSelect = (id: string) => {
     if (!multi) {
       onChange(id)
+      onElegir?.()
       return
     }
     const set = new Set(selectedIds)

@@ -11,14 +11,15 @@
 
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ALL_STEPS, type WizardStepDef } from '@/lib/wizard/wizard-schema'
 import { useWizard } from '@/hooks/useWizard'
 import { useLegacyReady } from '@/components/LegacyLoader'
-import { withBasePath } from '@/lib/basePath'
+import { AppTopbar } from './app-topbar'
+import { LETRAS } from './option-card'
 import { ProgressRail } from './progress-rail'
 import { ContextPanel } from './context-panel'
 import { StepShell } from './step-shell'
@@ -64,6 +65,79 @@ export function InterviewExperience() {
   const hasAnswer = wizard.currentStep
     ? isStepAnswered(wizard.currentStep, wizard.answers)
     : false
+
+  const currentStepDef = wizard.currentStep as WizardStepDef | null
+  const esUltimoPaso = wizard.index === wizard.visibleSteps.length - 1
+
+  // Auto-avance en seleccion unica. No corre en el ultimo paso: disparar
+  // el calculo tiene que ser un acto deliberado. El retardo alcanza para
+  // que la tarjeta se vea marcada antes de que la pantalla cambie.
+  const avanceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  useEffect(() => () => {
+    if (avanceRef.current) clearTimeout(avanceRef.current)
+  }, [])
+
+  const autoAvanzar = useCallback(() => {
+    if (esUltimoPaso) return
+    if (avanceRef.current) clearTimeout(avanceRef.current)
+    avanceRef.current = setTimeout(() => go(1, () => wizard.next()), 260)
+  }, [esUltimoPaso, go, wizard])
+
+  // Teclado: la letra de cada tarjeta la selecciona, Enter avanza,
+  // flecha izquierda vuelve. Las letras se muestran desde siempre; hasta
+  // ahora no hacian nada.
+  useEffect(() => {
+    if (wizard.phase !== 'question') return
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return
+      const target = e.target as HTMLElement | null
+      const escribiendo =
+        target &&
+        (target.tagName === 'INPUT' ||
+          target.tagName === 'TEXTAREA' ||
+          target.isContentEditable)
+
+      if (e.key === 'Enter') {
+        if (escribiendo) return
+        if (hasAnswer) {
+          e.preventDefault()
+          go(1, () => wizard.next())
+        }
+        return
+      }
+
+      if (e.key === 'ArrowLeft' && !escribiendo) {
+        e.preventDefault()
+        go(-1, () => wizard.back())
+        return
+      }
+
+      if (escribiendo) return
+      if (!currentStepDef || currentStepDef.kind === 'numeric') return
+
+      const i = LETRAS.indexOf(e.key.toUpperCase())
+      const opcion = i >= 0 ? currentStepDef.options[i] : undefined
+      if (!opcion) return
+
+      e.preventDefault()
+      if (currentStepDef.select === 'multi') {
+        const actuales = Array.isArray(wizard.answers[currentStepDef.id])
+          ? (wizard.answers[currentStepDef.id] as string[])
+          : []
+        const set = new Set(actuales)
+        if (set.has(opcion.id)) set.delete(opcion.id)
+        else set.add(opcion.id)
+        wizard.setAnswer(Array.from(set))
+      } else {
+        wizard.setAnswer(opcion.id)
+        autoAvanzar()
+      }
+    }
+
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [wizard, currentStepDef, hasAnswer, go, autoAvanzar])
 
   // ---- Landing ----
   if (showLanding) {
@@ -151,12 +225,19 @@ export function InterviewExperience() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <div className="mx-auto flex min-h-screen max-w-6xl flex-col px-5 pb-10 md:px-8">
-        {/* Header */}
-        <header className="flex items-center justify-between gap-6 py-6">
-          <Brand />
-          {wizard.phase === 'question' ? (
-          <div className="hidden w-64 md:block lg:w-80">
+      <AppTopbar caso={wizard.phase === 'question' ? 'Entrevista' : undefined}>
+        <button
+          type="button"
+          onClick={() => setShowMinimos(true)}
+          className="rounded-md px-2.5 py-1.5 text-[13px] text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          Mínimos
+        </button>
+      </AppTopbar>
+
+      <div className="mx-auto flex max-w-5xl flex-col px-6 pb-10 md:px-8">
+        {wizard.phase === 'question' ? (
+          <div className="py-5">
             <ProgressRail
               total={wizard.maxTotalSteps}
               current={wizard.index}
@@ -164,22 +245,10 @@ export function InterviewExperience() {
               showFraction={!!wizard.answers.tipoProceso}
             />
           </div>
-          ) : null}
-        </header>
-
-        {/* Mobile progress */}
-        {wizard.phase === 'question' ? (
-        <div className="mb-2 md:hidden">
-          <ProgressRail
-            total={wizard.totalSteps}
-            current={wizard.index}
-            completed={wizard.completedSteps}
-          />
-        </div>
         ) : null}
 
         {/* Body */}
-        <div className="grid flex-1 items-start gap-10 py-8 md:grid-cols-[minmax(0,1fr)_320px] md:gap-14 lg:gap-20">
+        <div className="grid flex-1 items-start gap-10 pb-8 pt-3 md:grid-cols-[minmax(0,1fr)_300px] md:gap-12 lg:gap-16">
           <div className="flex min-h-[60vh] flex-col">
             <div className="flex-1">
               <AnimatePresence mode="wait" custom={direction}>
@@ -215,6 +284,7 @@ export function InterviewExperience() {
                           step={currentStep}
                           value={wizard.answers[currentStep.id] as string | string[] | undefined}
                           onChange={wizard.setAnswer}
+                          onElegir={autoAvanzar}
                         />
                       )}
                     </StepShell>
@@ -225,34 +295,43 @@ export function InterviewExperience() {
 
             {/* Footer navigation */}
             {wizard.phase === 'question' ? (
-              <div className="mt-10 flex items-center justify-between border-t border-border pt-5">
+              <div className="mt-10 flex items-center justify-between gap-4 border-t border-border pt-5">
                 <Button
                   variant="ghost"
                   onClick={handleBack}
-                  className="h-11 rounded-full px-4 text-muted-foreground hover:text-foreground"
+                  className="h-10 px-3 text-muted-foreground hover:text-foreground"
                 >
-                  <ArrowLeft className="mr-1 h-4 w-4" />
-                  Atras
+                  <ArrowLeft className="mr-1.5 h-4 w-4" />
+                  Atrás
                 </Button>
 
                 <div className="flex items-center gap-4">
-                  {wizard.errorMessage && (
-                    <span className="text-[12px] text-destructive max-w-[180px] text-right leading-tight">
+                  {wizard.errorMessage ? (
+                    <span className="max-w-[200px] text-right text-[12px] leading-tight text-destructive">
                       {wizard.errorMessage}
                     </span>
+                  ) : (
+                    <span className="hidden items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider text-faint sm:flex">
+                      {currentStep?.kind === 'numeric' ? (
+                        <>
+                          <Tecla>Enter</Tecla> para continuar
+                        </>
+                      ) : (
+                        <>
+                          <Tecla>A</Tecla>
+                          <Tecla>B</Tecla>
+                          <Tecla>C</Tecla> para elegir
+                        </>
+                      )}
+                    </span>
                   )}
-                  <span className="hidden font-mono text-[11px] uppercase tracking-wider text-muted-foreground/70 sm:block">
-                    {hasAnswer ? 'Listo' : (currentStep?.kind === 'numeric' ? 'Ingrese un valor' : 'Seleccione una opcion')}
-                  </span>
                   <Button
                     onClick={handleNext}
                     disabled={!hasAnswer}
-                    className="group h-11 rounded-full px-6 disabled:opacity-40"
+                    className="group h-10 px-5 disabled:opacity-40"
                   >
-                    {wizard.index === wizard.visibleSteps.length - 1
-                      ? 'Calcular honorarios'
-                      : 'Continuar'}
-                    <ArrowRight className="ml-1 h-4 w-4 transition-transform duration-300 group-enabled:group-hover:translate-x-0.5" />
+                    {esUltimoPaso ? 'Calcular honorarios' : 'Continuar'}
+                    <ArrowRight className="ml-1.5 h-4 w-4 transition-transform duration-300 group-enabled:group-hover:translate-x-0.5" />
                   </Button>
                 </div>
               </div>
@@ -288,9 +367,12 @@ export function InterviewExperience() {
   )
 }
 
-function Brand() {
+/** Tecla dibujada como tecla, para que la pista de teclado se lea como tal. */
+function Tecla({ children }: { children: React.ReactNode }) {
   return (
-    <img src={withBasePath('/honorio.png')} alt="Honorio" width="147" className="h-auto" />
+    <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-sm border border-border bg-secondary px-1 text-[10px] text-muted-foreground">
+      {children}
+    </span>
   )
 }
 
@@ -310,7 +392,7 @@ function IntroAside() {
         {[
           { n: '01', t: 'Inicio', d: 'Ingresá el valor de la UMA' },
           { n: '02', t: 'Seleccioná el tipo de proceso', d: 'Ejecutivo, Sucesión y demás' },
-          { n: '03', t: 'Indicá opciones procesles que cambian el cálculo', d: 'El juicio terminó por sentencia, acuerdo, etc.' },
+          { n: '03', t: 'Indicá las opciones procesales que cambian el cálculo', d: 'El juicio terminó por sentencia, acuerdo, etc.' },
           { n: '04', t: 'Elegí el objeto del juicio', d: 'Desalojo, Escrituración, u otros' },
           { n: '05', t: 'Ingresá la base regulatoria', d: 'El monto del juicio' },
           { n: '06', t: 'Obtené el cálculo', d: 'Según las variables elegidas' },
