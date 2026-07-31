@@ -133,29 +133,16 @@ export function InterviewExperience() {
   }
 
   // ---- Dashboard ----
+  // La cabecera la pone DashboardView (AppTopbar): una sola para toda
+  // la pantalla, con la marca, el caso y los controles.
   if (wizard.phase === 'dashboard') {
     return (
-      <div className="min-h-screen bg-background text-foreground">
-        <header className="mx-auto flex max-w-6xl items-center justify-between px-5 py-6 md:px-8">
-          <Brand />
-          <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
-            Resultado del calculo
-          </span>
-        </header>
-        <motion.div
-          key="dashboard"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: transition.ease }}
-        >
-          <DashboardView
-            wizard={wizard}
-            onBack={() => go(-1, () => wizard.back())}
-            onRestart={handleRestart}
-            onShowMinimos={() => setShowMinimos(true)}
-          />
-        </motion.div>
-      </div>
+      <DashboardView
+        wizard={wizard}
+        onBack={() => go(-1, () => wizard.back())}
+        onRestart={handleRestart}
+        onShowMinimos={() => setShowMinimos(true)}
+      />
     )
   }
 

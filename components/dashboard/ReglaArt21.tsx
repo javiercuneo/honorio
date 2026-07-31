@@ -1,14 +1,21 @@
 "use client"
 
 // ---------------------------------------------------------------
-// La escala del art. 21 dibujada como una regla graduada.
+// Dos graficos que contestan la misma pregunta desde angulos
+// distintos:
+//   ReglaArt21     donde cae la base dentro de la escala progresiva
+//   BarraExcedente cuanto del honorario viene del piso del grado
+//                  anterior y cuanto de la alicuota del tramo
+//
+// El segundo es el que hace visible la regla del excedente: casi
+// todo el honorario suele venir del piso, y la alicuota apenas roza.
+//
 // Solo presentacion: los tramos son la transcripcion de la escala
-// legal para poder ubicar visualmente donde cae la base.
-// El calculo lo hace lib/legal/calculate.ts.
+// legal. El calculo lo hace lib/legal/calculate.ts.
 // ---------------------------------------------------------------
 
 import { cn } from "@/lib/utils"
-import { umaNum, pct } from "./format"
+import { useUma, usePesos } from "./primitives"
 
 export interface TramoArt21 {
   n: number
@@ -46,7 +53,11 @@ export function ReglaArt21({ baseEnUMA }: { baseEnUMA: number }) {
 
   return (
     <div>
-      <div className="flex items-stretch overflow-hidden rounded-md border border-border">
+      <div
+        className="flex items-stretch overflow-hidden rounded-md border border-border"
+        role="img"
+        aria-label={`La base cae en el tramo ${activo.n} de la escala del articulo 21, de ${activo.label} UMA`}
+      >
         {ESCALAS_ART21.map((t) => {
           const activa = t.n === activo.n
           return (
@@ -54,7 +65,7 @@ export function ReglaArt21({ baseEnUMA }: { baseEnUMA: number }) {
               key={t.n}
               className={cn(
                 "relative flex-1 border-r border-hair px-1.5 py-2 text-center last:border-r-0",
-                activa ? "bg-axis-escala-tint" : "bg-card",
+                activa ? "bg-axis-escala-tint" : "bg-secondary",
               )}
             >
               <div
@@ -78,7 +89,7 @@ export function ReglaArt21({ baseEnUMA }: { baseEnUMA: number }) {
 
               {activa ? (
                 <span
-                  className="pointer-events-none absolute inset-y-0 w-px bg-axis-escala"
+                  className="pointer-events-none absolute inset-y-0 w-[2px] bg-axis-escala"
                   style={{ left: `${posicion}%` }}
                   aria-hidden="true"
                 />
@@ -87,11 +98,72 @@ export function ReglaArt21({ baseEnUMA }: { baseEnUMA: number }) {
           )
         })}
       </div>
+    </div>
+  )
+}
 
-      <div className="mt-1.5 flex items-center gap-2 font-mono text-[10px] uppercase tracking-wider text-faint">
-        <span className="h-px w-3 bg-axis-escala" aria-hidden="true" />
-        Base de {umaNum(baseEnUMA)} UMA · tramo {activo.n} de 7 ·{" "}
-        {pct(activo.min)} a {pct(activo.max)}
+/**
+ * Proporcion entre el piso del grado anterior y el aporte del
+ * excedente. Ambos valores llegan ya calculados: aca solo se
+ * convierten en anchos.
+ */
+export function BarraExcedente({
+  pisoUMA,
+  aporteUMA,
+  limiteAnterior,
+  alicuota,
+  excedenteUMA,
+  valorUMA,
+}: {
+  pisoUMA: number
+  aporteUMA: number
+  limiteAnterior: number
+  alicuota: string
+  excedenteUMA: number
+  valorUMA: number
+}) {
+  const uma = useUma()
+  const money = usePesos()
+
+  const total = pisoUMA + aporteUMA
+  if (total <= 0) return null
+  const anchoPiso = (pisoUMA / total) * 100
+
+  return (
+    <div>
+      <div
+        className="flex h-9 overflow-hidden rounded-md border border-border"
+        role="img"
+        aria-label={`El piso del grado anterior aporta ${uma(pisoUMA)} UMA y el excedente ${uma(aporteUMA)} UMA`}
+      >
+        <div
+          className="flex items-center bg-axis-escala-tint px-3"
+          style={{ width: `${anchoPiso}%` }}
+        >
+          <span className="truncate font-mono text-[10px] uppercase tracking-wider text-axis-escala-tint-foreground">
+            Piso del grado anterior
+          </span>
+        </div>
+        <div
+          className="flex items-center bg-secondary px-2"
+          style={{ width: `${100 - anchoPiso}%` }}
+        />
+      </div>
+
+      <div className="mt-2 flex flex-wrap justify-between gap-x-6 gap-y-1 font-mono text-[11px] text-faint">
+        <span>
+          Maximo hasta {Math.round(limiteAnterior)} UMA{" "}
+          <span className="tabular-nums text-foreground">{money(pisoUMA * valorUMA)}</span>
+        </span>
+        <span>
+          {alicuota} del excedente de{" "}
+          <span className="tabular-nums text-foreground">
+            {money(excedenteUMA * valorUMA)}
+          </span>{" "}
+          <span className="tabular-nums text-foreground">
+            {money(aporteUMA * valorUMA)}
+          </span>
+        </span>
       </div>
     </div>
   )

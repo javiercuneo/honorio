@@ -1,6 +1,16 @@
+'use client'
+
 // ---------------------------------------------------------------
 // Piezas visuales compartidas del dashboard.
 // Solo presentacion: ningun calculo juridico vive aca.
+//
+// Dos reglas que sostienen todo lo demas:
+//   1. Los numeros no se ocultan nunca; las frases, siempre.
+//      Por eso Cifra siempre esta a la vista y todo fundamento va
+//      dentro de <Disclosure>.
+//   2. El "por que" es un unico signo: mismo texto, mismo tamano,
+//      mismo lugar. Si cada explicacion tuviera su propia forma, el
+//      mecanismo para bajar ruido seria la fuente de ruido.
 //
 // Sistema de color por eje: cada regla de la ley modifica uno de los
 // tres ejes del calculo, y ese eje tiene siempre el mismo color.
@@ -11,7 +21,8 @@
 
 import type { ReactNode } from "react"
 import { cn } from "@/lib/utils"
-import { splitPesos, umaNum } from "./format"
+import { usePrefs } from "@/components/prefs"
+import { pesos, splitPesos, umaNum } from "./format"
 
 export type Axis = "base" | "escala" | "honorarios"
 
@@ -21,12 +32,6 @@ export const AXIS_LABEL: Record<Axis, string> = {
   base: "Base",
   escala: "Escala",
   honorarios: "Honorario",
-}
-
-export const AXIS_TITLE: Record<Axis, string> = {
-  base: "Incide en la base regulatoria",
-  escala: "Incide en la escala aplicable",
-  honorarios: "Incide en el honorario final",
 }
 
 // Clases completas y estaticas: Tailwind no resuelve nombres compuestos.
@@ -48,10 +53,16 @@ export const AXIS_TINT: Record<Axis, string> = {
   honorarios: "bg-axis-honorarios-tint text-axis-honorarios-tint-foreground",
 }
 
-export const AXIS_TINT_BG: Record<Axis, string> = {
-  base: "bg-axis-base-tint",
-  escala: "bg-axis-escala-tint",
-  honorarios: "bg-axis-honorarios-tint",
+// ---- Formateadores atados a las preferencias de lectura ----
+
+export function usePesos() {
+  const { prefs } = usePrefs()
+  return (v: number) => pesos(v, prefs.centavos)
+}
+
+export function useUma() {
+  const { prefs } = usePrefs()
+  return (v: number) => umaNum(v, prefs.umaDecimales ? 2 : 0)
 }
 
 // ---- Tipografia de servicio ----
@@ -86,25 +97,28 @@ export function Articulo({ children }: { children: ReactNode }) {
 
 // ---- Cifras ----
 
-type CifraSize = "hero" | "lg" | "md" | "sm"
+type CifraSize = "hero" | "xl" | "lg" | "md" | "sm"
 
 const CIFRA_SIZE: Record<CifraSize, string> = {
-  hero: "text-[34px] leading-[1.05] md:text-[44px]",
-  lg: "text-[21px] leading-[1.1]",
+  hero: "text-[42px] leading-[1] md:text-[58px]",
+  xl: "text-[26px] leading-[1.05]",
+  lg: "text-[20px] leading-[1.1]",
   md: "text-[15px] leading-[1.2]",
   sm: "text-[13px] leading-[1.2]",
 }
 
 const CIFRA_DEC: Record<CifraSize, string> = {
-  hero: "text-[0.4em]",
+  hero: "text-[0.34em]",
+  xl: "text-[0.5em]",
   lg: "text-[0.55em]",
   md: "text-[0.7em]",
   sm: "text-[0.78em]",
 }
 
 /**
- * Importe en pesos, siempre completo. Los centavos se componen mas
- * chicos para que la cifra se lea de un golpe sin perder exactitud.
+ * Importe en pesos. Los centavos se componen mas chicos para que la
+ * cifra se lea de un golpe sin perder exactitud, y desaparecen si el
+ * lector eligio no verlos.
  */
 export function Cifra({
   value,
@@ -117,7 +131,8 @@ export function Cifra({
   className?: string
   tachado?: boolean
 }) {
-  const { entero, decimal } = splitPesos(value)
+  const { prefs } = usePrefs()
+  const { entero, decimal } = splitPesos(value, prefs.centavos)
   return (
     <span
       className={cn(
@@ -137,16 +152,15 @@ export function Cifra({
 
 export function EnUMA({
   value,
-  digits = 2,
   className,
 }: {
   value: number
-  digits?: number
   className?: string
 }) {
+  const uma = useUma()
   return (
-    <span className={cn("font-mono text-[11px] tabular-nums text-faint", className)}>
-      {umaNum(value, digits)}
+    <span className={cn("tabular-nums", className)}>
+      {uma(value)}
       <span className="ml-1 tracking-wider">UMA</span>
     </span>
   )
@@ -162,9 +176,7 @@ export function Card({
   className?: string
 }) {
   return (
-    <section
-      className={cn("rounded-lg border border-border bg-card", className)}
-    >
+    <section className={cn("rounded-lg border border-border bg-card", className)}>
       {children}
     </section>
   )
@@ -184,7 +196,7 @@ export function CardHeader({
   return (
     <div
       className={cn(
-        "flex flex-wrap items-center justify-between gap-x-4 gap-y-3 border-b border-border px-6 py-4",
+        "flex flex-wrap items-center justify-between gap-x-4 gap-y-3 border-b border-border px-7 py-4",
         className,
       )}
     >
@@ -245,16 +257,20 @@ export function Segmented<T extends string>({
   )
 }
 
+// ---- Filas ----
+
+const PUNTEADO =
+  "min-w-6 flex-1 translate-y-[-3px] border-b border-dotted border-hair"
+
 /**
- * Fila del ledger: concepto a la izquierda, valor a la derecha,
- * unidos por una linea de puntos. El ojo sigue la fila sin perderse.
+ * Fila del ledger: concepto a la izquierda, valor a la derecha, unidos
+ * por una linea de puntos. El ojo sigue la fila sin perderse.
  */
 export function LedgerRow({
   concepto,
   articulo,
   valor,
   sub,
-  axis,
   destacado,
   className,
 }: {
@@ -262,36 +278,115 @@ export function LedgerRow({
   articulo?: string
   valor: ReactNode
   sub?: ReactNode
-  axis?: Axis
   destacado?: boolean
   className?: string
 }) {
   return (
-    <div className={cn("flex items-baseline gap-3 py-1.5", className)}>
+    <div className={cn("flex items-baseline gap-3 py-2", className)}>
       <span
         className={cn(
-          "flex items-baseline gap-2",
-          destacado ? "text-foreground" : "text-muted-foreground",
-          destacado ? "text-[13px] font-medium" : "text-[13px]",
+          "flex items-baseline gap-2 text-[13px]",
+          destacado ? "font-medium text-foreground" : "text-muted-foreground",
         )}
       >
-        {axis ? (
-          <span
-            className={cn("h-1.5 w-1.5 shrink-0 rounded-full", AXIS_FILL[axis])}
-            aria-hidden="true"
-          />
-        ) : null}
         {concepto}
         {articulo ? <Articulo>{articulo}</Articulo> : null}
       </span>
-      <span
-        className="min-w-6 flex-1 translate-y-[-3px] border-b border-dotted border-hair"
-        aria-hidden="true"
-      />
+      <span className={PUNTEADO} aria-hidden="true" />
       <span className="shrink-0 text-right">
         <span className="block">{valor}</span>
         {sub ? <span className="block">{sub}</span> : null}
       </span>
+    </div>
+  )
+}
+
+/**
+ * El unico modo de esconder informacion en toda la app.
+ * Siempre la misma palabra, siempre al borde derecho de la fila.
+ */
+export function Disclosure({
+  concepto,
+  articulo,
+  valor,
+  children,
+  className,
+}: {
+  concepto: ReactNode
+  articulo?: string
+  valor?: ReactNode
+  children: ReactNode
+  className?: string
+}) {
+  return (
+    <details className={cn("group", className)}>
+      <summary className="flex cursor-pointer list-none items-baseline gap-3 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+        <span className="flex items-baseline gap-2 text-[13px] text-muted-foreground">
+          {concepto}
+          {articulo ? <Articulo>{articulo}</Articulo> : null}
+        </span>
+        <span className={PUNTEADO} aria-hidden="true" />
+        {valor ? <span className="shrink-0 text-right">{valor}</span> : null}
+        <span className="shrink-0 font-mono text-[10px] uppercase tracking-wider text-accent-foreground">
+          por que
+        </span>
+      </summary>
+      <div className="max-w-2xl pb-3 pr-8 text-[13px] leading-relaxed text-muted-foreground">
+        {children}
+      </div>
+    </details>
+  )
+}
+
+/** Texto de la ley: si aparece serif, se esta leyendo la norma. */
+export function Norma({ children }: { children: ReactNode }) {
+  return (
+    <p className="font-law text-[15px] leading-relaxed text-foreground/80">
+      {children}
+    </p>
+  )
+}
+
+/** Cierre de un bloque: la cifra con la que sale. */
+export function Total({
+  etiqueta,
+  children,
+}: {
+  etiqueta: string
+  children: ReactNode
+}) {
+  return (
+    <div className="mt-1 flex flex-wrap items-end justify-between gap-x-4 gap-y-1 border-t border-hair pt-3">
+      <Etiqueta>{etiqueta}</Etiqueta>
+      <span className="text-right">{children}</span>
+    </div>
+  )
+}
+
+/** Ficha: una cifra con su rotulo. Se escanea de un vistazo. */
+export function Tile({
+  etiqueta,
+  valor,
+  sub,
+  destacado,
+}: {
+  etiqueta: ReactNode
+  valor: ReactNode
+  sub?: ReactNode
+  destacado?: boolean
+}) {
+  return (
+    <div
+      className={cn(
+        "rounded-lg border border-border bg-card px-6 py-5",
+        destacado && "border-l-2 border-l-accent-foreground",
+      )}
+    >
+      <Etiqueta>{etiqueta}</Etiqueta>
+      <div className="mt-2.5">{valor}</div>
+      {sub ? (
+        <div className="mt-1.5 font-mono text-[11px] text-faint">{sub}</div>
+      ) : null}
     </div>
   )
 }

@@ -1,15 +1,17 @@
 "use client"
 
 // ---------------------------------------------------------------
-// Segunda instancia (art. 30) como seccion propia, no como un
-// desplegable de primera instancia: quien revisa una regulacion en
-// camara entra al dashboard buscando exactamente estos tres numeros.
+// Segunda instancia (art. 30) como seccion propia: quien revisa una
+// regulacion en camara entra al dashboard buscando exactamente estos
+// tres numeros.
+//
+// Los rotulos nombran el resultado procesal, no la posicion en una
+// tabla, y la base de calculo se dice una sola vez para las tres.
 // ---------------------------------------------------------------
 
 import type { ReactNode } from "react"
 import type { SegundaInstanciaRol } from "@/lib/legal/types"
-import { umaNum } from "./format"
-import { Card, CardHeader, Cifra, Etiqueta } from "./primitives"
+import { Cifra, Disclosure, EnUMA, Tile } from "./primitives"
 
 interface SegundaInstanciaBandProps {
   valores: SegundaInstanciaRol
@@ -18,35 +20,14 @@ interface SegundaInstanciaBandProps {
   children?: ReactNode
 }
 
-function Tier({
-  etiqueta,
-  detalle,
-  pesos,
-  uma,
-  destacado,
-}: {
-  etiqueta: string
-  detalle: string
-  pesos: number
-  uma: number
-  destacado?: boolean
-}) {
+function Valor({ pesos, uma }: { pesos: number; uma: number }) {
   return (
-    <div className="px-6 py-5">
-      <Etiqueta>{etiqueta}</Etiqueta>
-      <div className="mt-2">
-        <Cifra
-          value={pesos}
-          size="lg"
-          className={destacado ? "text-value-max" : "text-value-min"}
-        />
+    <>
+      <Cifra value={pesos} size="xl" className="text-foreground" />
+      <div className="mt-1.5 font-mono text-[11px] text-faint">
+        <EnUMA value={uma} />
       </div>
-      <div className="mt-1 font-mono text-[10px] tabular-nums text-faint">
-        {umaNum(uma, 4)}
-        <span className="ml-1 tracking-wider">UMA</span>
-      </div>
-      <p className="mt-2 text-[11px] leading-relaxed text-faint">{detalle}</p>
-    </div>
+    </>
   )
 }
 
@@ -57,42 +38,66 @@ export function SegundaInstanciaBand({
   children,
 }: SegundaInstanciaBandProps) {
   return (
-    <Card>
-      <CardHeader titulo="Honorarios · segunda instancia" articulo="art. 30">
+    <section>
+      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 pb-3">
+        <div className="flex items-baseline gap-2.5">
+          <h2 className="font-mono text-[11px] uppercase tracking-[0.18em] text-foreground">
+            Segunda instancia
+          </h2>
+          <span className="font-mono text-[10px] uppercase tracking-wider text-faint">
+            art. 30
+          </span>
+        </div>
         {children}
-      </CardHeader>
+      </div>
 
-      <div className="grid divide-y divide-hair sm:grid-cols-3 sm:divide-x sm:divide-y-0">
-        <Tier
-          etiqueta="Minimo · 30%"
-          detalle={`30% del minimo regulado en primera instancia al ${rolLabel.toLowerCase()}.`}
-          pesos={valores.minimo.minPesos}
-          uma={valores.minimo.minUMA}
+      <div className="grid gap-3 sm:grid-cols-3">
+        <Tile
+          etiqueta="Confirmada · 30%"
+          valor={
+            <Valor
+              pesos={valores.minimo.minPesos}
+              uma={valores.minimo.minUMA}
+            />
+          }
         />
         {!esProvisorio && (
           <>
-            <Tier
-              etiqueta="Maximo · 35%"
-              detalle="35% del maximo regulado en primera instancia."
-              pesos={valores.maximo.maxPesos}
-              uma={valores.maximo.maxUMA}
+            <Tile
+              etiqueta="Confirmada · 35%"
+              valor={
+                <Valor
+                  pesos={valores.maximo.maxPesos}
+                  uma={valores.maximo.maxUMA}
+                />
+              }
             />
-            <Tier
-              etiqueta="Sentencia revocada · 40%"
-              detalle="Tope elevado al 40% cuando la alzada revoca totalmente la sentencia apelada."
-              pesos={valores.revocada.maxPesos}
-              uma={valores.revocada.maxUMA}
+            <Tile
               destacado
+              etiqueta="Revocada · 40%"
+              valor={
+                <Valor
+                  pesos={valores.revocada.maxPesos}
+                  uma={valores.revocada.maxUMA}
+                />
+              }
             />
           </>
         )}
       </div>
 
-      <p className="border-t border-hair px-6 py-3 text-[12px] leading-relaxed text-faint">
-        Los honorarios de alzada se calculan sobre lo regulado en primera
-        instancia, no sobre la base regulatoria. Si en primera instancia hubo
-        reducciones, estas ya vienen arrastradas en estos importes.
-      </p>
-    </Card>
+      <div className="mt-1 px-1">
+        <Disclosure concepto="Se calculan sobre lo regulado en primera instancia">
+          <p>
+            El art. 30 fija los honorarios de alzada como un porcentaje de lo
+            regulado en primera instancia, no de la base regulatoria: el minimo
+            toma el 30% del piso y el maximo el 35% del techo del{" "}
+            {rolLabel.toLowerCase()}. Si la camara revoca totalmente la
+            sentencia apelada, ese tope sube al 40%. Cualquier reduccion
+            aplicada en primera instancia ya viene arrastrada en estos importes.
+          </p>
+        </Disclosure>
+      </div>
+    </section>
   )
 }

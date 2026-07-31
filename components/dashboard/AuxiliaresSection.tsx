@@ -1,6 +1,7 @@
+"use client"
+
 import type { Rango } from "@/lib/legal/types"
-import { umaNum } from "./format"
-import { Card, CardHeader, Cifra, Etiqueta } from "./primitives"
+import { Cifra, Disclosure, EnUMA, Tile } from "./primitives"
 
 interface AuxiliaresSectionProps {
   rango: Rango
@@ -9,39 +10,46 @@ interface AuxiliaresSectionProps {
 
 export function AuxiliaresSection({ rango, esProvisorio }: AuxiliaresSectionProps) {
   return (
-    <Card className="flex flex-col">
-      <CardHeader titulo="Auxiliares de justicia" articulo="art. 21" />
+    <section>
+      <div className="flex items-baseline gap-2.5 pb-3">
+        <h2 className="font-mono text-[11px] uppercase tracking-[0.18em] text-foreground">
+          Auxiliares de justicia
+        </h2>
+        <span className="font-mono text-[10px] uppercase tracking-wider text-faint">
+          art. 21
+        </span>
+      </div>
 
-      <div className="grid flex-1 divide-y divide-hair sm:grid-cols-2 sm:divide-x sm:divide-y-0">
-        <div className="px-6 py-5">
-          <Etiqueta>Minimo · 5%</Etiqueta>
-          <div className="mt-2">
-            <Cifra value={rango.minPesos} size="lg" className="text-value-min" />
-          </div>
-          <div className="mt-1 font-mono text-[10px] tabular-nums text-faint">
-            {umaNum(rango.minUMA)}
-            <span className="ml-1 tracking-wider">UMA</span>
-          </div>
-        </div>
-
+      <div className="grid gap-3 sm:grid-cols-2">
+        <Tile
+          etiqueta="Minimo · 5%"
+          valor={
+            <Cifra value={rango.minPesos} size="xl" className="text-value-min" />
+          }
+          sub={<EnUMA value={rango.minUMA} />}
+        />
         {!esProvisorio && (
-          <div className="px-6 py-5">
-            <Etiqueta>Maximo · 10%</Etiqueta>
-            <div className="mt-2">
-              <Cifra value={rango.maxPesos} size="lg" className="text-value-max" />
-            </div>
-            <div className="mt-1 font-mono text-[10px] tabular-nums text-faint">
-              {umaNum(rango.maxUMA)}
-              <span className="ml-1 tracking-wider">UMA</span>
-            </div>
-          </div>
+          <Tile
+            etiqueta="Maximo · 10%"
+            valor={
+              <Cifra value={rango.maxPesos} size="xl" className="text-value-max" />
+            }
+            sub={<EnUMA value={rango.maxUMA} />}
+          />
         )}
       </div>
 
-      <p className="border-t border-hair px-6 py-3 text-[12px] leading-relaxed text-faint">
-        Peritos y demas auxiliares: entre el 5% y el 10% de la base regulatoria.
-        No incluye las pautas de las leyes especiales de cada profesion.
-      </p>
-    </Card>
+      <div className="mt-1 px-1">
+        <Disclosure concepto="Entre el 5% y el 10% de la base regulatoria">
+          <p>
+            Alcanza a peritos y demas auxiliares que intervienen en el proceso.
+            No incluye las pautas de las leyes especiales que reglamentan cada
+            actividad profesional, ni a administradores, interventores,
+            liquidadores, arbitros o mediadores, que tienen regimen propio
+            (art. 32).
+          </p>
+        </Disclosure>
+      </div>
+    </section>
   )
 }

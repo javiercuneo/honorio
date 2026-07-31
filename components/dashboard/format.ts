@@ -1,6 +1,7 @@
-﻿export function pesos(value: number): string {
+﻿export function pesos(value: number, centavos = true): string {
   if (!isFinite(value)) return 'N/A'
-  return "$" + value.toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  const d = centavos ? 2 : 0
+  return "$" + value.toLocaleString("es-AR", { minimumFractionDigits: d, maximumFractionDigits: d })
 }
 
 export function umas(value: number): string {
@@ -18,14 +19,21 @@ export function porcentaje(value: number): string {
  * Las cifras se muestran siempre completas: los centavos se componen
  * mas chicos, pero no se ocultan ni se redondean.
  */
-export function splitPesos(value: number): { entero: string; decimal: string } {
+export function splitPesos(
+  value: number,
+  centavos = true,
+): { entero: string; decimal: string } {
   if (!isFinite(value)) return { entero: "N/A", decimal: "" }
+  const d = centavos ? 2 : 0
   const abs = Math.abs(value).toLocaleString("es-AR", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
+    minimumFractionDigits: d,
+    maximumFractionDigits: d,
   })
   const [entero, decimal] = abs.split(",")
-  return { entero: (value < 0 ? "-$" : "$") + entero, decimal: decimal ?? "00" }
+  return {
+    entero: (value < 0 ? "-$" : "$") + entero,
+    decimal: centavos ? decimal ?? "00" : "",
+  }
 }
 
 /** UMA sin sufijo, para componer con una etiqueta aparte. */

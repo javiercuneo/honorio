@@ -1,9 +1,10 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import { cn } from "@/lib/utils"
 import type { CalculoResultado, Rango, SegundaInstanciaRol } from "@/lib/legal/types"
-import { CaratulaCaso, type CaratulaCasoProps } from "./CaratulaCaso"
+import { pct } from "./format"
+import { derivarCadena } from "./cadena"
+import { ChipsCaso, type ChipsCasoProps } from "./ChipsCaso"
 import { HonorariosBand } from "./HonorariosBand"
 import { SegundaInstanciaBand } from "./SegundaInstanciaBand"
 import { CadenaCalculo } from "./CadenaCalculo"
@@ -23,18 +24,18 @@ const ROL_LABEL: Record<RolKey, string> = {
 
 const ROL_NOTA: Record<RolKey, string> = {
   patrocinante:
-    "Honorario del letrado patrocinante: es el que sale directamente de la escala.",
+    "Es el honorario que sale directamente de la escala del art. 21.",
   apoderado:
-    "El apoderado percibe un 40% mas que el patrocinante por la gestion del mandato (art. 20).",
+    "El art. 20 reconoce al apoderado un 40% mas que al patrocinante por la gestion del mandato. Se aplica sobre el honorario ya reducido, al final de la cadena.",
   procurador:
-    "El procurador percibe el 40% de lo que corresponde al patrocinante (art. 20).",
+    "El art. 20 fija el honorario del procurador en el 40% de lo que corresponde al patrocinante. Se aplica sobre el honorario ya reducido, al final de la cadena.",
 }
 
-interface DashboardProps extends Omit<CaratulaCasoProps, "tipoProceso" | "esProvisorio" | "valorUMA"> {
+type DashboardProps = Omit<ChipsCasoProps, "tipoProceso" | "valorUMA" | "transformaciones"> & {
   resultado: CalculoResultado
 }
 
-export function Dashboard({ resultado, ...caratula }: DashboardProps) {
+export function Dashboard({ resultado, ...caso }: DashboardProps) {
   const [rol, setRol] = useState<RolKey>("patrocinante")
 
   if (resultado.tipoProceso === "exhorto") {
@@ -45,23 +46,18 @@ export function Dashboard({ resultado, ...caratula }: DashboardProps) {
   }
 
   return (
-    <DashboardGeneral
-      resultado={resultado}
-      caratula={caratula}
-      rol={rol}
-      setRol={setRol}
-    />
+    <DashboardGeneral resultado={resultado} caso={caso} rol={rol} setRol={setRol} />
   )
 }
 
 function DashboardGeneral({
   resultado,
-  caratula,
+  caso,
   rol,
   setRol,
 }: {
   resultado: CalculoResultado
-  caratula: Omit<CaratulaCasoProps, "tipoProceso" | "esProvisorio" | "valorUMA">
+  caso: Omit<ChipsCasoProps, "tipoProceso" | "valorUMA" | "transformaciones">
   rol: RolKey
   setRol: (r: RolKey) => void
 }) {
@@ -82,6 +78,36 @@ function DashboardGeneral({
 
   const rango = rangoPorRol[rol] ?? patrocinante.rango
   const segunda: SegundaInstanciaRol | undefined = resultado.segundaInstancia?.[rol]
+  const escala = resultado.escala
+
+  const cadena = derivarCadena({
+    transformaciones: resultado.transformaciones,
+    final: rango,
+    patrocinante: patrocinante.rango,
+    escala,
+    baseFinal: resultado.baseFinal,
+  })
+
+  // En provisorios solo rige el minimo: nombrar el maximo seria enunciar
+  // un tope que este calculo no esta afirmando.
+  const alicuota = escala
+    ? resultado.esProvisorio
+      ? pct(escala.porcentajeMin)
+      : `${pct(escala.porcentajeMin)} a ${pct(escala.porcentajeMax)}`
+    : ""
+
+  // Lo que arroja leer la alicuota del tramo como si fuera directa sobre
+  // la base. Solo tiene sentido mostrarlo cuando difiere del resultado:
+  // en el primer tramo de la escala ambos coinciden y la frase mentiria.
+  const ingenuoBruto = escala
+    ? (resultado.baseFinal * escala.porcentajeMin) / 100
+    : 0
+  const ingenuo =
+    escala &&
+    escala.escalera &&
+    Math.abs(ingenuoBruto - rango.minPesos) / Math.max(1, rango.minPesos) > 0.01
+      ? ingenuoBruto
+      : null
 
   const selectorRol =
     rolesDisponibles.length > 1 ? (
@@ -94,20 +120,17 @@ function DashboardGeneral({
     ) : null
 
   return (
-    <div className="space-y-4">
-      <CaratulaCaso
-        {...caratula}
-        tipoProceso={resultado.tipoProceso}
-        esProvisorio={resultado.esProvisorio}
-        valorUMA={resultado.valorUMA}
-        transformaciones={resultado.transformaciones}
-      />
-
+    <div className="space-y-8">
       <HonorariosBand
         rango={rango}
         rolLabel={ROL_LABEL[rol]}
         esProvisorio={resultado.esProvisorio}
-        notaRol={ROL_NOTA[rol]}
+        escala={escala}
+        cadena={cadena}
+        valorUMA={resultado.valorUMA}
+        baseFinal={resultado.baseFinal}
+        alicuota={alicuota}
+        ingenuo={ingenuo}
       >
         {selectorRol}
       </HonorariosBand>
@@ -128,34 +151,35 @@ function DashboardGeneral({
         baseOriginal={resultado.baseOriginal}
         baseFinal={resultado.baseFinal}
         valorUMA={resultado.valorUMA}
-        escala={resultado.escala}
-        transformaciones={resultado.transformaciones}
+        escala={escala}
+        cadena={cadena}
         rango={rango}
-        patrocinante={patrocinante.rango}
         rolLabel={ROL_LABEL[rol]}
         notaRol={ROL_NOTA[rol]}
+        alicuota={alicuota}
         esProvisorio={resultado.esProvisorio}
-      />
-
-      <div
-        className={cn(
-          "grid gap-4",
-          resultado.partidor ? "lg:grid-cols-2" : "grid-cols-1",
-        )}
       >
-        {resultado.auxiliares ? (
-          <AuxiliaresSection
-            rango={resultado.auxiliares}
-            esProvisorio={resultado.esProvisorio}
-          />
-        ) : null}
-        {resultado.partidor ? (
-          <PartidorSection
-            partidor={resultado.partidor}
-            esProvisorio={resultado.esProvisorio}
-          />
-        ) : null}
-      </div>
+        <ChipsCaso
+          {...caso}
+          tipoProceso={resultado.tipoProceso}
+          valorUMA={resultado.valorUMA}
+          transformaciones={resultado.transformaciones}
+        />
+      </CadenaCalculo>
+
+      {resultado.auxiliares ? (
+        <AuxiliaresSection
+          rango={resultado.auxiliares}
+          esProvisorio={resultado.esProvisorio}
+        />
+      ) : null}
+
+      {resultado.partidor ? (
+        <PartidorSection
+          partidor={resultado.partidor}
+          esProvisorio={resultado.esProvisorio}
+        />
+      ) : null}
     </div>
   )
 }

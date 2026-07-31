@@ -1,10 +1,13 @@
 import { LegacyLoader } from '@/components/LegacyLoader'
+import { PrefsProvider } from '@/components/prefs'
 import { InterviewExperience } from '@/components/interview/interview-experience'
 
 export default function Page() {
   return (
-    <LegacyLoader>
-      <InterviewExperience />
-    </LegacyLoader>
+    <PrefsProvider>
+      <LegacyLoader>
+        <InterviewExperience />
+      </LegacyLoader>
+    </PrefsProvider>
   )
 }

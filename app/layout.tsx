@@ -38,9 +38,15 @@ export const metadata: Metadata = {
   },
 }
 
+// El tema lo decide el lector desde la topbar (components/prefs.tsx),
+// que aplica la clase .dark sobre <html>. Declarar solo 'light' aca
+// dejaba el modo oscuro muerto en el codigo.
 export const viewport: Viewport = {
-  colorScheme: 'light',
-  themeColor: [{ media: '(prefers-color-scheme: light)', color: '#e9ebee' }],
+  colorScheme: 'light dark',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#e9ebee' },
+    { media: '(prefers-color-scheme: dark)', color: '#0d0f13' },
+  ],
 }
 
 export default function RootLayout({
