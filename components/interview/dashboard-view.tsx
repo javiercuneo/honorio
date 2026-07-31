@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useMemo } from "react"
 import { motion } from "motion/react"
@@ -36,80 +36,78 @@ export function DashboardView({ wizard, onBack, onRestart, onShowMinimos }: Dash
         desalojoVivienda: wizard.answers.desalojoVivienda as string | undefined,
         posesoriasTipo: wizard.answers.posesoriasTipo as string | undefined,
       }
-    } catch (e: unknown) {
+    } catch {
       return { resultado: null, modoTerminacion: undefined, sentenciaResultado: undefined }
     }
   }, [wizard])
 
   return (
-    <div className="mx-auto max-w-6xl px-5 pb-16 md:px-8">
-      <motion.header
-        initial={{ opacity: 0, y: 12 }}
+    <div className="mx-auto max-w-5xl px-5 pb-20 md:px-8">
+      {/* La caratula del caso es el titulo de la pantalla: aca solo van
+          las acciones, en una barra discreta. */}
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease }}
-        className="flex items-center justify-between border-b border-border py-8"
+        transition={{ duration: 0.4, ease }}
+        className="flex flex-wrap items-center justify-between gap-3 py-5"
       >
-        <h1 className="font-meter text-4xl leading-[1.02] tracking-tight text-foreground md:text-5xl">
-          Resultados
-        </h1>
-        <div className="flex shrink-0 items-center gap-2">
+        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-faint">
+          Resultado del calculo
+        </span>
+        <div className="flex shrink-0 flex-wrap items-center gap-1.5">
           <Button
             variant="ghost"
+            size="sm"
             onClick={onBack}
-            className="h-10 rounded-full px-4 text-muted-foreground"
+            className="h-9 text-muted-foreground"
           >
-            <ArrowLeft className="mr-1 h-4 w-4" />
-            Revisar
+            <ArrowLeft className="mr-1.5 h-3.5 w-3.5" />
+            Revisar respuestas
           </Button>
           <Button
             variant="ghost"
+            size="sm"
             onClick={onShowMinimos}
-            className="h-10 rounded-full px-4 text-muted-foreground"
+            className="h-9 text-muted-foreground"
           >
-            <FileSpreadsheet className="mr-1.5 h-4 w-4" />
-            Ver mínimos
+            <FileSpreadsheet className="mr-1.5 h-3.5 w-3.5" />
+            Minimos
           </Button>
-          <Button
-            variant="outline"
-            onClick={onRestart}
-            className="h-10 rounded-full px-5"
-          >
-            <RotateCcw className="mr-1.5 h-4 w-4" />
+          <Button variant="outline" size="sm" onClick={onRestart} className="h-9">
+            <RotateCcw className="mr-1.5 h-3.5 w-3.5" />
             Nuevo calculo
           </Button>
         </div>
-      </motion.header>
+      </motion.div>
 
-      <div className="mt-6">
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease, delay: 0.1 }}
-        >
-          {resultado ? (
-            <Dashboard
-              resultado={resultado}
-              modoTerminacion={modoTerminacion}
-              sentenciaResultado={sentenciaResultado}
-              objetoBase={objetoBase}
-              tuvoExcepciones={tuvoExcepciones}
-              sucesionUnicoLetrado={sucesionUnicoLetrado}
-              medidaOposicion={medidaOposicion}
-              homologacionVivienda={homologacionVivienda}
-              caducidadCriterio={caducidadCriterio}
-              aperturaPrueba={aperturaPrueba}
-              desalojoVivienda={desalojoVivienda}
-              posesoriasTipo={posesoriasTipo}
-            />
-          ) : (
-            <div className="rounded-2xl border border-border bg-card p-10 text-center">
-              <p className="text-muted-foreground">
-                Error al generar el calculo. Verifique los datos ingresados.
-              </p>
-            </div>
-          )}
-        </motion.div>
-      </div>
+      <motion.div
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease, delay: 0.06 }}
+      >
+        {resultado ? (
+          <Dashboard
+            resultado={resultado}
+            modoTerminacion={modoTerminacion}
+            sentenciaResultado={sentenciaResultado}
+            objetoBase={objetoBase}
+            tuvoExcepciones={tuvoExcepciones}
+            sucesionUnicoLetrado={sucesionUnicoLetrado}
+            medidaOposicion={medidaOposicion}
+            homologacionVivienda={homologacionVivienda}
+            caducidadCriterio={caducidadCriterio}
+            aperturaPrueba={aperturaPrueba}
+            desalojoVivienda={desalojoVivienda}
+            posesoriasTipo={posesoriasTipo}
+          />
+        ) : (
+          <div className="rounded-lg border border-border bg-card p-10 text-center">
+            <p className="text-[13px] text-muted-foreground">
+              No se pudo generar el calculo. Revise los datos ingresados.
+            </p>
+          </div>
+        )}
+      </motion.div>
     </div>
   )
 }

@@ -1,7 +1,12 @@
 "use client"
 
+import { useEffect } from "react"
 import { X } from "lucide-react"
+import { cn } from "@/lib/utils"
 import type { EscalaAplicada } from "@/lib/legal/types"
+import { umaNum, pct } from "./format"
+import { Etiqueta } from "./primitives"
+import { ESCALAS_ART21, tramoDe } from "./ReglaArt21"
 
 interface ScaleBreakdownModalProps {
   isOpen: boolean
@@ -9,108 +14,129 @@ interface ScaleBreakdownModalProps {
   escala: EscalaAplicada
 }
 
-const ESCALAS_ART21 = [
-  { rango: "Hasta 15 UMA", minPct: 22, maxPct: 33 },
-  { rango: "16 a 45 UMA", minPct: 20, maxPct: 26 },
-  { rango: "46 a 90 UMA", minPct: 18, maxPct: 24 },
-  { rango: "91 a 150 UMA", minPct: 17, maxPct: 22 },
-  { rango: "151 a 450 UMA", minPct: 15, maxPct: 20 },
-  { rango: "451 a 750 UMA", minPct: 13, maxPct: 17 },
-  { rango: "Más de 751 UMA", minPct: 12, maxPct: 15 },
-]
+export function ScaleBreakdownModal({
+  isOpen,
+  onClose,
+  escala,
+}: ScaleBreakdownModalProps) {
+  useEffect(() => {
+    if (!isOpen) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose()
+    }
+    window.addEventListener("keydown", onKey)
+    return () => window.removeEventListener("keydown", onKey)
+  }, [isOpen, onClose])
 
-function pct(v: number): string {
-  return v + "%"
-}
-
-export function ScaleBreakdownModal({ isOpen, onClose, escala }: ScaleBreakdownModalProps) {
   if (!isOpen) return null
 
-  const scaleMatch = escala.titulo.match(/\d+/)
-  const currentScaleNum = scaleMatch ? parseInt(scaleMatch[0], 10) : null
+  const activo = tramoDe(escala.baseEnUMA)
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-border bg-card p-6 md:p-8">
-        <div className="flex items-center justify-between gap-4">
-          <h3 className="text-lg font-bold text-foreground">Desglose de Escala (Art. 21)</h3>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Escala del articulo 21"
+      onClick={onClose}
+    >
+      <div
+        className="max-h-[88vh] w-full max-w-xl overflow-y-auto rounded-lg border border-border bg-card"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between gap-4 border-b border-border px-6 py-4">
+          <div className="flex items-baseline gap-2.5">
+            <h3 className="font-mono text-[11px] uppercase tracking-[0.18em] text-foreground">
+              Escala arancelaria
+            </h3>
+            <span className="font-mono text-[10px] uppercase tracking-wider text-faint">
+              art. 21
+            </span>
+          </div>
           <button
+            type="button"
             onClick={onClose}
-            className="rounded-full p-1 hover:bg-muted"
+            className="rounded-sm p-1 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             aria-label="Cerrar"
           >
-            <X className="h-5 w-5 text-muted-foreground" />
+            <X className="h-4 w-4" />
           </button>
         </div>
 
-        <div className="mt-4 space-y-4 text-[13px] leading-relaxed text-muted-foreground">
-          <p>
-            La escala del artículo 21 se aplica por tramos: cada grado toma el máximo
-            acumulado del grado anterior y le suma la alícuota del tramo actual sobre el excedente.
-          </p>
-
-          {escala.escalera && escala.escalera.maximoEscalaAnterior > 0 ? (
-            <p>
-              En este caso, el grado inmediato anterior acumula{" "}
-              <span className="font-medium text-foreground">
-                {escala.escalera.maximoEscalaAnterior.toFixed(2)} UMA
-              </span>{" "}
-              hasta{" "}
-              <span className="font-medium text-foreground">
-                {escala.escalera.limiteAnterior.toFixed(0)} UMA
-              </span>
-              . La base de este cálculo excede ese límite en{" "}
-              <span className="font-medium text-foreground">
-                {escala.escalera.excedente.toFixed(2)} UMA
-              </span>
-              , que es lo que se regula a la alícuota del tramo{" "}
-              <span className="font-medium">{escala.titulo.split(":")[0]}</span>.
-            </p>
-          ) : (
-            <p>
-              Esta base cae dentro del primer tramo de la escala, por lo que no hay excedente de
-              un grado anterior que sumar.
-            </p>
-          )}
-        </div>
-
-        <div className="mt-6 overflow-x-auto rounded-xl border border-border/60">
-          <table className="w-full border-collapse font-mono text-[11px]">
+        <div className="px-6 py-5">
+          <table className="w-full border-collapse">
             <thead>
-              <tr className="border-b border-border/50 text-[10px] uppercase tracking-wider text-muted-foreground/50">
-                <th className="px-3 py-2 text-left font-medium">Rango de UMA</th>
-                <th className="px-3 py-2 text-right font-medium">Alícuotas</th>
+              <tr>
+                <th className="pb-2 text-left">
+                  <Etiqueta>Base en UMA</Etiqueta>
+                </th>
+                <th className="pb-2 text-right">
+                  <Etiqueta>Alicuota del tramo</Etiqueta>
+                </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-border/30">
-              {ESCALAS_ART21.map((row, idx) => {
-                const isActive = idx + 1 === currentScaleNum
+            <tbody>
+              {ESCALAS_ART21.map((t) => {
+                const activa = t.n === activo.n
                 return (
                   <tr
-                    key={idx}
-                    className={
-                      isActive
-                        ? "border-l-2 border-axis-escala bg-axis-escala-tint font-semibold text-axis-escala-tint-foreground"
-                        : "text-muted-foreground/60"
-                    }
+                    key={t.n}
+                    className={cn(
+                      "border-t border-hair font-mono text-[12px] tabular-nums",
+                      activa
+                        ? "bg-axis-escala-tint text-axis-escala-tint-foreground"
+                        : "text-muted-foreground",
+                    )}
                   >
-                    <td className="whitespace-nowrap px-3 py-2 text-left">{row.rango}</td>
-                    <td className="whitespace-nowrap px-3 py-2 text-right">
-                      {isActive
-                        ? `${pct(escala.porcentajeMinAplicado)} a ${pct(escala.porcentajeMaxAplicado)}`
-                        : `${row.minPct}% a ${row.maxPct}%`}
+                    <td className="px-2 py-2 text-left">
+                      {t.n}
+                      <span className="mx-2 text-faint">·</span>
+                      {t.label}
+                    </td>
+                    <td className="px-2 py-2 text-right">
+                      {pct(t.min)} a {pct(t.max)}
                     </td>
                   </tr>
                 )
               })}
             </tbody>
           </table>
-        </div>
 
-        <div className="mt-4 rounded-lg border border-border/40 bg-muted/20 p-3 text-[12px] text-muted-foreground">
-          <span className="font-medium text-foreground">Tu caso:</span> Base de{" "}
-          <span className="font-medium text-foreground">{escala.baseEnUMA.toFixed(0)} UMA</span>{" "}
-          aplica alícuota de {pct(escala.porcentajeMinAplicado)} a {pct(escala.porcentajeMaxAplicado)}
+          <div className="mt-5 space-y-3 border-t border-hair pt-4 text-[13px] leading-relaxed text-muted-foreground">
+            <p className="font-law text-[15px] leading-relaxed">
+              &ldquo;En ningun caso los honorarios podran ser inferiores al
+              maximo del grado inmediato anterior de la escala, con mas el
+              incremento por aplicacion al excedente de la alicuota que
+              corresponde al grado siguiente.&rdquo;
+            </p>
+            <p>
+              Es la regla del excedente. Por eso la alicuota del tramo no se
+              aplica a toda la base: se toma como piso el maximo que acumula el
+              grado anterior y solo lo que excede ese limite tributa la alicuota
+              del tramo en curso.
+            </p>
+            {escala.escalera ? (
+              <p>
+                En este caso el piso es{" "}
+                <span className="font-mono tabular-nums text-foreground">
+                  {umaNum(escala.escalera.maximoEscalaAnterior)} UMA
+                </span>{" "}
+                —el maximo hasta{" "}
+                {umaNum(escala.escalera.limiteAnterior, 0)} UMA— y el excedente
+                sujeto a alicuota es de{" "}
+                <span className="font-mono tabular-nums text-foreground">
+                  {umaNum(escala.escalera.excedente)} UMA
+                </span>
+                .
+              </p>
+            ) : (
+              <p>
+                La base de este calculo cae en el primer tramo, de modo que no
+                hay grado anterior que acumular: la alicuota se aplica sobre el
+                total.
+              </p>
+            )}
+          </div>
         </div>
       </div>
     </div>
