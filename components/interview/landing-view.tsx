@@ -8,18 +8,13 @@
 
 import { ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { withBasePath } from '@/lib/basePath'
+import { Ilustracion } from '@/components/brand'
 
 export function LandingView({ onStart }: { onStart: () => void }) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-6 text-foreground">
       <div className="w-full max-w-md text-center">
-        <img
-          src={withBasePath('/honorio.png')}
-          alt=""
-          aria-hidden="true"
-          className="mx-auto h-auto w-28 max-w-full"
-        />
+        <Ilustracion className="mx-auto w-28 text-foreground" />
 
         <h1 className="mt-6 font-meter text-[52px] font-semibold uppercase leading-none tracking-[0.06em] text-foreground md:text-[64px]">
           Honorio
