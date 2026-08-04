@@ -5,6 +5,17 @@ import { AnimatePresence, motion } from 'motion/react'
 import { ArrowRight, Scale, FileText, ShieldCheck, HelpCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
+// Enlace a OTRO sitio, no a otra pantalla de esta app: la calculadora de
+// mediacion vive con el resto de las calculadoras, que se quedan en el
+// repositorio principal cuando Honorio se mude al suyo.
+//
+// Por eso es absoluto y tiene que seguir siendolo. Esta aca arriba, y no
+// enterrado en el JSX, para que sea el unico lugar donde tocarlo el dia que
+// las calculadoras cambien de dominio. Es la unica URL de este tipo en toda
+// la app; si aparece otra, va al lado de esta.
+const CALCULADORA_MEDIACION =
+  'https://javiercuneo.github.io/Herramientas-Judiciales-IA/calculadoras/honorarios-mediacion.html'
+
 // No describen los pasos —eso ya lo cuenta el panel de la derecha—
 // sino lo que la herramienta hace distinto: declarar cada regla.
 const notes = [
@@ -118,7 +129,7 @@ export function IntroView({ onStart, onShowMinimos }: { onStart: () => void; onS
                   <ul className="mt-2 list-disc space-y-1.5 pl-4 text-[13px] leading-relaxed text-muted-foreground">
                     <li>Leyes especiales: no se incluyen las pautas de las leyes especiales que reglamenten cada actividad profesional (art. 1, 2° párrafo de la ley 27423) ni las modificaciones de la <a href="https://servicios.infoleg.gob.ar/infolegInternet/anexos/420000-424999/423680/norma.htm" target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-foreground"> Ley 27.802 (Modernización Laboral)</a> pero se muestran algunas reglas incorporadas por ésta.</li> 
                     <li>Excluidos: no contempla los cálculos de los honorarios de los administradores judiciales, interventores o veedores, interventores recaudadores, liquidadores judiciales, árbitros, mediadores o amigables componedores (art. 32).</li>
-                    <li>Mediadores: tienen normativa propia (<a href="http://servicios.infoleg.gob.ar/infolegInternet/anexos/165000-169999/166999/texact.htm" target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-foreground"> Ley 26.589</a> y Decretos <a href="http://servicios.infoleg.gob.ar/infolegInternet/anexos/255000-259999/255741/norma.htm" target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-foreground"> 2536/15 </a>y <a href="https://servicios.infoleg.gob.ar/infolegInternet/anexos/415000-419999/418049/norma.htm" target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-foreground">696/2025</a>). Puede utilizar nuestra <a href="https://javiercuneo.github.io/Herramientas-Judiciales-IA/calculadoras/honorarios-mediacion.html" target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-foreground">calculadora</a>.</li>
+                    <li>Mediadores: tienen normativa propia (<a href="http://servicios.infoleg.gob.ar/infolegInternet/anexos/165000-169999/166999/texact.htm" target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-foreground"> Ley 26.589</a> y Decretos <a href="http://servicios.infoleg.gob.ar/infolegInternet/anexos/255000-259999/255741/norma.htm" target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-foreground"> 2536/15 </a>y <a href="https://servicios.infoleg.gob.ar/infolegInternet/anexos/415000-419999/418049/norma.htm" target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-foreground">696/2025</a>). Puede utilizar nuestra <a href={CALCULADORA_MEDIACION} target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-foreground">calculadora</a>.</li>
                   </ul>
                 </div>
                 <div>
