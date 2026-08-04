@@ -17,3 +17,9 @@ out/
 
 # Cache incremental de TypeScript: se ensucia en cada tsc
 tsconfig.tsbuildinfo
+
+# Generado por Next, y alterna solo segun si lo ultimo que corrio fue
+# `dev` o `build` (importa .next/dev/types/... o .next/types/...). Eso
+# dejaba el arbol sucio despues de cualquier sesion. Se regenera en cada
+# `dev`/`build`, y `tsc --noEmit` pasa igual sin el: verificado.
+next-env.d.ts
