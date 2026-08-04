@@ -103,19 +103,18 @@ Decisiones de diseño vigentes y lo que está en curso:
 
 ## Cómo se verifica un cambio en el motor
 
-El motor tiene validaciones que comparan su salida contra una implementación
-de referencia, caso por caso. **Todas tienen que quedar en verde antes de
-tocar nada más.**
+El motor tiene 11 suites de validación que comparan su salida contra una
+implementación de referencia, caso por caso. **Todas tienen que quedar en verde
+antes de tocar nada más.**
 
 ```bash
-for f in lib/legal/__tests__/*.validation.ts; do npx tsx "$f"; done
+npm run check
 ```
 
-Y, para el resto:
+Eso corre los tipos y las validaciones, y es exactamente lo que ejecuta CI en
+cada push y cada pull request. Si alguna falla, no se publica.
 
-```bash
-npx tsc --noEmit && npm run build
-```
+Por separado: `npm run typecheck`, `npm run validate`, `npm run build`.
 
 ---
 
