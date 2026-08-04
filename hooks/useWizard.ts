@@ -20,6 +20,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { Answers, WizardState } from '@/lib/legal/types'
 import type { WizardStepDef } from '@/lib/wizard/wizard-schema'
 import { PROCESS_STEP_MAP } from '@/lib/wizard/wizard-schema'
+import { pasosVisibles, podarInalcanzables } from '@/lib/wizard/reachability'
 import * as adapters from '@/lib/legal/adapters'
 
 export type Phase = 'intro' | 'question' | 'dashboard'
@@ -62,17 +63,10 @@ export function useWizard(allSteps: WizardStepDef[], initialValues?: Partial<Ans
   const [errorMessage, setError] = useState<string | null>(null)
 
   // ---- Computar pasos visibles segun condiciones ----
-  const visibleSteps = useMemo(() => {
-    const tipo = answers.tipoProceso as string | undefined
-    const stepIds = tipo ? PROCESS_STEP_MAP[tipo] : undefined
-    const candidates = stepIds
-      ? allSteps.filter(s => stepIds.includes(s.id))
-      : allSteps
-    return candidates.filter((step) => {
-      if (!step.condition) return true
-      return step.condition(answers)
-    })
-  }, [allSteps, answers])
+  const visibleSteps = useMemo(
+    () => pasosVisibles(allSteps, answers),
+    [allSteps, answers],
+  )
 
   const totalSteps = visibleSteps.length
   // Total de pasos posibles para el proceso elegido.
@@ -106,28 +100,20 @@ export function useWizard(allSteps: WizardStepDef[], initialValues?: Partial<Ans
   const currentStep = visibleSteps[index] ?? null
 
   // ---- Actualizar respuesta ----
+  // Cambiar una respuesta puede dejar huerfanas a las que dependian de
+  // ella. Se podan en el acto: si el paso ya no se pregunta, la respuesta
+  // no existe. Esto reemplaza el nuleo ad-hoc de las sub-opciones de
+  // 'objeto' —era el mismo problema, resuelto para un solo caso— y cierra
+  // el resto: cambiar de proceso ya no arrastra la terminacion anterior.
   const setAnswer = useCallback(
     (value: string | string[] | number | boolean | null) => {
       if (!currentStep) return
       setError(null)
-      setAnswers((prev) => {
-        const nextAnswers = { ...prev, [currentStep.id]: value } as Answers
-        // Al cambiar el objeto, la sub-opcion del objeto anterior deja de
-        // aplicar (equivalente a wizard.js: nulea el campo hermano).
-        if (currentStep.id === 'objeto') {
-          if (value !== 'desalojo') delete nextAnswers.desalojoVivienda
-          if (value !== 'posesorias_interdictos') delete nextAnswers.posesoriasTipo
-        }
-        return nextAnswers
-      })
-
-      syncToLegacy(currentStep.id, value)
-      if (currentStep.id === 'objeto') {
-        if (value !== 'desalojo') syncToLegacy('desalojoVivienda', null)
-        if (value !== 'posesorias_interdictos') syncToLegacy('posesoriasTipo', null)
-      }
+      setAnswers((prev) =>
+        podarInalcanzables(allSteps, { ...prev, [currentStep.id]: value } as Answers),
+      )
     },
-    [currentStep],
+    [allSteps, currentStep],
   )
 
   // ---- Validar paso actual ----
@@ -213,7 +199,12 @@ export function useWizard(allSteps: WizardStepDef[], initialValues?: Partial<Ans
   }, [])
 
   // ---- Ejecutar calculo final ----
+  // El estado del motor se reconstruye entero, no se parchea: `wizardState`
+  // es un objeto mutable de larga vida y un parcheo incremental deja
+  // adentro respuestas que la poda ya descarto. Reconstruirlo hace que
+  // `answers` sea la unica fuente de verdad.
   const calculate = useCallback((): string => {
+    adapters.resetWizardState()
     syncAllToLegacy(answers)
     adapters.recolectarDatos()
     return adapters.calcularFinalHTML()

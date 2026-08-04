@@ -1,6 +1,6 @@
 {
   "name": "honorio",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
   "description": "Asistente para la regulación de honorarios (Ley 27.423)",
   "license": "AGPL-3.0-or-later",
@@ -9,7 +9,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint ."
+    "typecheck": "tsc --noEmit",
+    "validate": "node scripts/validate.mjs",
+    "check": "npm run typecheck && npm run validate"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",
@@ -35,6 +37,7 @@
     "jest": "^30.4.2",
     "postcss": "^8.5",
     "tailwindcss": "^4.3.3",
+    "tsx": "^4.23.5",
     "typescript": "5.7.3"
   },
   "pnpm": {

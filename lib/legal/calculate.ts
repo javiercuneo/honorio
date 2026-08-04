@@ -515,6 +515,24 @@ export function calcularPartidor(basePesos: number, valorUMA: number): Partidor 
 }
 
 /**
+ * Procesos en los que la regulacion provisoria del art. 12 es una
+ * respuesta posible. Son exactamente aquellos en los que la entrevista
+ * pregunta la forma de terminacion.
+ *
+ * La sucesion queda afuera a proposito, y no por simetria con el wizard:
+ * en el proceso sucesorio no se admiten regulaciones provisorias salvo
+ * excepcion, y en esa excepcion —el letrado renuncia con la sucesion sin
+ * terminar— la regulacion es definitiva y se enuncia con minimo y maximo,
+ * que es justo lo contrario de lo que hace el art. 12. Mostrar una banda
+ * de un solo extremo ahi seria decir algo falso.
+ */
+const PROCESOS_CON_TERMINACION: readonly string[] = [
+  'conocimiento',
+  'ejecucion_sentencia',
+  'ejecutivo',
+]
+
+/**
  * Art. 12: si el profesional se aparta antes de la conclusion del proceso,
  * la regulacion provisoria se fija "en el minimo que le hubiere podido
  * corresponder". No cambia ningun factor del calculo: cambia que solo el
@@ -524,8 +542,14 @@ export function calcularPartidor(basePesos: number, valorUMA: number): Partidor 
  * cualquier consumidor del motor (wizard, API, otra app) obtenga el mismo
  * resultado mandando unicamente el modo de terminacion. La bandera se
  * respeta si viene puesta, por compatibilidad con el motor clasico.
+ *
+ * El tipo de proceso manda sobre las dos vias: un estado que diga
+ * `sucesion` y `provisorios` a la vez no describe ningun caso real, y el
+ * motor lo resuelve por si mismo en lugar de confiar en que el llamador
+ * no lo arme. Asi ocurria al volver atras en la entrevista.
  */
 export function esRegulacionProvisoria(state: WizardState): boolean {
+  if (!PROCESOS_CON_TERMINACION.includes(state.tipoProceso)) return false
   return state.esProvisorio === true || state.modoTerminacion === 'provisorios'
 }
 
@@ -845,6 +869,13 @@ function resolveReglas(state: WizardState): ReglasProceso {
   // Escala
   const aplicaArt35 = tipo === 'sucesion' && state.sucesionUnicoLetrado === true
   const aplicaArt41 = tipo === 'ejecucion_sentencia'
+  // Los dos criterios de la caducidad son alternativos: o art. 22 o
+  // art. 25. Si se elige el art. 22 la instancia cae como demanda
+  // desestimada y la apertura a prueba no juega —la quita es de base, no
+  // de escala—; recien con el art. 25 el momento importa. Habia aca una
+  // tercera rama que aplicaba el -50% tambien al criterio del art. 22:
+  // acumulaba las dos quitas sobre el mismo hecho y no existe en el motor
+  // clasico. Se quito el 3/8/2026.
   const aplicaArt25 = (
        ['conocimiento', 'ejecucion_sentencia', 'ejecutivo'].includes(tipo)
     && state.modoTerminacion === 'modos_anormales'
@@ -853,11 +884,6 @@ function resolveReglas(state: WizardState): ReglasProceso {
        ['conocimiento', 'ejecucion_sentencia', 'ejecutivo'].includes(tipo)
     && state.modoTerminacion === 'caducidad'
     && state.caducidadCriterio === 'art25'
-    && state.aperturaPrueba === false
-  ) || (
-       ['conocimiento', 'ejecucion_sentencia', 'ejecutivo'].includes(tipo)
-    && state.modoTerminacion === 'caducidad'
-    && state.caducidadCriterio === 'art22'
     && state.aperturaPrueba === false
   )
 

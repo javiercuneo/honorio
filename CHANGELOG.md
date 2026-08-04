@@ -25,6 +25,67 @@ es un criterio, es un dato.
 
 ---
 
+## 2.0.0 — 3 de agosto de 2026
+
+Volver atrás en la entrevista arrastraba respuestas que el proceso nuevo ya
+no pregunta. Es MAYOR y no PARCHE porque un caso armado volviendo atrás pudo
+haber dado un número distinto del que da hoy.
+
+### Qué caso da distinto
+
+Solo los que se llegaron **volviendo atrás y cambiando una respuesta ya
+contestada**. Una entrevista corrida de principio a fin sin retroceder da
+exactamente lo mismo que en 1.0.0.
+
+| Camino | Antes | Ahora |
+|---|---|---|
+| Terminación «honorarios provisorios» → atrás → **sucesión** (o cautelar, homologación, exhorto, incidente) | El resultado salía marcado como provisorio: una sola cifra, sin máximo | Regulación normal, con mínimo y máximo |
+| Sentencia «rechazada» → atrás → **modos anormales** o **caducidad** | La base seguía reducida un 30 % (art. 22) | Base sin reducir |
+| Modos anormales «antes de prueba» → atrás → **caducidad / art. 22** | La escala seguía reducida un 50 % (art. 25) | Escala sin reducir |
+
+El primero, además de un estado imposible, era un error jurídico: en el
+proceso sucesorio no se admiten regulaciones provisorias salvo excepción, y
+en esa excepción —el letrado renuncia con la sucesión sin terminar— la
+regulación es definitiva y se enuncia con mínimo y máximo, que es justo lo
+contrario de lo que manda el art. 12.
+
+### Motor
+
+- **La caducidad vuelve a tener dos criterios excluyentes.** `resolveReglas`
+  aplicaba el −50 % del art. 25 también cuando la caducidad se trataba por
+  art. 22, acumulando la quita de base del 22 y la de escala del 25 sobre el
+  mismo hecho. El motor clásico nunca tuvo esa rama. Elegido el art. 22, la
+  instancia cae como demanda desestimada y el momento de la apertura a prueba
+  no juega; recién con el art. 25 importa.
+- **`esRegulacionProvisoria` mira el tipo de proceso.** El art. 12 solo puede
+  aplicarse donde la entrevista pregunta la forma de terminación. Un estado
+  que diga `sucesion` y `provisorios` a la vez lo rechaza el motor por su
+  cuenta, sin depender de que el llamador lo haya limpiado.
+
+### Entrevista
+
+- **Una respuesta vive mientras su paso se pregunte**
+  (`lib/wizard/reachability.ts`). Al cambiar una respuesta se podan las que
+  dependían de ella, en cascada y hasta punto fijo. Reemplaza el nuleo
+  ad-hoc de las sub-opciones de «objeto», que era este mismo problema
+  resuelto para un solo caso.
+- **El estado del motor se reconstruye entero antes de calcular**, en vez de
+  parchearse. `wizardState` es un objeto mutable de larga vida; parchearlo
+  dejaba adentro lo que la poda ya había descartado.
+- Consecuencia visible: volver atrás y cambiar el tipo de proceso ahora
+  vacía las respuestas que ese proceso no comparte. Si se vuelve al proceso
+  anterior hay que responderlas de nuevo. Es el precio de que no queden
+  respuestas que el usuario no dio.
+
+### Validación
+
+- `lib/legal/__tests__/retroceso.validation.ts`. Enumera las 160 corridas
+  limpias posibles y barre los **25.600 cruces** de «volver atrás y cambiar
+  de rumbo», exigiendo que el estado podado sea indistinguible de una
+  corrida limpia y dé el mismo cálculo. Son 11 validaciones en total.
+
+---
+
 ## 1.0.0 — 31 de julio de 2026
 
 Primera versión pública.
