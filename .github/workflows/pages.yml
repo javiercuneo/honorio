@@ -1,0 +1,58 @@
+# ------------------------------------------------------------------
+# Publica Honorio en honorio.ar (GitHub Pages).
+#
+# Las validaciones del motor corren ANTES del build: si un cambio movio
+# un numero, no se publica. No es una formalidad — un calculo de esta
+# app puede terminar fundando una regulacion judicial.
+#
+# El dominio sale de public/CNAME, que el export estatico deja en la
+# raiz de out/.
+# ------------------------------------------------------------------
+name: Deploy Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Validar el motor
+        run: npm run validate
+
+      - name: Build (export estatico)
+        run: npm run build
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: out
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

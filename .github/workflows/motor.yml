@@ -1,0 +1,39 @@
+# ------------------------------------------------------------------
+# Validaciones del motor.
+#
+# Corre en toda rama y en todo pull request, no solo al publicar. Es lo
+# que sostiene la afirmacion del README: "ningun cambio puede mover un
+# numero sin que una validacion falle". Sin esto, la afirmacion depende
+# de que alguien se acuerde de correr los scripts a mano.
+# ------------------------------------------------------------------
+name: Motor
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  validar:
+    name: Tipos y validaciones
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Chequeo de tipos
+        run: npm run typecheck
+
+      - name: Validaciones del motor
+        run: npm run validate
+
+      # El export estatico es lo que se publica. Que compile es parte de
+      # que el cambio este bien, no un paso aparte.
+      - name: Build
+        run: npm run build
