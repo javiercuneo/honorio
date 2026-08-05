@@ -6,7 +6,7 @@ Se actualiza en el mismo commit que el trabajo, para que nunca mienta.
 Última actualización: 2026-08-04
 
 > Honorio salió de
-> [Herramientas-Judiciales-IA](https://github.com/javiercuneo/Herramientas-Judiciales-IA),
+> [herramientas-judiciales](https://github.com/javiercuneo/herramientas-judiciales),
 > donde convivía con las calculadoras de plazos y el asistente clásico. La
 > historia de `honorio/` viajó completa con `git subtree split`, así que
 > `git log` de antes de la mudanza sigue siendo válido. Lo que quedó allá:

@@ -49,7 +49,7 @@ Está publicada como sitio estático, sin backend ni base de datos: nada de lo
 que se escribe sale del navegador.
 
 ```
-https://javiercuneo.github.io/Herramientas-Judiciales-IA/honorio/
+https://honorio.ar
 ```
 
 ## Cómo se corre localmente

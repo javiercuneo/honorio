@@ -14,7 +14,7 @@ import { Button } from '@/components/ui/button'
 // las calculadoras cambien de dominio. Es la unica URL de este tipo en toda
 // la app; si aparece otra, va al lado de esta.
 const CALCULADORA_MEDIACION =
-  'https://javiercuneo.github.io/Herramientas-Judiciales-IA/calculadoras/honorarios-mediacion.html'
+  'https://javiercuneo.github.io/herramientas-judiciales/calculadoras/honorarios-mediacion.html'
 
 // No describen los pasos —eso ya lo cuenta el panel de la derecha—
 // sino lo que la herramienta hace distinto: declarar cada regla.
