@@ -12,6 +12,7 @@
 
 import type { CardOption, Explanation, Answers } from '@/lib/legal/types'
 import { UMA_VIGENTE } from '@/lib/legal/uma'
+import { VALORES_UMA } from '@/lib/enlaces'
 export type { Answers }
 
 // ---- Tipos del schema ----
@@ -48,6 +49,13 @@ export interface NumericStepDef extends BaseStepDef {
   prefix?: string
   suffix?: string
   unidad: string
+  /**
+   * Convierte `unidad` en un enlace. Existe para un solo caso y es el
+   * que lo justifica: al pedir el valor de la UMA se le pide al
+   * usuario que lo verifique, y la norma que lo fija tiene que estar
+   * a un clic de ahi, no en una nota al pie de otra pantalla.
+   */
+  unidadHref?: string
   min: number
   max: number
   step: number
@@ -372,6 +380,7 @@ export const LEGAL_STEPS: WizardStepDef[] = [
     // hace que el numero se pueda defender, y es el mismo texto que
     // despues firma el informe. Ver lib/legal/uma.ts.
     unidad: UMA_VIGENTE.fuente ?? 'Verificá en el sitio de la Corte',
+    unidadHref: UMA_VIGENTE.url ?? undefined,
     prefix: '$',
     min: 50000,
     max: 200000,
@@ -380,7 +389,8 @@ export const LEGAL_STEPS: WizardStepDef[] = [
     format: pesos,
     explicacion: {
       brief: 'Ver más',
-      expanded: 'Para comprobar el valor podes ir a acordadas y filtrar por las que dicen "Determinar el valor de la Unidad de Medida Arancelaria (UMA)". También hay info en la web del CPACF',
+      expanded: 'Para comprobar el valor podes ir a acordadas y filtrar por las que dicen "Determinar el valor de la Unidad de Medida Arancelaria (UMA)". El CPACF mantiene la serie completa, que es la forma mas rapida de verificarlo',
+      enlace: { texto: 'Valores de la UMA en el CPACF', href: VALORES_UMA },
       full: [
         'ARTÍCULO 19. Institúyese la Unidad de Medida Arancelaria (UMA) para los honorarios profesionales de los abogados, procuradores y auxiliares de la Justicia, la que equivaldrá al 3 %  de la remuneración básica asignada al cargo de juez federal de primera instancia. La Corte Suprema de Justicia de la Nación suministrará y publicará mensualmente, por el medio a determinar por dicho Alto Tribunal, el valor resultante, eliminando las fracciones decimales, e informará a las diferentes cámaras el valor de la UMA',
       ],

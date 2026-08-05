@@ -235,6 +235,13 @@ export interface Explanation {
   brief: string
   expanded: string
   full: string[]
+  /**
+   * Un enlace al final de la explicacion, cuando el texto manda a
+   * mirar algo afuera. `expanded` es una cadena plana y se renderiza
+   * como tal a proposito —no se interpreta HTML de este schema—, asi
+   * que el enlace va aparte y no incrustado en la frase.
+   */
+  enlace?: { texto: string; href: string }
 }
 
 // ---- Respuestas del wizard (formato generico) ----

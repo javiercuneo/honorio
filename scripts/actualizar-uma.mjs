@@ -12,10 +12,15 @@
 //   UMA,102.076
 //   UHOM,12.960
 //   Acordada,Expresado en UMAs: (valor = $ 102.076 segun Res. SGA n° 1785/26)
+//   URL,https://www.csjn.gov.ar/documentos/descargar?ID=160573
 //
 // Se lee como un diccionario y no por posicion: agregar una fila o
 // cambiarlas de orden no puede romper el numero. La fila UHOM la usa
 // otra calculadora y aca se ignora.
+//
+// URL es una celda aparte porque el hipervinculo de una celda NO viaja
+// en el CSV: un CSV publicado es texto plano y la frase de Acordada
+// llega sin su enlace. Se comprobo.
 //
 // Salidas:
 //   0  con o sin cambios (el workflow mira el diff de git, no el
@@ -193,19 +198,38 @@ if (previo) {
 }
 
 const celdaNorma = tabla.get('ACORDADA') ?? ''
+const fuente = normaDesde(celdaNorma)
+// La celda propia gana sobre una URL suelta dentro de la frase: es la
+// que la planilla declara a proposito.
+const url = tabla.get('URL') || urlDesde(celdaNorma) || null
 const hoy = new Date().toISOString().slice(0, 10)
 
 if (previo && previo.valor === valor) {
+  // El valor no cambio, pero la procedencia puede haber llegado
+  // despues —la celda de la URL se agrego cuando el valor ya estaba
+  // cargado—. Completarla no es reescribir historia: el numero no se
+  // toca, y sin esto la fuente entraria recien dentro de varios meses,
+  // cuando la UMA se mueva.
+  if (previo.fuente !== fuente || previo.url !== url) {
+    previo.fuente = fuente
+    previo.url = url
+    actual.actualizado = hoy
+    writeFileSync(DESTINO, JSON.stringify(actual, null, 2) + '\n', 'utf8')
+    console.log(
+      'La UMA no cambio ($' +
+        valor.toLocaleString('es-AR') +
+        '), pero se actualizo su procedencia: ' +
+        (fuente ?? 'sin norma') +
+        (url ? ' — ' + url : ''),
+    )
+    process.exit(0)
+  }
+
   console.log('La UMA no cambio: $' + valor.toLocaleString('es-AR') + '.')
   process.exit(0)
 }
 
-actual.historia.push({
-  valor,
-  fuente: normaDesde(celdaNorma),
-  url: urlDesde(celdaNorma),
-  capturado: hoy,
-})
+actual.historia.push({ valor, fuente, url, capturado: hoy })
 actual.actualizado = hoy
 
 writeFileSync(DESTINO, JSON.stringify(actual, null, 2) + '\n', 'utf8')
@@ -214,5 +238,5 @@ console.log(
   'UMA actualizada: $' +
     (previo ? previo.valor.toLocaleString('es-AR') + ' -> $' : '') +
     valor.toLocaleString('es-AR') +
-    (normaDesde(celdaNorma) ? ' (' + normaDesde(celdaNorma) + ')' : ''),
+    (fuente ? ' (' + fuente + ')' : ''),
 )

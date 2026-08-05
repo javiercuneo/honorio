@@ -37,3 +37,14 @@ export const LICENCIA = 'https://www.gnu.org/licenses/agpl-3.0.html'
 
 /** Para reportar un numero mal calculado. */
 export const CONTACTO = 'javiercuneol@hotmail.com'
+
+/**
+ * La serie completa de valores de la UMA, mantenida por el CPACF.
+ *
+ * Es distinta del enlace que viaja en `data/uma.json`: aquel apunta a
+ * la norma que fijo el valor vigente —lo que se cita—, este a la tabla
+ * historica —lo que se consulta para verificar—. El paso de la UMA usa
+ * los dos, cada uno donde corresponde.
+ */
+export const VALORES_UMA =
+  'https://www.cpacf.org.ar/noticia/5201/valores-uma-pjn-ley-27423'

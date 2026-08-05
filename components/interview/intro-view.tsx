@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button'
 // se mudaron a lib/enlaces.ts: dejaron de ser una sola, y el barrido
 // del dia que cambie el dominio tiene que ser la lectura de un
 // archivo y no del repositorio entero.
-import { CALCULADORA_MEDIACION } from '@/lib/enlaces'
+import { CALCULADORA_MEDIACION, DOCUMENTACION } from '@/lib/enlaces'
 
 // No describen los pasos —eso ya lo cuenta el panel de la derecha—
 // sino lo que la herramienta hace distinto: declarar cada regla.
@@ -101,6 +101,7 @@ export function IntroView({ onStart, onShowMinimos }: { onStart: () => void; onS
                   <ul className="mt-2 list-disc space-y-1.5 pl-4 text-[13px] leading-relaxed text-muted-foreground">
                     <li>Esta herramienta es de carácter referencial; no sustituye el criterio del juez ni debe considerarse un dictamen profesional</li>
 <li>Los resultados se basan en interpretaciones de la <a href="https://servicios.infoleg.gob.ar/infolegInternet/anexos/305000-309999/305057/texact.htm" target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-foreground">Ley 27.423 </a>que podrían diferir de tu criterio o del de los distintos tribunales</li>                    <li>En cada paso, intentaremos explicitar el fundamento jurídico y su impacto en el cálculo</li>
+                    <li>Los criterios que la app adopta donde la ley admite más de una lectura están escritos y publicados: <a href={DOCUMENTACION} target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-foreground">cómo se interpreta la ley</a></li>
                   </ul>
                 </div>
                 <div>

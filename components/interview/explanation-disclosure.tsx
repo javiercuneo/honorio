@@ -41,6 +41,17 @@ export function ExplanationDisclosure({
           {explanation.expanded}
         </p>
 
+        {explanation.enlace ? (
+          <a
+            href={explanation.enlace.href}
+            target="_blank"
+            rel="noopener"
+            className="mt-2 inline-block text-[13px] text-accent-foreground underline underline-offset-2 hover:text-foreground"
+          >
+            {explanation.enlace.texto}
+          </a>
+        ) : null}
+
         {articulado.length > 0 ? (
           <ul className="mt-3 space-y-2 border-l-2 border-hair pl-4">
             {articulado.map((line, i) => (

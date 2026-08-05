@@ -16,7 +16,7 @@ Se actualiza en el mismo commit que el trabajo, para que nunca mienta.
 
 ## Dónde estamos
 
-Versión **2.1.0**. El rediseño visual está cerrado y el bug del flujo hacia
+Versión **2.1.1**. El rediseño visual está cerrado y el bug del flujo hacia
 atrás de la entrevista —que arrastraba respuestas de un proceso a otro— quedó
 resuelto. Las 11 validaciones de `lib/legal/__tests__` están en verde y corren
 solas en CI.
@@ -95,10 +95,22 @@ Los cuatro problemas que resolvió, porque conviene no rediscutirlos:
 como diccionario: agregar una fila o cambiarlas de orden no puede romper el
 número. Hoy trae `UMA`, `UHOM` (de otra calculadora, se ignora) y `Acordada`.
 
-**El hipervínculo de la celda no viaja.** Un CSV publicado es texto plano: la
-frase llega, la URL no. Si alguna vez se quiere el enlace a la norma en el
-informe, va en una celda aparte como texto; el script ya lo levanta
-(`urlDesde`) y `data/uma.json` tiene el campo `url` esperándolo.
+**El hipervínculo de una celda no viaja.** Un CSV publicado es texto plano: la
+frase de `Acordada` llega sin su enlace. Se comprobó. Por eso la URL va en una
+**fila propia** (`URL`), que un AppScript de la planilla escribe; el script la
+prefiere sobre cualquier URL suelta dentro de la frase.
+
+**El script completa la procedencia aunque el valor no cambie.** La celda de
+la URL se agregó cuando el valor ya estaba cargado: sin esto habría entrado
+recién dentro de varios meses, cuando la UMA se moviera. Actualiza `fuente` y
+`url` de la última entrada y **nunca el valor** — completar el registro no es
+reescribir historia; cambiar un número que ya se usó para calcular, sí.
+
+**No se guarda desde cuándo rige.** Decisión de Javier del 5/8: el dato no
+está en su planilla original y levantarlo le agrega fricción diaria. Se
+aceptó el costo —el informe cita la norma, no su vigencia— porque la norma se
+identifica sola y el PDF la trae. Si algún día se quiere calcular con la UMA
+vigente a una fecha anterior, ese es el dato que falta.
 
 `public/legacy/core.js` **conserva su `cargarUMA()` y no se toca**: es copia
 del asistente clásico, que se mantiene en el otro repositorio y todavía la
@@ -313,24 +325,23 @@ que barre los 25.600 cruces en cada corrida.
 
 ### Pendiente inmediato
 
-Los tres de esta lista se cerraron el 5/8: **informe imprimible**, **autoría
-visible** y la **vuelta al repositorio**. Queda uno:
+**Los cuatro se cerraron el 5/8**: informe imprimible, autoría visible, vuelta
+al repositorio y enlace a la documentación de dominio.
 
-- **Enlace a la documentación de dominio desde la app.** La URL ya está en
-  `lib/enlaces.ts` (`DOCUMENTACION`) y el sitio la publica. Falta decidir
-  **desde qué pantalla se entra**: la intro es lo más obvio, pero es donde
-  menos ganas hay de leer ocho documentos.
+**Dónde quedó el enlace a la documentación, y por qué.** En la **firma** del
+dashboard y en la **información adicional** de la intro. Son dos lectores
+distintos y ninguno está en la portada:
 
-Lo que sigue abierto de esa tanda:
+- Quien busca los ocho documentos de dominio casi siempre **ya tiene un
+  número y no está de acuerdo con él**. Entra por el resultado, no por la
+  puerta: de ahí la firma, que además se imprime con el informe.
+- Quien está leyendo el alcance y los límites antes de empezar ya está en la
+  información adicional, junto a los enlaces a infoleg y al precedente.
+- **En la portada no.** Su único trabajo es que se apriete «Comenzar»;
+  ofrecer ocho documentos ahí compite con esa decisión.
 
-- **Enlace a la norma de la UMA en el informe.** El campo `url` existe en
-  `data/uma.json` y el script lo levanta si aparece en la celda. Depende de
-  que la planilla lo traiga como texto (ver arriba).
-- **Fecha de vigencia de la UMA.** Hoy se guarda `capturado` —el día que el
-  build la tomó—, no *desde cuándo rige*. Para citar la norma con propiedad
-  falta ese dato, y no está en la planilla. Es lo que habilitaría calcular
-  con la UMA vigente a una fecha anterior, que es el motivo por el que
-  `data/uma.json` es una lista y no un número.
+Lo único que sigue abierto de esa tanda es la **fecha de vigencia de la UMA**
+(ver más arriba: se decidió no levantarla).
 
 ### Pendiente de diseño y contenido
 
@@ -402,6 +413,14 @@ Lo que sigue abierto de esa tanda:
 - **El valor de un `<input>` no aparece en `get_page_text`.** Es `value`, no
   `innerText`. Un campo que se ve vacío en el texto de la página puede estar
   perfectamente lleno; hay que leerlo por JS.
+- **`explanation.expanded` es texto plano y se renderiza como tal.** Si un
+  paso necesita mandar a un sitio, va en `explanation.enlace`, no incrustado
+  como HTML en la frase. Interpretar HTML de ese schema abriría una puerta
+  que no hace falta.
+- **Las acciones de CI se fijan por major (`@v7`) y el runner corre Node 24.**
+  Estaban en `@v4` con Node 20 y GitHub ya avisaba que las forzaba a 24. Al
+  tocar una workflow, tocar las tres: quedar desparejas es cómo vuelve el
+  aviso.
 - **Nunca escribir `92482` ni ningún otro valor de UMA en el código.** El
   único lugar es `data/uma.json`, y `UMA_VIGENTE` es la única forma de
   leerlo. Un valor por defecto escrito a mano es un número equivocado

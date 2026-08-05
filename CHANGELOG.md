@@ -27,6 +27,31 @@ posible —cambió la UMA— que no se podía comprobar.
 
 ---
 
+## 2.1.1 — 5 de agosto de 2026
+
+PARCHE: el motor no se toca. Termina de cablear la procedencia de la UMA y
+el acceso a la documentación de dominio, que quedaron a medio camino en
+2.1.0 porque faltaban datos.
+
+- **La norma de la UMA es un enlace.** Un AppScript de la planilla escribe
+  la URL en una celda propia (`URL`), porque el hipervínculo de una celda no
+  viaja en el CSV. El script la levanta y ahora el enlace al PDF de la Corte
+  está en el paso de la UMA y en la firma del informe.
+- **El script completa la procedencia sin esperar a que cambie el valor.**
+  Si la UMA es la misma pero la norma o la URL llegaron después, actualiza
+  esos dos campos de la última entrada. El valor no se toca nunca: sin esto,
+  una URL agregada hoy entraba recién dentro de meses.
+- **La serie completa de valores, en el «por qué» del paso de la UMA.** El
+  texto ya mandaba al CPACF sin enlazarlo. Es la tabla histórica, distinta
+  del enlace a la norma: una se consulta para verificar, la otra se cita.
+- **La documentación de dominio se enlaza desde la app**, en la firma y en
+  la información adicional de la intro. No en la portada: su trabajo es que
+  se apriete «Comenzar».
+- CI pasa a Node 24 y a las acciones v7; las de Node 20 estaban deprecadas y
+  el runner ya las forzaba a correr en 24.
+
+---
+
 ## 2.1.0 — 5 de agosto de 2026
 
 MENOR y no MAYOR porque **ningún criterio del motor cambió**: las 11

@@ -124,7 +124,18 @@ export function NumericField({ step, value, onChange }: NumericFieldProps) {
         ) : null}
       </div>
       <p className="mt-2 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-        {step.unidad}
+        {step.unidadHref ? (
+          <a
+            href={step.unidadHref}
+            target="_blank"
+            rel="noopener"
+            className="underline decoration-hair underline-offset-4 transition-colors hover:text-accent-foreground"
+          >
+            {step.unidad}
+          </a>
+        ) : (
+          step.unidad
+        )}
       </p>
     </div>
   )

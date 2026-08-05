@@ -25,7 +25,13 @@
 
 import { useEffect, useState } from 'react'
 import { UMA_VIGENTE } from '@/lib/legal/uma'
-import { CONTACTO, HONORIO, LICENCIA, REPOSITORIO } from '@/lib/enlaces'
+import {
+  CONTACTO,
+  DOCUMENTACION,
+  HONORIO,
+  LICENCIA,
+  REPOSITORIO,
+} from '@/lib/enlaces'
 import { pesos } from './format'
 import { Etiqueta } from './primitives'
 
@@ -87,6 +93,12 @@ export function Firma() {
 
       <p className="mt-2 flex flex-wrap gap-x-3 gap-y-1">
         <Enlace href={HONORIO}>honorio.ar</Enlace>
+        <span aria-hidden="true">·</span>
+        {/* Los ocho documentos de dominio son el razonamiento detras
+            de cada regla. Van aca y no en la portada porque quien los
+            busca es el que ya tiene un numero y no esta de acuerdo:
+            entra por el resultado, no por la puerta. */}
+        <Enlace href={DOCUMENTACION}>cómo se interpreta la ley</Enlace>
         <span aria-hidden="true">·</span>
         <Enlace href={REPOSITORIO}>código</Enlace>
         <span aria-hidden="true">·</span>
