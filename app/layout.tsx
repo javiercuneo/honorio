@@ -1,5 +1,4 @@
-﻿import { Analytics } from '@vercel/analytics/next'
-import type { Metadata, Viewport } from 'next'
+﻿import type { Metadata, Viewport } from 'next'
 import { Archivo, Geist, Geist_Mono, Source_Serif_4 } from 'next/font/google'
 import { withBasePath } from '@/lib/basePath'
 import './globals.css'
@@ -59,10 +58,11 @@ export default function RootLayout({
       lang="es"
       className={`${geistSans.variable} ${geistMono.variable} ${archivo.variable} ${sourceSerif.variable} bg-background`}
     >
-      <body className="font-sans antialiased">
-        {children}
-        {process.env.NODE_ENV === 'production' && <Analytics />}
-      </body>
+      {/* Sin analytics ni telemetria, a proposito: la app declara que nada
+          de lo que se escribe sale del navegador, y eso tiene que ser
+          literal. Si alguna vez hace falta medir uso, que sea con algo que
+          no vea los datos del calculo y que este declarado en la app. */}
+      <body className="font-sans antialiased">{children}</body>
     </html>
   )
 }
