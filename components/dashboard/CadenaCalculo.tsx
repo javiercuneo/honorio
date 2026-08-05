@@ -210,19 +210,30 @@ export function CadenaCalculo({
               {cadena.txBase.map((tx) => (
                 <Regla key={tx.id} tx={tx} axis="base" />
               ))}
+              <Total etiqueta="Base sobre la que se regula">
+                <Cifra value={baseFinal} size="lg" className="text-foreground" />
+                <span className="mt-0.5 block font-mono text-[10px] text-faint">
+                  <EnUMA value={baseEnUMA} />
+                </span>
+              </Total>
             </>
           ) : (
-            <p className="py-1 text-[13px] text-faint">
-              Ninguna regla reduce la base: se regula sobre el monto del proceso.
-            </p>
+            // Sin reduccion, el total repetia debajo de la frase el
+            // mismo numero que la frase ya explicaba, y que ademas es
+            // el que el usuario acaba de ingresar. Va una sola fila:
+            // la frase es el rotulo y la cifra su valor.
+            <LedgerRow
+              concepto="Ninguna regla la reduce: se regula sobre el monto del proceso"
+              valor={
+                <Cifra value={baseFinal} size="lg" className="text-foreground" />
+              }
+              sub={
+                <span className="font-mono text-[10px] text-faint">
+                  <EnUMA value={baseEnUMA} />
+                </span>
+              }
+            />
           )}
-
-          <Total etiqueta="Base sobre la que se regula">
-            <Cifra value={baseFinal} size="lg" className="text-foreground" />
-            <span className="mt-0.5 block font-mono text-[10px] text-faint">
-              <EnUMA value={baseEnUMA} />
-            </span>
-          </Total>
         </Bloque>
 
         {/* ---------- ESCALA ---------- */}
@@ -287,31 +298,37 @@ export function CadenaCalculo({
 
         {/* ---------- HONORARIO ---------- */}
         <Bloque titulo="Honorario" axis="honorarios">
-          {cadena.txFinal.length > 0 ? (
-            cadena.txFinal.map((tx) => (
-              <Regla key={tx.id} tx={tx} axis="honorarios" />
-            ))
+          {cadena.txFinal.map((tx) => (
+            <Regla key={tx.id} tx={tx} axis="honorarios" />
+          ))}
+
+          {/* El total del patrocinante solo dice algo si algo lo movio:
+              una regla de este eje, o el ajuste por rol que viene
+              despues y lo necesita como punto de partida. Cuando no hay
+              ni una cosa ni la otra repetia, por tercera vez, la misma
+              cifra que ya estan la fila de la escala y el numero grande
+              de arriba. */}
+          {cadena.txFinal.length > 0 || ajustaPorRol ? (
+            <Total etiqueta="Patrocinante">
+              <ParPesos
+                min={cadena.trasFinal.minPesos}
+                max={cadena.trasFinal.maxPesos}
+                esProvisorio={esProvisorio}
+                size={ajustaPorRol ? "md" : "lg"}
+              />
+              <span className="mt-0.5 block">
+                <ParUMA
+                  min={cadena.trasFinal.minUMA}
+                  max={cadena.trasFinal.maxUMA}
+                  esProvisorio={esProvisorio}
+                />
+              </span>
+            </Total>
           ) : (
             <p className="py-1 text-[13px] text-faint">
-              Ninguna regla reduce el honorario calculado sobre la escala.
+              Ninguna regla lo reduce: es el que sale de la escala.
             </p>
           )}
-
-          <Total etiqueta="Patrocinante">
-            <ParPesos
-              min={cadena.trasFinal.minPesos}
-              max={cadena.trasFinal.maxPesos}
-              esProvisorio={esProvisorio}
-              size={ajustaPorRol ? "md" : "lg"}
-            />
-            <span className="mt-0.5 block">
-              <ParUMA
-                min={cadena.trasFinal.minUMA}
-                max={cadena.trasFinal.maxUMA}
-                esProvisorio={esProvisorio}
-              />
-            </span>
-          </Total>
 
           {ajustaPorRol ? (
             <>

@@ -11,6 +11,7 @@
 // ---------------------------------------------------------------
 
 import type { CardOption, Explanation, Answers } from '@/lib/legal/types'
+import { UMA_VIGENTE } from '@/lib/legal/uma'
 export type { Answers }
 
 // ---- Tipos del schema ----
@@ -367,7 +368,10 @@ export const LEGAL_STEPS: WizardStepDef[] = [
     pregunta: 'Valor de la UMA',
     ayuda: 'Ingrese el valor de la Unidad de Medida Arancelaria. La app carga el último valor, pero podés ajustarlo manualmente',
     resumenLabel: 'Valor UMA',
-    unidad: 'Verificá en el sitio de la Corte',
+    // La procedencia va a la vista, no en una nota al pie: es lo que
+    // hace que el numero se pueda defender, y es el mismo texto que
+    // despues firma el informe. Ver lib/legal/uma.ts.
+    unidad: UMA_VIGENTE.fuente ?? 'Verificá en el sitio de la Corte',
     prefix: '$',
     min: 50000,
     max: 200000,

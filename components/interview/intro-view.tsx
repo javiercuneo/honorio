@@ -5,16 +5,12 @@ import { AnimatePresence, motion } from 'motion/react'
 import { ArrowRight, Scale, FileText, ShieldCheck, HelpCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
-// Enlace a OTRO sitio, no a otra pantalla de esta app: la calculadora de
-// mediacion vive con el resto de las calculadoras, que se quedan en el
-// repositorio principal cuando Honorio se mude al suyo.
-//
-// Por eso es absoluto y tiene que seguir siendolo. Esta aca arriba, y no
-// enterrado en el JSX, para que sea el unico lugar donde tocarlo el dia que
-// las calculadoras cambien de dominio. Es la unica URL de este tipo en toda
-// la app; si aparece otra, va al lado de esta.
-const CALCULADORA_MEDIACION =
-  'https://javiercuneo.github.io/herramientas-judiciales/calculadoras/honorarios-mediacion.html'
+// La calculadora de mediacion vive en OTRO sitio, con el resto de las
+// herramientas. Su URL —y las demas que cruzan de un sitio al otro—
+// se mudaron a lib/enlaces.ts: dejaron de ser una sola, y el barrido
+// del dia que cambie el dominio tiene que ser la lectura de un
+// archivo y no del repositorio entero.
+import { CALCULADORA_MEDIACION } from '@/lib/enlaces'
 
 // No describen los pasos —eso ya lo cuenta el panel de la derecha—
 // sino lo que la herramienta hace distinto: declarar cada regla.

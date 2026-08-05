@@ -3,7 +3,7 @@
 Documento de continuidad entre sesiones. **Leer antes de empezar a trabajar.**
 Se actualiza en el mismo commit que el trabajo, para que nunca mienta.
 
-Última actualización: 2026-08-04
+Última actualización: 2026-08-05
 
 > Honorio salió de
 > [herramientas-judiciales](https://github.com/javiercuneo/herramientas-judiciales),
@@ -16,13 +16,145 @@ Se actualiza en el mismo commit que el trabajo, para que nunca mienta.
 
 ## Dónde estamos
 
-Versión **2.0.0**. El rediseño visual está cerrado y el bug del flujo hacia
+Versión **2.1.0**. El rediseño visual está cerrado y el bug del flujo hacia
 atrás de la entrevista —que arrastraba respuestas de un proceso a otro— quedó
 resuelto. Las 11 validaciones de `lib/legal/__tests__` están en verde y corren
 solas en CI.
 
 Pantallas terminadas sobre el mismo sistema visual: **dashboard**, **wizard**,
 **portada**, **intro** y **mínimos**. Falta pulido de mensajes.
+
+El 5/8 se cerraron los tres pendientes inmediatos —**autoría**, **informe
+imprimible** y **vuelta al repositorio**— y se sacó la UMA del navegador del
+visitante. Ver [Lo del 5/8](#lo-del-58-la-uma-la-firma-y-el-informe).
+
+---
+
+## Lo del 5/8: la UMA, la firma y el informe
+
+### El campo numérico leía mal lo que se pegaba
+
+Lo reportó Javier con el caso: pegar `66316779.77` cargaba `$6.631.677.977`.
+El parser hacía `replace(/\./g,'')` a ciegas, suponiendo formato es-AR, así
+que un punto decimal multiplicaba por cien. Un separador de miles inglés
+(`66,316,779.77`) daba `NaN` y el campo volvía al valor anterior. **Los dos
+en silencio**, y el número que salía se veía perfectamente normal.
+
+La regla nueva, única y escrita en `numeric-field.tsx`: **el último separador
+con una o dos cifras detrás es el decimal; cualquier otro separa miles.**
+Entran las dos convenciones. Lo único que no cubre es un decimal de tres
+cifras (`1,234` por 1 con 234 milésimas), que no existe en pesos y que
+admitirlo obligaría a leer `66.316.779` como 66 mil.
+
+**El script que lee la planilla usa la misma función**, copiada a mano porque
+es `.mjs` y no puede importar TS. Si una cambia, la otra también: mostrar un
+número y calcular con otro es el peor resultado posible acá.
+
+### Y no se podía corregir sin un clic al vacío
+
+El segundo bug del mismo campo, y el peor: el valor se confirmaba en `blur` y
+en `Enter`, nunca al escribir. Pegar un número y apretar «Calcular»
+**calculaba con el anterior** — el botón corría antes de que el campo se
+sincronizara. Había que hacer clic en cualquier otro lado primero.
+
+Ahora se confirma en cada tecla y en cada pegado. Mientras el campo tiene el
+foco manda lo que se escribió (reformatear ahí mueve el cursor); al salir, la
+cifra se normaliza, y **esa normalización es la confirmación visual de cómo
+se leyó lo pegado**.
+
+> **Invariante:** el valor que se ve y el valor que entra al motor no se
+> pueden separar. Si algún día se agrega otro campo de entrada, se confirma
+> en `onChange`, no en `onBlur`.
+
+### La UMA sale del repositorio, no de Google
+
+La planilla la lee el build, no el visitante. `scripts/actualizar-uma.mjs` la
+baja, la compara con `data/uma.json` y agrega una entrada si cambió; un cron
+mensual (`.github/workflows/uma.yml`) lo corre solo y el push dispara el
+deploy.
+
+**La planilla sigue siendo la superficie de edición** y eso era el requisito:
+Javier la actualiza todos los días para su trabajo, y cualquier alternativa
+que le pidiera un segundo acto de actualización se iba a pudrir. Lo que
+cambió es *cuándo* se lee.
+
+Los cuatro problemas que resolvió, porque conviene no rediscutirlos:
+
+1. **La afirmación de privacidad dependía de Google.** La app declara que
+   nada de lo que se escribe sale del navegador, pero cada visitante le
+   mandaba su IP a `docs.google.com`. Es el mismo razonamiento con el que se
+   sacó `@vercel/analytics` el 4/8.
+2. **El fallback era una mina.** Si el pedido fallaba, el motor seguía con
+   `92482` escrito a mano y avisaba por `console.warn`.
+3. **El número no tenía procedencia.** Ahora llega con su norma, y el paso de
+   la UMA la muestra debajo del campo.
+4. **No era reproducible.** La lista histórica deja abierto calcular con la
+   UMA vigente a una fecha anterior sin rehacer nada.
+
+**El formato de la planilla es `clave,valor` por fila** y el script la lee
+como diccionario: agregar una fila o cambiarlas de orden no puede romper el
+número. Hoy trae `UMA`, `UHOM` (de otra calculadora, se ignora) y `Acordada`.
+
+**El hipervínculo de la celda no viaja.** Un CSV publicado es texto plano: la
+frase llega, la URL no. Si alguna vez se quiere el enlace a la norma en el
+informe, va en una celda aparte como texto; el script ya lo levanta
+(`urlDesde`) y `data/uma.json` tiene el campo `url` esperándolo.
+
+`public/legacy/core.js` **conserva su `cargarUMA()` y no se toca**: es copia
+del asistente clásico, que se mantiene en el otro repositorio y todavía la
+usa. Parchear la copia la haría divergir de su fuente. Simplemente no se la
+llama: `adapters.setUMA()` pisa `window.valorUMA` después de cargar.
+
+### Autoría e informe: eran un solo trabajo
+
+Las dos preguntas eran la misma —*¿quién firma esto y contra qué versión se
+hizo?*— y por eso resolver «autoría» sola habría terminado en un nombre en un
+rincón sin función.
+
+`components/dashboard/Firma.tsx` va al pie del dashboard y se imprime con el
+informe. Lleva autor, versión del motor, la UMA con su norma, la fecha del
+cálculo, el contacto, el código y la licencia. Decisión de Javier: **sin
+matrícula** —es abogado no matriculado, trabaja en el Poder Judicial— y por
+eso el rol dice «autor de Honorio», que es lo exacto.
+
+La fecha se resuelve después del montaje a propósito: el sitio es un export
+estático y en el HTML sería la fecha del build, no la del cálculo.
+
+**El informe es CSS de impresión, no PDF armado.** Se descartó la librería:
+sería una segunda maqueta que se desvía de la primera sin que nadie se entere
+hasta que alguien imprime algo mal. El costo aceptado es que el navegador
+agrega su encabezado y que los saltos de página hay que cuidarlos a mano
+(`break-inside: avoid` en `section` y en `[data-ledger-row]`).
+
+**Lo que no era obvio del interruptor de fundamentos:** viven en `<details>`,
+y un `<details>` cerrado no imprime su contenido. Sin hacer nada, el informe
+habría salido con los fundamentos que el lector hubiera abierto al leer —o
+sea, cualquier cosa— y el interruptor habría sido decorativo. Se abren o se
+cierran todos en `beforeprint` y se restaura el estado exacto en
+`afterprint`. Va enganchado al evento y no al botón porque `Ctrl+P` tiene que
+dar el mismo informe.
+
+### Menos ruido en la cadena de cálculo
+
+Pedido de Javier con el caso: sucesión, único letrado, sin ninguna reducción
+de base. El bloque decía «Ninguna regla reduce la base» y debajo imprimía un
+total con el mismo número que el usuario acababa de ingresar; el bloque de
+honorario repetía por tercera vez la cifra que ya estaban la fila de la
+escala y el número grande de arriba.
+
+Se extendió a los otros dos ejes **el criterio que la escala ya usaba**: si no
+hubo reducción, no se imprime el total. Los tres ejes siguen apareciendo —se
+ve que se consideraron— pero ninguna cifra se repite sin agregar algo.
+
+### Lo que se descartó, y por qué
+
+- **Un honorario promedio** entre mínimo y máximo. No tiene estatus
+  normativo: el punto medio no lo señala nada de la 27.423, sería la única
+  cifra en pantalla sin un artículo al lado, y por su forma («el justo
+  medio») se citaría como «lo que corresponde». Va en contra de la misma
+  tesis que sostiene el contrafáctico.
+- **Un scraper de la Corte.** Acordadas en PDF sobre un sitio que cambia: un
+  pasivo permanente que además falla en silencio.
 
 ### El flujo hacia atrás (cerrado el 3/8)
 
@@ -181,17 +313,24 @@ que barre los 25.600 cruces en cada corrida.
 
 ### Pendiente inmediato
 
-- **Enlace a la documentación desde la app.** Ya hay a dónde apuntar: la
-  documentación de dominio está publicada en el sitio de origen. Falta decidir
-  **desde qué pantalla se entra**.
-- **Informe imprimible.** PDF del cálculo con interruptor para incluir u omitir
-  las explicaciones. Propuesto, no empezado.
-- **Autoría visible.** Hoy figura en los README, no en la interfaz. Es la misma
-  pregunta que "qué firma el informe imprimible".
+Los tres de esta lista se cerraron el 5/8: **informe imprimible**, **autoría
+visible** y la **vuelta al repositorio**. Queda uno:
 
-La versión del motor —hoy `2.0.0`— es el hilo que los une: el informe la tiene
-que mostrar, y es lo que hace que un cálculo sea reproducible dentro de dos
-años. Ver el encabezado de `CHANGELOG.md` para el criterio de numeración.
+- **Enlace a la documentación de dominio desde la app.** La URL ya está en
+  `lib/enlaces.ts` (`DOCUMENTACION`) y el sitio la publica. Falta decidir
+  **desde qué pantalla se entra**: la intro es lo más obvio, pero es donde
+  menos ganas hay de leer ocho documentos.
+
+Lo que sigue abierto de esa tanda:
+
+- **Enlace a la norma de la UMA en el informe.** El campo `url` existe en
+  `data/uma.json` y el script lo levanta si aparece en la celda. Depende de
+  que la planilla lo traiga como texto (ver arriba).
+- **Fecha de vigencia de la UMA.** Hoy se guarda `capturado` —el día que el
+  build la tomó—, no *desde cuándo rige*. Para citar la norma con propiedad
+  falta ese dato, y no está en la planilla. Es lo que habilitaría calcular
+  con la UMA vigente a una fecha anterior, que es el motivo por el que
+  `data/uma.json` es una lista y no un número.
 
 ### Pendiente de diseño y contenido
 
@@ -252,6 +391,21 @@ años. Ver el encabezado de `CHANGELOG.md` para el criterio de numeración.
 - **`next dev` puede quedar bloqueado por un candado de un proceso muerto**
   ("Another next dev server is already running" con un PID que ya no existe).
   Levantarlo en otro puerto (`npx next dev -p 3007`) destraba y sirve igual.
+- **La tecla Enter del panel del navegador llega con `key` vacía.** Un
+  `computer key Return` desde la automatización dispara un `keydown` con
+  `key: ""`, así que ningún manejador que mire `e.key === 'Enter'` reacciona.
+  **No es un bug de la app**: costó media hora darlo por roto cuando andaba.
+  Para verificar atajos de teclado, despachar el evento a mano
+  (`new KeyboardEvent('keydown', { key: 'Enter', bubbles: true })`) y leer el
+  DOM **después de un tick**, no en la misma expresión: React todavía no
+  re-renderizó y parece que no pasó nada.
+- **El valor de un `<input>` no aparece en `get_page_text`.** Es `value`, no
+  `innerText`. Un campo que se ve vacío en el texto de la página puede estar
+  perfectamente lleno; hay que leerlo por JS.
+- **Nunca escribir `92482` ni ningún otro valor de UMA en el código.** El
+  único lugar es `data/uma.json`, y `UMA_VIGENTE` es la única forma de
+  leerlo. Un valor por defecto escrito a mano es un número equivocado
+  esperando el día que algo falle.
 
 ---
 
@@ -260,4 +414,5 @@ años. Ver el encabezado de `CHANGELOG.md` para el criterio de numeración.
 ```bash
 npm run check    # tipos + las 11 validaciones. Es lo que corre CI.
 npm run build    # el export estatico, que es lo que se publica
+npm run uma      # trae el valor de la UMA de la planilla, si cambio
 ```

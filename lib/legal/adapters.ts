@@ -20,6 +20,7 @@ import type {
 } from './types'
 import { buildCalculationResult, PROCESS_REGISTRY } from './calculate'
 import { renderLegacyHTML } from './render-legacy'
+import { UMA_VIGENTE } from './uma'
 
 // ---- Helpers de tipo ----
 function g(): any {
@@ -41,7 +42,7 @@ export function setWizardState(partial: Partial<WizardState>): void {
 }
 
 export function resetWizardState(): void {
-  const uma = g().wizardState?.valorUMA ?? g().valorUMA ?? 92482
+  const uma = g().wizardState?.valorUMA ?? g().valorUMA ?? UMA_VIGENTE.valor
   g().wizardState = {
     step: 0,
     valorUMA: uma,
@@ -66,18 +67,26 @@ export function resetWizardState(): void {
 
 // ---- UMA ----
 export function getUMA(): number {
-  return (window as any).valorUMA ?? g().valorUMA ?? 92482
+  return (window as any).valorUMA ?? g().valorUMA ?? UMA_VIGENTE.valor
 }
 
-export function cargarUMA(): Promise<void> {
-  const before = (window as any).valorUMA
-  const result = g().cargarUMA()
-  if (!result) return Promise.resolve()
-  return result.then(() => {
-    if ((window as any).valorUMA === before) {
-      throw new Error('No se pudo cargar la UMA desde Google Sheets')
-    }
-  })
+/**
+ * Instala el valor de la UMA en el motor legacy.
+ *
+ * `core.js` abre con un valor escrito a mano y trae su propio
+ * `cargarUMA()`, que va a buscarlo a la planilla desde el navegador.
+ * Esa funcion sigue ahi y no se toca: `public/legacy/*.js` es una
+ * copia del asistente clasico, que se mantiene en el otro repositorio
+ * y todavia la usa. Parchear la copia la haria divergir de su fuente,
+ * que es exactamente lo que AGENTS.md prohibe.
+ *
+ * Asi que no se la llama y se pisa el valor: la fuente de la UMA es
+ * `lib/legal/uma.ts`, versionada, y el visitante no le pide nada a
+ * Google.
+ */
+export function setUMA(valor: number): void {
+  g().valorUMA = valor
+  if (g().wizardState) g().wizardState.valorUMA = valor
 }
 
 // ---- Parseo / Formato ----

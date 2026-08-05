@@ -18,6 +18,7 @@ import { Button } from '@/components/ui/button'
 import { ALL_STEPS, type WizardStepDef } from '@/lib/wizard/wizard-schema'
 import { useWizard } from '@/hooks/useWizard'
 import { useLegacyReady } from '@/components/LegacyLoader'
+import { UMA_VIGENTE } from '@/lib/legal/uma'
 import { AppTopbar } from './app-topbar'
 import { LETRAS } from './option-card'
 import { ProgressRail } from './progress-rail'
@@ -107,7 +108,12 @@ export function InterviewExperience() {
           target.isContentEditable)
 
       if (e.key === 'Enter') {
-        if (escribiendo) return
+        // En un paso numerico Enter avanza aunque el cursor este en el
+        // campo: es lo que promete la pista del pie, y el campo ya
+        // confirmo el valor en cada tecla, asi que no hay nada
+        // pendiente de sincronizar. En los demas pasos, escribir no
+        // avanza.
+        if (escribiendo && currentStepDef?.kind !== 'numeric') return
         if (hasAnswer) {
           e.preventDefault()
           go(1, () => wizard.next())
@@ -195,23 +201,16 @@ export function InterviewExperience() {
     )
   }
 
-  if (showMinimos && ready && !umaValorCargado) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
-        <div className="text-center max-w-md">
-          <p className="font-mono text-[13px] text-destructive">
-            No se pudo cargar el valor de la UMA desde Google Sheets.
-          </p>
-          <p className="mt-2 text-[12px] text-muted-foreground">
-            Los valores de referencia no están disponibles sin el valor de la UMA.
-          </p>
-        </div>
-      </div>
-    )
-  }
-
+  // La pantalla de "no se pudo cargar la UMA desde Google Sheets" se
+  // fue con el pedido que la justificaba: el valor sale del archivo
+  // versionado y esta disponible apenas monta el motor.
   if (showMinimos) {
-    return <MinimosView onBack={() => setShowMinimos(false)} umaValor={umaValorCargado!} />
+    return (
+      <MinimosView
+        onBack={() => setShowMinimos(false)}
+        umaValor={umaValorCargado ?? UMA_VIGENTE.valor}
+      />
+    )
   }
 
   // ---- Dashboard ----

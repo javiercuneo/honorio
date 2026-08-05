@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button"
 import type { UseWizardReturn } from "@/hooks/useWizard"
 import { calcularResultadoEstructurado } from "@/lib/legal/adapters"
 import { Dashboard } from "@/components/dashboard/Dashboard"
+import { Firma } from "@/components/dashboard/Firma"
+import { BotonImprimir, HOJA_PROPS } from "@/components/dashboard/imprimir"
 import { PROCESO_LABEL, SENTENCIA_LABEL, EXCEPCIONES_LABEL } from "@/components/dashboard/format"
 import { AppTopbar } from "./app-topbar"
 
@@ -82,6 +84,7 @@ export function DashboardView({ wizard, onBack, onRestart, onShowMinimos }: Dash
           <FileSpreadsheet className="mr-1.5 h-3.5 w-3.5" />
           Minimos
         </Button>
+        <BotonImprimir />
         <Button variant="outline" size="sm" onClick={onRestart} className="h-8 text-[13px]">
           <RotateCcw className="mr-1.5 h-3.5 w-3.5" />
           Nuevo cálculo
@@ -93,7 +96,19 @@ export function DashboardView({ wizard, onBack, onRestart, onShowMinimos }: Dash
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease }}
         className="mx-auto max-w-5xl px-6 pb-24 pt-8 md:px-8"
+        {...HOJA_PROPS}
       >
+        {/* En pantalla la cabecera dice de que se trata; en papel la
+            cabecera no va, asi que el titulo lo pone el informe. */}
+        <div className="hidden print:mb-6 print:block">
+          <p className="font-meter text-[17px] font-semibold uppercase tracking-[0.06em]">
+            Honorio
+          </p>
+          <p className="mt-1 font-mono text-[11px] uppercase tracking-[0.12em]">
+            Cálculo de honorarios · Ley 27.423{caso ? ' · ' + caso : ''}
+          </p>
+        </div>
+
         {resultado && datos ? (
           <Dashboard
             resultado={resultado}
@@ -116,6 +131,8 @@ export function DashboardView({ wizard, onBack, onRestart, onShowMinimos }: Dash
             </p>
           </div>
         )}
+
+        {resultado ? <Firma /> : null}
       </motion.div>
     </div>
   )

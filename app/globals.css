@@ -232,3 +232,86 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* ------------------------------------------------------------------
+   Informe imprimible.
+
+   Se imprime el mismo DOM que se verifico en pantalla, con reglas de
+   @media print. La alternativa era armar el PDF por codigo, y se
+   descarto: seria una segunda maqueta que se desvia de la primera sin
+   que nadie se entere hasta que alguien imprime algo mal. En una app
+   donde el numero es el producto, ese desvio es el riesgo real.
+
+   Tres decisiones:
+
+   1. Papel blanco siempre. El tema oscuro es una preferencia de
+      pantalla; en papel gasta tinta y se lee peor. Se fuerzan las
+      variables a la paleta clara sin tocar la clase .dark, para que
+      volver de la impresion no cambie nada de lo que el lector eligio.
+   2. Los fundamentos se imprimen si el lector lo pidio. La app abre
+      los <details> antes de imprimir y los vuelve a cerrar despues
+      (ver usarImpresion): asi el interruptor decide de verdad, en vez
+      de depender de cuales quedaron abiertos al leer.
+   3. Nada se corta al medio. Cada tarjeta y cada fila del ledger son
+      indivisibles.
+   ------------------------------------------------------------------ */
+
+@media print {
+  :root,
+  .dark {
+    --background: #ffffff;
+    --foreground: #14181f;
+    --card: #ffffff;
+    --card-foreground: #14181f;
+    --muted-foreground: #4a5261;
+    --border: #c8ccd4;
+    --hair: #dcdfe5;
+    --faint: #5a6272;
+    --value-min: #3f4757;
+    --value-max: #14181f;
+  }
+
+  html,
+  body {
+    background: #fff !important;
+  }
+
+  @page {
+    margin: 16mm 14mm;
+  }
+
+  /* Controles: en papel no se puede hacer clic en nada. */
+  [data-imprimir='no'] {
+    display: none !important;
+  }
+
+  /* El cuerpo del dashboard ocupa el ancho del papel. */
+  [data-imprimir='hoja'] {
+    max-width: none !important;
+    padding: 0 !important;
+  }
+
+  section,
+  [data-ledger-row] {
+    break-inside: avoid;
+  }
+
+  h2,
+  h3 {
+    break-after: avoid;
+  }
+
+  /* La marca del "por qué" es un boton: en papel no dice nada, y el
+     texto que abria queda igual a la vista. */
+  summary [data-por-que] {
+    display: none !important;
+  }
+
+  summary {
+    list-style: none;
+  }
+
+  a {
+    color: inherit;
+  }
+}

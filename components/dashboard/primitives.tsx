@@ -330,7 +330,7 @@ export function LedgerRow({
   className?: string
 }) {
   return (
-    <div className={cn("flex items-baseline gap-3 py-2", className)}>
+    <div data-ledger-row className={cn("flex items-baseline gap-3 py-2", className)}>
       <span
         className={cn(
           "flex items-baseline gap-2 text-[13px]",
@@ -367,7 +367,7 @@ export function Disclosure({
   className?: string
 }) {
   return (
-    <details className={cn("group", className)}>
+    <details data-ledger-row className={cn("group", className)}>
       <summary className="flex cursor-pointer list-none items-baseline gap-3 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
         <span className="flex items-baseline gap-2 text-[13px] text-muted-foreground">
           {concepto}
@@ -375,7 +375,10 @@ export function Disclosure({
         </span>
         <span className={PUNTEADO} aria-hidden="true" />
         {valor ? <span className="shrink-0 text-right">{valor}</span> : null}
-        <span className="shrink-0 font-mono text-[10px] uppercase tracking-wider text-accent-foreground">
+        <span
+          data-por-que
+          className="shrink-0 font-mono text-[10px] uppercase tracking-wider text-accent-foreground"
+        >
           por qué
         </span>
       </summary>

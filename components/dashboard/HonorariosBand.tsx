@@ -295,7 +295,9 @@ export function HonorariosBand({
             />
           </div>
 
-          <div className="mt-4 flex items-center gap-5">
+          {/* Los controles no van al papel; las dos cifras que
+              producen, si. */}
+          <div className="mt-4 flex items-center gap-5" data-imprimir="no">
             <input
               type="range"
               min={0}

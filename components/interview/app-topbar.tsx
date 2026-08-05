@@ -7,9 +7,10 @@
 // ---------------------------------------------------------------
 
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { Moon, Settings2, Sun } from 'lucide-react'
+import { ArrowUpRight, Moon, Settings2, Sun } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { usePrefs } from '@/components/prefs'
+import { HERRAMIENTAS } from '@/lib/enlaces'
 
 function IconButton({
   onClick,
@@ -150,7 +151,9 @@ export function AppTopbar({
   const { prefs, alternarTema } = usePrefs()
 
   return (
-    <header className="border-b border-border">
+    // La cabecera es toda controles: en papel no dice nada, y la
+    // identificacion la da la Firma al pie del informe.
+    <header className="border-b border-border" data-imprimir="no">
       <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-x-6 gap-y-3 px-6 py-4 md:px-8">
         <div className="flex min-w-0 items-baseline gap-3">
           <span className="font-meter text-[19px] font-semibold uppercase tracking-[0.06em] text-foreground">
@@ -166,6 +169,20 @@ export function AppTopbar({
         <div className="flex shrink-0 items-center gap-1.5">
           {children}
           <span className="mx-1 h-5 w-px bg-hair" aria-hidden="true" />
+          {/* honorio.ar es la puerta de entrada de mucha gente que
+              nunca va a ver la landing: sin este enlace, el resto de
+              las herramientas —plazos, mora, caducidad— no existe para
+              ellos. Va absoluto porque cruza de un sitio al otro. */}
+          <a
+            href={HERRAMIENTAS}
+            target="_blank"
+            rel="noopener"
+            title="Plazos, mora, caducidad y el resto de las herramientas"
+            className="hidden rounded-md px-2.5 py-1.5 text-[13px] text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:inline-flex sm:items-center"
+          >
+            Herramientas
+            <ArrowUpRight className="ml-1 h-3.5 w-3.5" />
+          </a>
           <IconButton
             onClick={alternarTema}
             label={prefs.tema === 'dark' ? 'Tema claro' : 'Tema oscuro'}

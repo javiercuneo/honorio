@@ -20,8 +20,82 @@ Un cambio MAYOR se anota siempre con **qué caso da distinto y por qué**. Es
 la entrada que alguien va a leer dentro de dos años, cuando tenga que
 explicar una diferencia entre dos regulaciones.
 
-El valor de la UMA no versiona nada: se lee actualizado en cada cálculo y no
-es un criterio, es un dato.
+El valor de la UMA no versiona esta app: es un dato, no un criterio. Pero sí
+se versiona **él**, en `data/uma.json`, con la norma que lo fijó y la fecha
+en que entró. Sin eso, «el mismo caso da otro número» tenía una explicación
+posible —cambió la UMA— que no se podía comprobar.
+
+---
+
+## 2.1.0 — 5 de agosto de 2026
+
+MENOR y no MAYOR porque **ningún criterio del motor cambió**: las 11
+validaciones dan exactamente lo mismo que en 2.0.0. Entran el informe
+imprimible y la firma, y cambia de dónde sale el valor de la UMA.
+
+### Qué puede dar distinto, y no es el motor
+
+Un caso armado **pegando** la base regulatoria pudo haber salido mal. El
+campo suponía formato es-AR —punto de miles, coma de decimales— y no
+avisaba cuando lo que llegaba no lo era:
+
+| Se pegaba | Se cargaba antes | Se carga ahora |
+|---|---|---|
+| `66316779.77` | `$6.631.677.977` | `$66.316.779,77` |
+| `66,316,779.77` | volvía al valor anterior, sin avisar | `$66.316.779,77` |
+| `1.5` | `15` | `1,5` |
+
+Y había un segundo problema encima: el valor se confirmaba recién al salir
+del campo, así que **pegar un número y apretar «Calcular» calculaba con el
+anterior**. Había que hacer clic en cualquier otro lado primero.
+
+Los dos fallaban en silencio y el número que salía se veía perfectamente
+normal. Si hay un cálculo guardado de antes del 5/8/2026 con la base pegada,
+conviene rehacerlo.
+
+La regla nueva es una sola y está escrita: **el último separador con una o
+dos cifras detrás es el decimal; cualquier otro separa miles.** Entran las
+dos convenciones. La misma regla la usa el script que lee la planilla, para
+que lo que se muestra y lo que se calcula no puedan discrepar.
+
+### El valor de la UMA sale del repositorio, no de Google
+
+Lo buscaba el navegador de cada visitante a una planilla publicada, en cada
+carga. Ahora lo lee el build (`npm run uma`, más un cron mensual) y queda
+en `data/uma.json` con su norma y su fecha.
+
+- La app declaraba que nada de lo que se escribe sale del navegador, y con
+  ese pedido la afirmación dependía de Google. Mismo criterio con el que se
+  sacó `@vercel/analytics` el 4/8.
+- Si el pedido fallaba, el motor seguía con `92482` escrito a mano —un valor
+  de meses atrás— y solo avisaba por `console.warn`.
+- El script se planta y no toca el archivo si la planilla no responde, si
+  devuelve HTML, o si el valor saltó más de un 60 %.
+
+`public/legacy/core.js` conserva su `cargarUMA()` y no se toca: es copia del
+asistente clásico, que se mantiene en el otro repositorio. Simplemente no se
+la llama más.
+
+### Informe imprimible y autoría
+
+- **Firma al pie del cálculo**: autor, versión del motor, la UMA con su
+  norma, la fecha, el contacto, el código y la licencia. Es lo que hace que
+  el número se pueda defender cuando sale de la pantalla.
+- **Imprimir**, con interruptor para incluir u omitir los fundamentos: el
+  cálculo desnudo para adjuntar, o el cálculo fundado para sostenerlo. Se
+  imprime el mismo DOM que se ve, con `@media print`; no hay una segunda
+  maqueta que pueda desviarse de la primera.
+
+### Interfaz
+
+- **Vuelta a las herramientas.** Desde `honorio.ar` no había manera de
+  llegar al resto de las calculadoras. Ahora hay un enlace en la cabecera.
+- La cadena de cálculo deja de repetir cifras: cuando un eje no reduce
+  nada, no imprime un total que diga lo mismo que la línea de arriba.
+- Un campo numérico sin responder muestra vacío en vez de `0`.
+- `Enter` en un campo numérico avanza, que es lo que prometía la pista del
+  pie.
+- Las URL que cruzan a otro sitio viven todas en `lib/enlaces.ts`.
 
 ---
 

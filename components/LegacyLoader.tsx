@@ -9,6 +9,7 @@
 
 import { useEffect, useState, createContext, useContext, type ReactNode } from 'react'
 import * as adapters from '@/lib/legal/adapters'
+import { UMA_VIGENTE } from '@/lib/legal/uma'
 import { withBasePath } from '@/lib/basePath'
 
 interface LegacyContextType {
@@ -61,14 +62,12 @@ export function LegacyLoader({ children }: { children: ReactNode }) {
           throw new Error('Motor juridico no disponible despues de cargar scripts')
         }
 
-                if (!cancelled) {
-          try {
-            await adapters.cargarUMA()
-            const uma = adapters.getUMA()
-            if (!cancelled) setUmaValor(uma)
-          } catch {
-            console.warn('No se pudo cargar la UMA desde Google Sheets, se usara el valor default')
-          }
+        if (!cancelled) {
+          // El valor viene del archivo versionado, no de la red: no
+          // hay nada que pueda fallar aca ni un estado de carga que
+          // esperar. Ver lib/legal/uma.ts.
+          adapters.setUMA(UMA_VIGENTE.valor)
+          setUmaValor(UMA_VIGENTE.valor)
           setReady(true)
         }
       } catch (err) {

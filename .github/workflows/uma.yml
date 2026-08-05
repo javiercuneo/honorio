@@ -1,0 +1,58 @@
+# ------------------------------------------------------------------
+# Trae el valor de la UMA de la planilla y lo commitea si cambio.
+#
+# La planilla la lee este workflow, no el navegador del visitante: la
+# app declara que nada de lo que se escribe sale del navegador, y con
+# un fetch a Google en cada carga esa afirmacion dependia de Google.
+# El porque completo esta en lib/legal/uma.ts.
+#
+# El push a main dispara Deploy Pages, asi que el sitio queda con el
+# valor nuevo sin que nadie toque nada.
+#
+# El cron corre los dias 1 y 15 porque la Corte publica el valor
+# durante el mes y no siempre el mismo dia; dos pasadas alcanzan para
+# que nunca pase mas de dos semanas desactualizado. Igual queda el
+# disparo manual para el dia que sale y no se quiere esperar.
+#
+# Si la planilla no responde, o trae algo que no pasa los controles,
+# el script falla y no toca el archivo. Publicar con el valor de ayer
+# es mejor que publicar con uno inventado.
+# ------------------------------------------------------------------
+name: UMA
+
+on:
+  schedule:
+    - cron: '0 11 1,15 * *' # 08:00 en Buenos Aires
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: uma
+  cancel-in-progress: false
+
+jobs:
+  actualizar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Traer el valor de la planilla
+        run: node scripts/actualizar-uma.mjs
+
+      - name: Commitear si cambio
+        run: |
+          if git diff --quiet -- data/uma.json; then
+            echo "Sin cambios."
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/uma.json
+          git commit -m "chore: actualizar el valor de la UMA"
+          git push

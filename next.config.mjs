@@ -1,3 +1,12 @@
+import { readFileSync } from 'node:fs'
+
+// La version del motor la firma el informe: es lo que hace que un
+// calculo de hoy se pueda reproducir dentro de dos anios. Se lee de
+// package.json en vez de escribirse en una constante para que no
+// existan dos versiones que puedan discrepar; la que vale es la que
+// se publica.
+const { version } = JSON.parse(readFileSync('./package.json', 'utf8'))
+
 /** @type {import('next').NextConfig} */
 // El prefijo de publicacion viene de afuera porque Honorio se sirve
 // desde dos lugares distintos mientras dura la mudanza:
@@ -20,6 +29,7 @@ const nextConfig = {
   trailingSlash: true,
   env: {
     NEXT_PUBLIC_BASE_PATH: basePath,
+    NEXT_PUBLIC_VERSION: version,
   },
   images: {
     unoptimized: true,
