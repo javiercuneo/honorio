@@ -123,7 +123,7 @@ Lo que sigue en curso: [`docs/ROADMAP.md`](docs/ROADMAP.md).
 El **razonamiento normativo** de las reglas —qué hace cada tipo de proceso, qué
 dice cada artículo, dónde la ley obliga a elegir un criterio— quedó en el
 repositorio de origen, porque lo comparte con el asistente clásico:
-[documentación de dominio](https://javiercuneo.github.io/herramientas-judiciales/docs/).
+[documentación de dominio](https://javiercuneo.com.ar/docs/).
 Si alguna vez el clásico se retira, esos ocho documentos se mudan acá.
 
 ### El motor legacy

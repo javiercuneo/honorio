@@ -11,21 +11,28 @@
 // Ya paso: al renombrar el repositorio en agosto de 2026, la URL
 // vieja de Pages quedo con un 404 duro y hubo que salir a buscar
 // enlaces sueltos a mano.
+//
+// El 5/8/2026 se hizo ese barrido: `javiercuneo.com.ar` quedo activo y
+// estas tres pasaron de javiercuneo.github.io/herramientas-judiciales/
+// al dominio. Funciono como se esperaba —un solo archivo que leer— y
+// esta vez la URL vieja no quedo rota: GitHub redirige con 301 al
+// dominio propio conservando la ruta. Ese es justamente el motivo de
+// pasar a dominio propio y no volver a mover nada.
 // ---------------------------------------------------------------
 
 /** El sitio del que salio Honorio: plazos, mora, caducidad, PDF. */
-export const HERRAMIENTAS = 'https://javiercuneo.github.io/herramientas-judiciales/'
+export const HERRAMIENTAS = 'https://javiercuneo.com.ar/'
 
 /** Documentacion de dominio (Ley 27.423), publicada con ese sitio. */
 export const DOCUMENTACION =
-  'https://javiercuneo.github.io/herramientas-judiciales/docs/'
+  'https://javiercuneo.com.ar/docs/'
 
 /**
  * Los mediadores tienen normativa propia y su calculadora se quedo
  * con el resto de las herramientas.
  */
 export const CALCULADORA_MEDIACION =
-  'https://javiercuneo.github.io/herramientas-judiciales/calculadoras/honorarios-mediacion.html'
+  'https://javiercuneo.com.ar/calculadoras/honorarios-mediacion.html'
 
 /** Honorio, para que el informe impreso diga de donde salio. */
 export const HONORIO = 'https://honorio.ar'

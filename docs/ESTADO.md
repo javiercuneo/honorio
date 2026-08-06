@@ -28,6 +28,13 @@ El 5/8 se cerraron los tres pendientes inmediatos —**autoría**, **informe
 imprimible** y **vuelta al repositorio**— y se sacó la UMA del navegador del
 visitante. Ver [Lo del 5/8](#lo-del-58-la-uma-la-firma-y-el-informe).
 
+**El sitio de herramientas ya tiene dominio propio.** `javiercuneo.com.ar`
+quedó activo el 5/8 y las tres URL absolutas de `lib/enlaces.ts` apuntan ahí.
+Fue exactamente el barrido para el que ese archivo se centralizó: una lectura
+y listo. Y a diferencia del renombre del 4/8, la URL vieja **no quedó rota**:
+GitHub redirige `javiercuneo.github.io/herramientas-judiciales/…` con 301 al
+dominio, conservando la ruta.
+
 ---
 
 ## Lo del 5/8: la UMA, la firma y el informe
