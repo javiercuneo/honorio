@@ -290,6 +290,39 @@ borde derecho de la fila, en toda la app. **No inventar variantes.**
   mucho quienes revisan regulaciones en cámara.
 - **No numerar los ejes.** "Eje 1 / 01" es una convención nuestra, no de la ley.
 
+### Los tres rótulos de un paso del wizard
+
+Cada paso tiene **tres** textos y cada uno tiene un trabajo distinto. Estaban
+mezclados hasta el 5/8; lo notó Javier probando la entrevista.
+
+| Campo | Qué es | Ejemplo |
+|---|---|---|
+| `eyebrow` | El **término técnico** corto, en monoespaciado, arriba de la pregunta. | `Clase de proceso` |
+| `pregunta` | **Lo que se pregunta**, en forma de pregunta. | `¿Qué clase de proceso es?` |
+| `resumenLabel` | Cómo se rotula **la respuesta** en el resumen lateral y en el informe. Registro llano. | `Tipo de proceso` |
+
+**Que `eyebrow` y `resumenLabel` digan cosas distintas es a propósito** y hay que
+sostenerlo: `Clase de proceso` es como lo llama el CPCCN —art. 319, y así se
+titula el Capítulo I del Título I del Libro Segundo—, mientras que «tipo de
+proceso» es lo que entiende cualquiera. El técnico va arriba, el llano en el
+resumen. Decisión de Javier.
+
+Lo que estaba mal y se corrigió:
+
+- `sentenciaResultado` tenía `resumenLabel: 'Contingencias'`. No es el término
+  técnico ni el llano de ese paso: es el nombre de un **grupo** de pasos, y
+  quedaba como si «admitida» fuera una categoría distinta de la de su paso
+  hermano. Ahora es `Resultado de la sentencia`.
+- `aperturaPrueba` tenía `pregunta: 'Modos anormales'`, que **no es una pregunta
+  sino la respuesta del paso anterior**. Ahora pregunta lo que necesita saber:
+  si terminó antes o después de la apertura a prueba.
+- Tres pasos usaban «Seleccione…» y «Especifique…», imperativos de *usted*,
+  contra la convención rioplatense del repositorio.
+
+**Regla para un paso nuevo:** si es una elección, la `pregunta` se escribe como
+pregunta. Los dos pasos de entrada numérica —`demas` (UMA) y `base`— son la
+excepción y llevan un sintagma, porque rotulan un campo y no preguntan nada.
+
 ### Arquitectura del rediseño
 
 - `components/dashboard/primitives.tsx` — `Cifra`, `LedgerRow`, `Disclosure`,
