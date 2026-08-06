@@ -697,8 +697,18 @@ function buildIncidente(state: WizardState): CalculoResultado {
 // ================================================================
 
 /**
- * Factor de escala para medida cautelar (art. 29 inc. e).
+ * Factor de escala para medida cautelar (art. 37).
  * 0.25 sin oposicion, 0.50 con oposicion.
+ *
+ * No es una reduccion sobre la escala: el art. 37 dice que la base es un
+ * porcentaje de la escala del art. 21, y que ese porcentaje se eleva del
+ * 25% al 50% si hubo controversia u oposicion.
+ *
+ * La cita decia 'art. 29 inc. e' y venia del motor clasico, que resolvia
+ * la cautelar bajo la Ley 21.839. Bajo la 27.423 el inciso e del art. 29
+ * es el de los procesos penales; el articulo es el 37. Corregido el
+ * 6/8/2026. El renderizador legacy conserva la cita vieja a proposito:
+ * su contrato es reproducir el HTML del clasico tal cual.
  */
 export function aplicarFactorCautelar(input: { medidaOposicion: boolean | null }): TransformacionEscalaResult {
   const factor = input.medidaOposicion ? 0.5 : 0.25
@@ -708,7 +718,7 @@ export function aplicarFactorCautelar(input: { medidaOposicion: boolean | null }
     concepto: input.medidaOposicion
       ? '50% de la escala por medida cautelar con oposicion'
       : '25% de la escala por medida cautelar sin oposicion',
-    articulo: 'art. 29 inc. e',
+    articulo: 'art. 37',
     visible: true,
     valorPrevio: 1,
     factor,

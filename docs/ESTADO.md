@@ -3,7 +3,7 @@
 Documento de continuidad entre sesiones. **Leer antes de empezar a trabajar.**
 Se actualiza en el mismo commit que el trabajo, para que nunca mienta.
 
-Última actualización: 2026-08-05
+Última actualización: 2026-08-06
 
 > Honorio salió de
 > [herramientas-judiciales](https://github.com/javiercuneo/herramientas-judiciales),
@@ -34,6 +34,61 @@ Fue exactamente el barrido para el que ese archivo se centralizó: una lectura
 y listo. Y a diferencia del renombre del 4/8, la URL vieja **no quedó rota**:
 GitHub redirige `javiercuneo.github.io/herramientas-judiciales/…` con 301 al
 dominio, conservando la ruta.
+
+**El 6/8 se corrigió la medida cautelar**, que decía al revés lo que hacía. Ver
+abajo. Ningún número se movió.
+
+---
+
+## Lo del 6/8: la cautelar decía al revés lo que hacía
+
+Lo encontró la reescritura de `01_PROCESOS.md` en el repositorio de
+herramientas, que se hizo leyendo este motor en vez de leer el documento viejo.
+Dos cosas, las dos de texto, **ninguna movía un número**.
+
+### Las dos opciones de oposición tenían las descripciones cruzadas
+
+En `CAUTELAR_OPOSICION` (`lib/wizard/wizard-schema.ts`), la opción **Con
+oposición** decía «25 % de la escala del artículo 21» y **Sin oposición** decía
+«50 %». El art. 37 dice exactamente lo contrario: la base es el 25 % de la
+escala y **se eleva** al 50 % en caso de controversia u oposición.
+
+**El motor calculaba bien todo este tiempo**: `aplicarFactorCautelar()` hace
+`medidaOposicion ? 0.5 : 0.25`. O sea que el número que salía era el correcto y
+el cartel que lo explicaba decía al revés. Peor que un número mal: el usuario
+elegía la opción leyendo una consecuencia que no era la que iba a obtener.
+
+**Ninguna validación lo agarraba, y no es una falla de las validaciones.** Las
+once comparan números, y acá los números estaban bien. Un `description` de una
+tarjeta no lo mira nadie más que el que lo lee en pantalla. **Los rótulos que
+prometen un porcentaje son código legal aunque vivan en un string**, y la
+manera de controlarlos es la que se usó: leer el schema y el motor uno contra
+el otro.
+
+Es la segunda vez que aparece algo así en dos días: el 5/8 fue
+`fix(wizard): los tres rótulos de cada paso decían cosas distintas`.
+
+### La cita del art. 29 inc. e
+
+La transformación `escala-cautelar` se atribuía al **art. 29 inc. e**, en
+`calculate.ts` y en el «por qué» de `components/dashboard/format.ts`. Ese
+inciso, en la Ley 27.423, es el de los **procesos penales**. El artículo de la
+cautelar es el **37**, que es además el que la propia pregunta cita en pantalla
+y el que la tarjeta del tipo de proceso muestra como *hint*.
+
+La cita venía del motor clásico, que resolvía la cautelar bajo la **Ley
+21.839**, donde el art. 29 inc. e sí era el de las medidas cautelares. Se
+arrastró al motor nuevo sin volver a mirarla.
+
+**`render-legacy.ts` conserva la cita vieja a propósito.** Su contrato es
+producir el HTML idéntico al del asistente clásico, y además escribe en un
+contenedor con `display: none` que nadie ve. Cambiarla ahí rompería lo único
+que ese archivo promete.
+
+**Verificación:** las 11 validaciones en verde (830 afirmaciones), `npm run
+check` limpio, y la corrida completa en el navegador —cautelar con oposición,
+base $50.000.000— muestra la tarjeta con «50 %», la cadena con `ART. 37−50%` y
+la escala pasando de $9.715.394 a $4.857.697, que es exactamente la mitad.
 
 ---
 
@@ -360,8 +415,22 @@ Consecuencias que hay que sostener:
 
 ### Bugs conocidos
 
-Ninguno. El del flujo hacia atrás quedó cubierto por `retroceso.validation.ts`,
-que barre los 25.600 cruces en cada corrida.
+Ninguno abierto. El del flujo hacia atrás quedó cubierto por
+`retroceso.validation.ts`, que barre los 25.600 cruces en cada corrida. Los dos
+de la cautelar se cerraron el 6/8.
+
+### Lo que las once validaciones no cubren
+
+Quedó a la vista el 6/8 y conviene tenerlo escrito: **las validaciones comparan
+números, así que un texto que promete un porcentaje puede mentir con todas en
+verde.** Pasó dos veces en dos días —los rótulos de los pasos el 5/8, las
+descripciones de la cautelar el 6/8—.
+
+No hace falta automatizarlo todavía, pero sí saber dónde mirar: los
+`description` y `hint` de las `CardOption` de `wizard-schema.ts`, los `motivo`
+de `format.ts` y los `explicacion.expanded` de cada paso. **Cada vez que uno de
+esos strings nombra un porcentaje o un artículo, hay que leerlo contra
+`resolveReglas()` y contra la ley**, porque nada más lo va a hacer.
 
 ### Pendiente inmediato
 

@@ -230,13 +230,13 @@ export const CAUTELAR_OPOSICION: CardOption[] = [
   {
     id: 'con',
     label: 'Con oposición',
-    description: '25 % de la escala del artículo 21',
+    description: '50 % de la escala del artículo 21',
     hint: 'Art. 37',
   },
   {
     id: 'sin',
     label: 'Sin oposición',
-    description: '50 % de la escala del artículo 21',
+    description: '25 % de la escala del artículo 21',
     hint: 'Art. 37',
   },
 ]

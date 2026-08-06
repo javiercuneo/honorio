@@ -174,7 +174,7 @@ export const REGLA_LABEL: Record<string, { titulo: string; motivo: string }> = {
   "escala-cautelar": {
     titulo: "Medida cautelar",
     motivo:
-      "El art. 29 inc. e regula la cautelar en un porcentaje de la escala, según haya mediado o no oposición.",
+      "El art. 37 toma como base el 25% de la escala del art. 21, y la eleva al 50% si hubo controversia u oposición.",
   },
   "escala-homologacion": {
     titulo: "Homologación de desocupación",
