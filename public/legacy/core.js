@@ -16,14 +16,62 @@ function formatNumber(num) {
     return num.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
+/*
+  La planilla es una tabla de clave y valor:
+
+    UMA,102.076
+    UHOM,12.960
+    Acordada,"Expresado en UMAs: (valor = $ ... segun Res. ...)"
+    URL,https://...
+
+  Se busca POR CLAVE y no por posicion: agregar una fila o cambiarlas
+  de orden no puede romper el numero. Antes esto leia la primera linea
+  a ciegas. Es el mismo criterio que usa scripts/actualizar-uma.mjs en
+  el repositorio de Honorio.
+
+  Se respetan las comillas porque la fila Acordada tiene comas adentro.
+*/
+function valorDePlanilla(csv, clave) {
+    const campos = [];
+    let celda = '';
+    let entreComillas = false;
+
+    const cerrarFila = () => {
+        campos.push(celda);
+        celda = '';
+        const encontrada = campos[0].trim().toUpperCase() === clave;
+        const valor = encontrada && campos.length > 1 ? campos[1].trim() : null;
+        campos.length = 0;
+        return valor;
+    };
+
+    for (let i = 0; i < csv.length; i++) {
+        const c = csv[i];
+        if (entreComillas) {
+            if (c === '"') {
+                if (csv[i + 1] === '"') { celda += '"'; i++; }
+                else entreComillas = false;
+            } else celda += c;
+            continue;
+        }
+        if (c === '"') entreComillas = true;
+        else if (c === ',') { campos.push(celda); celda = ''; }
+        else if (c === '\n') { const v = cerrarFila(); if (v) return v; }
+        else if (c !== '\r') celda += c;
+    }
+    return cerrarFila();
+}
+
 function cargarUMA() {
     const url = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ8tumvxptTGBCfScMwWxK7r6ATnGfMw061GKGdzfIVyThcSGzUqjI-vcpME1AtykPmjqTq0xdjgc7D/pub?output=csv';
     return fetch(url)
         .then(response => response.text())
         .then(data => {
-            const filas = data.split('\n');
-            const cols = filas[0].split(',');
-            let val = cols[1]?.replace(/"/g, '').trim();
+            // Google devuelve el HTML de una pantalla de error con status
+            // 200 cuando la publicacion se dio de baja.
+            if (/^\s*</.test(data)) throw new Error('la planilla no esta publicada');
+
+            const val = valorDePlanilla(data, 'UMA');
             if (val && !isNaN(parseNumber(val))) {
                 const nuevoUMA = parseNumber(val);
                 valorUMA = nuevoUMA;
