@@ -27,6 +27,61 @@ posible —cambió la UMA— que no se podía comprobar.
 
 ---
 
+## 3.0.0 — 7 de agosto de 2026
+
+MAYOR: **un caso da distinto que ayer, y da distinto a propósito.**
+
+### Qué caso, y por qué
+
+La modificación de una cuota alimentaria —aumento, disminución, cesación o
+coparticipación— iba por la escala progresiva del art. 21. Va por la escala de
+los incidentes, que es lo que manda el **art. 39 segundo párrafo**. Antes la
+app ni siquiera preguntaba de qué supuesto se trataba.
+
+Un aumento con diferencia de $200.000 mensuales, base de 2 años $4.800.000,
+UMA $102.076:
+
+```
+ANTES  escala del art. 21, 3ª (46-90 UMA)   $1.231.473,60  a  $1.243.868,40
+AHORA  escala de los incidentes, 2 % a 20 %     $96.000,00  a    $960.000,00
+```
+
+No es un ajuste: es otra escala, y el mínimo cae a menos de la décima parte.
+La ley lo dice con todas las letras y la app no lo hacía.
+
+**La base también cambia, y esa parte la pone el usuario:** en la modificación
+son dos años de **la diferencia** entre la cuota vieja y la nueva, no de la
+cuota entera. El hint del paso de la base ahora lo dice con el ejemplo, porque
+es el error más caro de esta rama.
+
+**No es un criterio interpretativo nuevo.** La escala de los incidentes es la
+misma que la app ya usaba para los incidentes —el 2 % al 20 % del art. 33 de la
+Ley 21.839, porque el art. 47 de la 27.423 quedó observado—. Es un criterio
+declarado una vez y aplicado en los dos lugares donde la ley remite a lo mismo,
+y `alimentosArt39.validation.ts` comprueba que los dos números coincidan: si
+algún día divergen, tiene que ser a propósito.
+
+**Arrastra la cuenta de recorridos.** El sub-paso nuevo lleva el conocimiento
+de 120 a 128 recorridos y el total de 160 a 168, así que los cruces del barrido
+pasan de 25.600 a 28.224. Actualizado en el mismo commit acá, en el `README` y
+en la landing.
+
+### Lo demás
+
+- **Actuaciones posteriores a la ejecución (art. 41, última oración).** Un
+  bloque propio, al 40 % de la escala del art. 21. **Es de la escala completa,
+  no de la mitad que el mismo artículo aplica a la ejecución**, y no le entra el
+  10 % por no haber excepciones: eso último es un criterio y está declarado en
+  pantalla. No se pone entre las fracciones por etapas porque no es una etapa
+  sino otra regulación sobre la misma base, y pueden concurrir.
+- **Los mínimos de los auxiliares, al lado de su 5 %-10 %.** Se muestran los
+  dos números y no se aplica el piso, que era la propuesta original. **Aplicarlo
+  es una decisión, y no siempre la correcta:** el art. 21 deja a salvo el
+  art. 478 CPCCN, que manda adecuar los honorarios de los peritos «por debajo de
+  sus topes mínimos inclusive» a lo que se regule a los demás profesionales.
+  Cuando el 5 % queda por debajo de un piso, la pantalla lo señala. Decisión de
+  Javier.
+
 ## 2.2.0 — 7 de agosto de 2026
 
 MENOR: entra contenido que no existía y ningún caso da distinto. Las 11

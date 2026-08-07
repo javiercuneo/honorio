@@ -16,9 +16,9 @@ Se actualiza en el mismo commit que el trabajo, para que nunca mienta.
 
 ## Dónde estamos
 
-Versión **2.2.0**. El rediseño visual está cerrado y el bug del flujo hacia
+Versión **3.0.0**. El rediseño visual está cerrado y el bug del flujo hacia
 atrás de la entrevista —que arrastraba respuestas de un proceso a otro— quedó
-resuelto. Las 11 validaciones de `lib/legal/__tests__` están en verde y corren
+resuelto. Las 14 validaciones de `lib/legal/__tests__` están en verde y corren
 solas en CI.
 
 Pantallas terminadas sobre el mismo sistema visual: **dashboard**, **wizard**,
@@ -38,14 +38,129 @@ dominio, conservando la ruta.
 **El 6/8 se corrigió la medida cautelar**, que decía al revés lo que hacía. Ver
 abajo. Ningún número se movió.
 
-**El 7/8 arrancó el [`PLAN_COBERTURA_LEY.md`][plan]** —el plan vive en el
-repositorio de herramientas— y salió la versión **2.2.0**. Se cerraron sus
-puntos **1, 6 y 3a**: volvió el hint de la base, quedó dicho el litisconsorcio
-y dejaron de ofrecerse las etapas que no pudieron existir. De paso se corrigió
-la atribución del 2 %-20 % del incidente y entró la jurisprudencia. Ver abajo.
-**Ningún número se movió.**
+**El 7/8 se hizo entero el [`PLAN_COBERTURA_LEY.md`][plan]** —el plan vive en el
+repositorio de herramientas— en dos tandas.
+
+**Primero, 2.2.0, sin mover un número:** volvió el hint de la base (punto 1),
+quedó dicho el litisconsorcio (punto 6), dejaron de ofrecerse las etapas que no
+pudieron existir (punto 3a), se corrigió la atribución del 2 %-20 % del
+incidente y entró la jurisprudencia.
+
+**Después, 3.0.0, que sí mueve un número y por eso es MAYOR:** las actuaciones
+posteriores a la ejecución (punto 2), los mínimos de los auxiliares mostrados
+al lado del 5 %-10 % (punto 8, resuelto distinto de como estaba planteado) y la
+modificación de alimentos por la escala de los incidentes (punto 4), que es el
+cambio que mueve el número. El caso concreto está en el
+[`CHANGELOG`](../CHANGELOG.md).
+
+Del plan quedan solo cosas anotadas sin fecha.
 
 [plan]: https://github.com/javiercuneo/herramientas-judiciales/blob/main/docs/PLAN_COBERTURA_LEY.md
+
+---
+
+## Lo del 7/8, segunda tanda: los tres que mueven números
+
+### Art. 41, última oración — actuaciones posteriores a la ejecución
+
+Un bloque propio en el resultado, al **40 % de la escala del art. 21**, solo
+para `ejecucion_sentencia`.
+
+**Las dos formas de equivocarse acá, y cómo quedaron cerradas:**
+
+- **Tomar el 40 % de la escala ya partida al medio.** El mismo art. 41 aplica
+  la mitad de la escala a la ejecución, y las dos son fracciones de lo mismo:
+  la ejecución al 50 %, las posteriores al 40 %. `actuacionesPosteriores.validation.ts`
+  lo comprueba con una relación que lo hace evidente —las posteriores son 0,8
+  del honorario de la ejecución— y **se probó que caza el error**: forzando la
+  escala reducida, 13 afirmaciones fallan con exactamente la mitad.
+- **Ponerlo como una cuarta tarjeta al lado del completo, el 2/3 y el 1/3.**
+  Esa fila divide *una* regulación en fracciones del art. 29; el 40 % del
+  art. 41 es *otra* regulación sobre la misma base, y pueden concurrir. Va
+  donde ya están la segunda instancia y el partidor, que son eso mismo.
+
+**Un criterio declarado:** no se le aplica el −10 % por no haber excepciones.
+Esa quita se refiere al honorario de la ejecución —tener excepciones o no es un
+hecho de la ejecución, no de lo que viene después— y la última oración regula
+un tramo aparte remitiendo a la escala «del citado artículo», sin descuentos.
+Está dicho en pantalla y en el código. Si la lectura correcta fuera la otra, el
+cambio es multiplicar por `factorFinal` en el llamador.
+
+### Los mínimos de los auxiliares se muestran, no se aplican
+
+**El punto 8 del plan proponía comprobarlos contra el resultado y elevarlo.
+Javier lo resolvió distinto y mejor.**
+
+Aplicar el piso es una decisión, y no siempre la correcta: el art. 21, en su
+último párrafo, extiende sus normas a los peritos **salvo lo dispuesto en el
+art. 478 CPCCN**, que manda a los jueces adecuar los honorarios de los peritos
+*«por debajo de sus topes mínimos inclusive»* a las regulaciones de los demás
+profesionales, ponderando naturaleza, complejidad, calidad y extensión. O sea
+que el piso se puede perforar, y automatizarlo sería decidir por el juez.
+
+Así que la sección de auxiliares muestra **los dos números**: su 5 %-10 % y los
+pisos del art. 58 (4 UMA) y del art. 61 bis (2 UMA), con una insignia cuando el
+5 % queda por debajo. Es el criterio del repositorio aplicado a un caso nuevo:
+los números no se ocultan nunca.
+
+**El art. 60 queda afuera** y no por olvido: es expresamente de los procesos
+**no** susceptibles de apreciación pecuniaria, donde no hay base ni escala al
+lado de la cual mostrarlo.
+
+**Los pisos se derivan de `MINIMOS_AUXILIARES_JUSTICIA`, no se reescriben.** Un
+número de la ley copiado en dos lugares algún día discrepa consigo mismo. Eso
+abre otro riesgo —si alguien renombra un grupo, la derivación devuelve una
+lista más corta **y no falla nada**, la pantalla deja de mostrar un piso en
+silencio—, y para eso existe `minimosAuxiliares.validation.ts`.
+
+### Art. 39, segundo párrafo — la modificación de alimentos
+
+**Es el cambio que mueve el número, y por eso la versión es MAYOR.** El caso
+concreto, con las cifras de antes y después, está en el `CHANGELOG`.
+
+Un sub-paso nuevo bajo `familia_alimentos` distingue los dos supuestos del
+art. 39: la fijación de la cuota, que sigue por la escala del art. 21, y la
+modificación —aumento, disminución, cesación o coparticipación—, que va por la
+escala de los incidentes sobre una base que es **la diferencia** por dos años.
+
+**No es un criterio interpretativo nuevo, y eso es lo que lo hace defendible.**
+La escala de los incidentes es la que la app ya usaba: el 2 %-20 % del art. 33
+de la Ley 21.839, porque el art. 47 de la 27.423 quedó observado. Es un solo
+criterio declarado una vez y aplicado en los dos lugares donde la ley remite a
+lo mismo, y `alimentosArt39.validation.ts` **comprueba que los dos números
+coincidan**: si algún día divergen, tiene que ser a propósito.
+
+**Cómo se implementó, para no romper el resto.** `calcularEscalaIncidentes()`
+devuelve un `EscalaResult` con la misma forma que `calcularEscala()`, así que
+todo lo que viene después —reducciones, roles, segunda instancia, auxiliares—
+funciona sin saber cuál de las dos corrió. Lo único que cambia es que **no hay
+escalera**: el rango es plano, no progresivo.
+
+De ahí salió `EscalaAplicada.regimen`, que la presentación necesita: la tabla
+de tramos y la barra del excedente son del art. 21 y no significan nada para un
+rango plano. Cuando el régimen es `incidentes` se muestra en su lugar un «por
+qué» que dice por qué la tabla no corresponde.
+
+**Arrastra la cuenta de recorridos**, como el plan anticipaba: el conocimiento
+pasa de 120 a 128 y el total de 160 a 168, así que los cruces del barrido pasan
+de 25.600 a 28.224. Actualizado en el mismo commit en `01_PROCESOS.md`,
+`05_DEPENDENCIAS.md`, el `README.md` y la landing.
+
+**Un campo nuevo del wizard toca seis lugares**, y conviene tenerlos juntos
+porque el typecheck solo agarra tres: `WizardState` en `types.ts`, el reset de
+`adapters.ts`, el `MAPPING` y el `transformToLegacy` de `hooks/useWizard.ts`,
+los mismos dos **duplicados** en `retroceso.validation.ts` —que los copia a
+propósito, para validar el flujo real y no el que el hook diga— y
+`PROCESS_STEP_MAP` más `ALL_STEPS` en el schema.
+
+### Verificación
+
+`npm run check` limpio, **14 validaciones**, y `npm run build` sin errores. En
+el navegador, la modificación de alimentos con base $4.800.000 y UMA $102.076
+muestra $96.000 a $960.000 con «2,0 % efectivo» y «20,0 % efectivo», que son
+exactamente los números del `CHANGELOG`; la ejecución de sentencia con base
+$50.000.000 muestra las actuaciones posteriores en $3.886.157,60, que es la
+escala completa por 0,40 y también el honorario de la ejecución por 0,8.
 
 ---
 
@@ -97,11 +212,11 @@ más abajo: ninguna de las 24 dice «Ver más».
 - **En el desalojo laboral se dice que el 20 % del art. 40 no juega**, porque
   no hay contrato de locación. Verificado: `esViviendaProtegida` exige
   `desalojoVivienda === 'vivienda'`.
-- **En alimentos se dice qué supuesto calcula la app y cuál no.** El segundo
-  párrafo del art. 39 —aumento, disminución, cesación o coparticipación: la
-  base es la diferencia y va por la escala de los incidentes— no está
-  implementado, y ahora la pantalla lo dice en vez de dejar creer que sí. Es el
-  punto 4 del plan.
+- **En alimentos se dijo qué supuesto calculaba la app y cuál no.** El segundo
+  párrafo del art. 39 no estaba implementado y la pantalla pasó a decirlo en vez
+  de dejar creer que sí. **Duró unas horas**: era el punto 4 del plan y se
+  implementó el mismo día, más abajo. Queda como ejemplo de que decir «esto no
+  lo hago» es barato y hace visible lo que falta.
 - **En el incidente se dice de dónde sale el 2 %-20 %**: del art. 33 de la Ley
   21.839, porque el art. 47 de la 27.423 quedó observado. Es un criterio
   declarado, no una transcripción, y ahora está declarado donde el usuario lo
@@ -620,7 +735,7 @@ Consecuencias que hay que sostener:
 ### Bugs conocidos
 
 Ninguno abierto. El del flujo hacia atrás quedó cubierto por
-`retroceso.validation.ts`, que barre los 25.600 cruces en cada corrida. Los dos
+`retroceso.validation.ts`, que barre los 28.224 cruces en cada corrida. Los dos
 de la cautelar se cerraron el 6/8.
 
 ### Lo que las once validaciones no cubren
@@ -762,7 +877,7 @@ Lo único que sigue abierto de esa tanda es la **fecha de vigencia de la UMA**
 ## Cómo verificar un cambio
 
 ```bash
-npm run check    # tipos + las 11 validaciones. Es lo que corre CI.
+npm run check    # tipos + las 14 validaciones. Es lo que corre CI.
 npm run build    # el export estatico, que es lo que se publica
 npm run uma      # trae el valor de la UMA de la planilla, si cambio
 ```
