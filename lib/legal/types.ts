@@ -23,6 +23,7 @@ export interface WizardState {
   objetoBase: ObjetoBase
   desalojoVivienda: DesalojoVivienda
   posesoriasTipo: PosesoriasTipo
+  alimentosTipo: AlimentosTipo
   baseValor: number
   esProvisorio: boolean
   desdeMinimos: boolean
@@ -75,6 +76,17 @@ export type ObjetoBase =
 
 export type DesalojoVivienda = string | null // 'vivienda' | 'civil' | 'laboral' | null
 export type PosesoriasTipo = string | null   // 'beneficio' | 'demas' | null
+
+/**
+ * Los dos supuestos del art. 39.
+ *
+ * 'fijacion'     — primer parrafo: se fija la cuota. Base = 2 años de
+ *                  la cuota, escala del art. 21.
+ * 'modificacion' — segundo parrafo: aumento, disminucion, cesacion o
+ *                  coparticipacion. Base = 2 años de **la diferencia**,
+ *                  y se aplica la escala de los incidentes.
+ */
+export type AlimentosTipo = string | null    // 'fijacion' | 'modificacion' | null
 
 // ---- Resultados de calculo ----
 export interface Etapa {
@@ -178,6 +190,24 @@ export interface EscalaAplicada {
   porcentajeMinAplicado: number
   porcentajeMaxAplicado: number
   escalera?: EscaleraInfo
+  /**
+   * Que escala se aplico. Casi siempre la progresiva del art. 21; la
+   * de los incidentes solo cuando el art. 39 segundo parrafo la manda
+   * (aumento, disminucion, cesacion o coparticipacion de alimentos).
+   *
+   * La presentacion lo necesita: la tabla de tramos y la barra del
+   * excedente son del art. 21 y no significan nada para un rango plano.
+   * Ausente equivale a 'art21', para no romper lo ya construido.
+   */
+  regimen?: 'art21' | 'incidentes'
+}
+
+/// Actuaciones posteriores a la ejecucion propiamente dicha
+/// (art. 41, ultima oracion) — solo ejecucion_sentencia
+export interface ActuacionesPosteriores {
+  patrocinante: Rango
+  apoderado: Rango
+  procurador: Rango
 }
 
 /// Partidor (solo sucesion, art. 35)
@@ -201,6 +231,7 @@ export interface CalculoResultado {
   honorarios: Honorarios
   segundaInstancia?: SegundaInstancia
   auxiliares: Rango
+  actuacionesPosteriores?: ActuacionesPosteriores
   partidor?: Partidor
   exhorto?: {
     incisoA: number

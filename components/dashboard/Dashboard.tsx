@@ -7,6 +7,7 @@ import { derivarCadena } from "./cadena"
 import { ChipsCaso, type ChipsCasoProps } from "./ChipsCaso"
 import { HonorariosBand } from "./HonorariosBand"
 import { SegundaInstanciaBand } from "./SegundaInstanciaBand"
+import { ActuacionesPosterioresSection } from "./ActuacionesPosterioresSection"
 import { CadenaCalculo } from "./CadenaCalculo"
 import { AuxiliaresSection } from "./AuxiliaresSection"
 import { PartidorSection } from "./PartidorSection"
@@ -146,6 +147,18 @@ function DashboardGeneral({
         </SegundaInstanciaBand>
       ) : null}
 
+      {resultado.actuacionesPosteriores ? (
+        <ActuacionesPosterioresSection
+          rango={resultado.actuacionesPosteriores[rol]}
+          rolLabel={ROL_LABEL[rol]}
+          esProvisorio={resultado.esProvisorio}
+        >
+          <span className="font-mono text-[10px] uppercase tracking-wider text-faint">
+            {ROL_LABEL[rol]}
+          </span>
+        </ActuacionesPosterioresSection>
+      ) : null}
+
       <CadenaCalculo
         baseOriginal={resultado.baseOriginal}
         baseFinal={resultado.baseFinal}
@@ -169,6 +182,7 @@ function DashboardGeneral({
       {resultado.auxiliares ? (
         <AuxiliaresSection
           rango={resultado.auxiliares}
+          valorUMA={resultado.valorUMA}
           esProvisorio={resultado.esProvisorio}
         />
       ) : null}

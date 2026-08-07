@@ -12,7 +12,7 @@
 // Milestone 2: implementacion progresiva caso por caso.
 // ---------------------------------------------------------------
 
-import type { WizardState, CalculoResultado, EscalaResult, Transformacion, Rango, Partidor, SegundaInstancia, SegundaInstanciaRol } from './types'
+import type { WizardState, CalculoResultado, EscalaResult, Transformacion, Rango, ActuacionesPosteriores, Partidor, SegundaInstancia, SegundaInstanciaRol } from './types'
 
 // ---- Registry de procesos ----
 // Cada proceso registra su funcion build.
@@ -132,6 +132,83 @@ export function calcularEscala(basePesos: number, valorUMA: number): EscalaResul
     auxMin,
     auxMax,
   }
+}
+
+/**
+ * La escala de los incidentes, para el unico caso en que la Ley 27.423
+ * manda aplicarla fuera del incidente: el **art. 39 segundo parrafo**,
+ * aumento, disminucion, cesacion o coparticipacion de alimentos.
+ *
+ *   "...se tomara como base la diferencia que resulte del monto de la
+ *    sentencia por el termino de dos (2) anos, aplicandose la escala
+ *    de los incidentes."
+ *
+ * **Es la misma escala que ya usa `buildIncidente()`, y eso es lo que
+ * hace defendible este calculo.** El 2 %-20 % viene del art. 33 de la
+ * Ley 21.839, porque el art. 47 de la 27.423 quedo observado por el
+ * Decreto 1077/2017 y no hay otra escala de incidentes vigente. No son
+ * dos criterios interpretativos: es uno solo, declarado una vez y
+ * aplicado en los dos lugares donde la ley remite a lo mismo.
+ * Ver lib/legal/jurisprudencia.ts.
+ *
+ * Devuelve un `EscalaResult` con la misma forma que `calcularEscala()`
+ * para que todo lo que viene despues -reducciones, roles, segunda
+ * instancia, auxiliares- funcione sin saber cual de las dos corrio.
+ * Lo unico que cambia es que **no hay escalera**: el rango es plano,
+ * no progresivo, asi que no hay grado anterior ni excedente.
+ */
+export function calcularEscalaIncidentes(
+  basePesos: number,
+  valorUMA: number,
+): EscalaResult | null {
+  if (!basePesos || !valorUMA || valorUMA <= 0) return null
+
+  const baseEnUMA = basePesos / valorUMA
+  const minPorc = 2
+  const maxPorc = 20
+  const minComp = baseEnUMA * (minPorc / 100)
+  const maxComp = baseEnUMA * (maxPorc / 100)
+
+  const etapaUnMin = minComp / 3
+  const etapaUnMax = maxComp / 3
+  const etapaDosMin = (minComp * 2) / 3
+  const etapaDosMax = (maxComp * 2) / 3
+
+  return {
+    tituloEscala: 'Escala de los incidentes: 2% a 20%',
+    baseEnUMA,
+    minPorc,
+    maxPorc,
+    // Rango plano: no hay grado anterior que acumular.
+    maximoEscalaAnterior: 0,
+    limiteAnterior: 0,
+    patrocinante: {
+      full: { min: minComp, max: maxComp },
+      uno: { min: etapaUnMin, max: etapaUnMax },
+      dos: { min: etapaDosMin, max: etapaDosMax },
+    },
+    apoderado: {
+      full: { min: minComp * 1.4, max: maxComp * 1.4 },
+      uno: { min: etapaUnMin * 1.4, max: etapaUnMax * 1.4 },
+      dos: { min: etapaDosMin * 1.4, max: etapaDosMax * 1.4 },
+    },
+    // Los auxiliares siguen el art. 21: su 5 %-10 % es del monto del
+    // proceso y no depende de por que escala vaya el honorario.
+    auxMin: baseEnUMA * 0.05,
+    auxMax: baseEnUMA * 0.10,
+  }
+}
+
+/**
+ * Si el caso cae en el art. 39 segundo parrafo. Se pregunta en la
+ * entrevista con un sub-paso de `familia_alimentos`.
+ */
+export function usaEscalaDeIncidentes(state: WizardState): boolean {
+  return (
+    state.tipoProceso === 'conocimiento' &&
+    state.objetoBase === 'familia_alimentos' &&
+    state.alimentosTipo === 'modificacion'
+  )
 }
 
 // ================================================================
@@ -490,6 +567,61 @@ export function calcularSegundaInstancia(
     patrocinante: buildRol(minPatro, maxPatro),
     apoderado: buildRol(minApo, maxApo),
     procurador: buildRol(minProc, maxProc),
+  }
+}
+
+/**
+ * Actuaciones posteriores a la ejecucion propiamente dicha
+ * (art. 41, ultima oracion): 40 % de la escala del art. 21.
+ *
+ * Dos cosas que conviene no confundir, porque las dos son formas de
+ * equivocarse que ya estuvieron sobre la mesa:
+ *
+ * 1. **Es el 40 % de la escala completa**, no de la mitad que el mismo
+ *    art. 41 aplica a la ejecucion. Las dos son fracciones de lo mismo:
+ *    la ejecucion al 50 %, las posteriores al 40 %.
+ * 2. **No es una etapa de la ejecucion sino otra regulacion sobre la
+ *    misma base**, como la segunda instancia o el partidor. Por eso va
+ *    en un bloque propio y no como una cuarta fraccion al lado del
+ *    completo, el 2/3 y el 1/3: aquellas dividen *una* regulacion en
+ *    partes; esta es otra, y pueden concurrir —el mismo profesional
+ *    puede cobrar la ejecucion y las posteriores—.
+ *
+ * **Interpretacion declarada:** no se le aplica el -10 % por no haber
+ * excepciones. Esa reduccion del art. 41 se refiere al honorario de la
+ * ejecucion —tener o no excepciones es un hecho de la ejecucion, no de
+ * lo que viene despues— y la ultima oracion regula un tramo aparte
+ * remitiendo a la escala «del citado articulo», sin descuentos. Si la
+ * lectura correcta fuera la otra, el cambio es multiplicar por
+ * `factorFinal` en el llamador.
+ *
+ * Las reducciones de **base** si estan adentro, y no por decision:
+ * llegan en la escala, que se calcula sobre `baseFinal`.
+ *
+ * @param minEscala - Minimo de la escala del art. 21, en UMA, del patrocinante
+ * @param maxEscala - Maximo de la escala del art. 21, en UMA, del patrocinante
+ * @param valorUMA  - Valor de la UMA vigente
+ */
+export function calcularActuacionesPosteriores(
+  minEscala: number,
+  maxEscala: number,
+  valorUMA: number,
+): ActuacionesPosteriores {
+  const FACTOR_ART41 = 0.40
+  const minPatro = minEscala * FACTOR_ART41
+  const maxPatro = maxEscala * FACTOR_ART41
+
+  return {
+    patrocinante: {
+      minUMA: minPatro,
+      maxUMA: maxPatro,
+      minPesos: minPatro * valorUMA,
+      maxPesos: maxPatro * valorUMA,
+    },
+    // El ajuste por rol del art. 20 es posterior e independiente de
+    // que regulacion se este mirando, igual que en primera instancia.
+    apoderado: calcularApoderado(minPatro, maxPatro, valorUMA),
+    procurador: calcularProcurador(minPatro, maxPatro, valorUMA),
   }
 }
 
@@ -942,7 +1074,12 @@ export function buildGeneral(state: WizardState): CalculoResultado {
   })
 
   // 2. Scale
-  const escala = calcularEscala(baseFinal, uma)
+  // Casi siempre la progresiva del art. 21. La de los incidentes solo
+  // cuando el art. 39 segundo parrafo la manda.
+  const porIncidentes = usaEscalaDeIncidentes(state)
+  const escala = porIncidentes
+    ? calcularEscalaIncidentes(baseFinal, uma)
+    : calcularEscala(baseFinal, uma)
   if (!escala) return buildEmpty(state)
 
   // 3. Scale reductions
@@ -991,6 +1128,17 @@ export function buildGeneral(state: WizardState): CalculoResultado {
     ? calcularPartidor(baseFinal, uma)
     : undefined
 
+  // 10. Actuaciones posteriores a la ejecucion (art. 41, ultima
+  // oracion). Sobre la escala del art. 21 sin la mitad del propio
+  // art. 41 y sin las reducciones finales: ver la funcion.
+  const actuacionesPosteriores = tipo === 'ejecucion_sentencia'
+    ? calcularActuacionesPosteriores(
+        escala.patrocinante.full.min,
+        escala.patrocinante.full.max,
+        uma,
+      )
+    : undefined
+
   return {
     tipoProceso: tipo,
     esProvisorio: esRegulacionProvisoria(state),
@@ -1009,6 +1157,7 @@ export function buildGeneral(state: WizardState): CalculoResultado {
         limiteAnterior: escala.limiteAnterior,
         excedente: escala.baseEnUMA - escala.limiteAnterior,
       } : undefined,
+      regimen: porIncidentes ? 'incidentes' : 'art21',
     },
     honorarios: {
       patrocinante: { rango: { minUMA: minFinal, maxUMA: maxFinal, minPesos: minFinal * uma, maxPesos: maxFinal * uma } },
@@ -1017,6 +1166,7 @@ export function buildGeneral(state: WizardState): CalculoResultado {
     },
     auxiliares: aux,
     segundaInstancia,
+    actuacionesPosteriores,
     partidor: partidor ?? undefined,
     transformaciones: [
       ...txBase,
