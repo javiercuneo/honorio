@@ -3,7 +3,7 @@
 Documento de continuidad entre sesiones. **Leer antes de empezar a trabajar.**
 Se actualiza en el mismo commit que el trabajo, para que nunca mienta.
 
-Última actualización: 2026-08-06
+Última actualización: 2026-08-07
 
 > Honorio salió de
 > [herramientas-judiciales](https://github.com/javiercuneo/herramientas-judiciales),
@@ -16,7 +16,7 @@ Se actualiza en el mismo commit que el trabajo, para que nunca mienta.
 
 ## Dónde estamos
 
-Versión **2.1.1**. El rediseño visual está cerrado y el bug del flujo hacia
+Versión **2.2.0**. El rediseño visual está cerrado y el bug del flujo hacia
 atrás de la entrevista —que arrastraba respuestas de un proceso a otro— quedó
 resuelto. Las 11 validaciones de `lib/legal/__tests__` están en verde y corren
 solas en CI.
@@ -37,6 +37,210 @@ dominio, conservando la ruta.
 
 **El 6/8 se corrigió la medida cautelar**, que decía al revés lo que hacía. Ver
 abajo. Ningún número se movió.
+
+**El 7/8 arrancó el [`PLAN_COBERTURA_LEY.md`][plan]** —el plan vive en el
+repositorio de herramientas— y salió la versión **2.2.0**. Se cerraron sus
+puntos **1, 6 y 3a**: volvió el hint de la base, quedó dicho el litisconsorcio
+y dejaron de ofrecerse las etapas que no pudieron existir. De paso se corrigió
+la atribución del 2 %-20 % del incidente y entró la jurisprudencia. Ver abajo.
+**Ningún número se movió.**
+
+[plan]: https://github.com/javiercuneo/herramientas-judiciales/blob/main/docs/PLAN_COBERTURA_LEY.md
+
+---
+
+## Lo del 7/8: el hint de la base
+
+**No es una funcionalidad nueva: es una regresión que se saldó.** El asistente
+clásico mostraba, arriba del campo de la base, un cuadro que decía **qué monto
+ingresar** según lo contestado antes —quince leyendas distintas en
+`asistente-honorarios-clasico/js/wizard.js`, `renderBase()`—. La migración se
+llevó el campo y dejó el cuadro.
+
+**Por qué importa más que su tamaño.** El error más caro de esta app no es la
+escala sino la base: la escala la validan 830 afirmaciones en cada push, y la
+base la pone una persona sin que nada la controle. Un cero de más ahí no lo
+agarra ninguna validación, y el número sale igual de prolijo.
+
+### Cómo quedó
+
+`ayuda` y `explicacion` de un paso pueden ahora **derivarse de las respuestas**
+—`(answers) => texto`—, que es el mismo mecanismo de las `condition`. El tipo
+es `Derivable<T>` en `wizard-schema.ts`, con `ayudaDe()` y `explicacionDe()`
+como única forma de leerlos: la presentación pide el texto para las respuestas
+que tiene y no sabe si el schema lo traía fijo o lo derivó. Los demás pasos no
+se tocaron y siguen con sus cadenas.
+
+Las leyendas están en **`lib/wizard/indicacion-base.ts`**, aparte del schema
+porque son unas 250 líneas de texto legal y adentro lo volvían ilegible. Son
+**24 ramas** —doce objetos del juicio, las dos del desalojo, las cuatro
+terminaciones del cobro de sumas y los seis tipos de proceso restantes— y cada
+una reparte el contenido en los tres lugares que la app ya tiene: la
+instrucción práctica en el `ayuda`, que se ve siempre; el criterio y las
+reglas de detalle en el `expanded`; y el texto del artículo, verbatim, en el
+`full`. De paso se escribieron **briefs reales**, que era un pendiente anotado
+más abajo: ninguna de las 24 dice «Ver más».
+
+### Lo que no se copió del clásico
+
+**El texto viejo no se tomó como oráculo.** Cada cita se verificó contra
+`docs/domain/00_LEY_27423.md` y cada afirmación sobre la app contra
+`calculate.ts`. De ahí salieron cosas que el clásico no decía o decía a medias:
+
+- **El aviso de «no descuentes la reducción» aparece solo cuando alguna quita
+  de base rige de verdad.** `hayQuitaDeBase()` espeja las cuatro condiciones de
+  `aplicarReduccionesBase()` —desalojo de vivienda, homologación de vivienda,
+  demanda rechazada y caducidad por art. 22—. Repetirlo en las 24 ramas lo
+  habría vuelto invisible justo donde importa. Comprobado que **no** sale en
+  los dos casos parecidos: homologación «demás casos», y caducidad por art. 25,
+  que reduce la escala y no la base.
+- **En el desalojo laboral se dice que el 20 % del art. 40 no juega**, porque
+  no hay contrato de locación. Verificado: `esViviendaProtegida` exige
+  `desalojoVivienda === 'vivienda'`.
+- **En alimentos se dice qué supuesto calcula la app y cuál no.** El segundo
+  párrafo del art. 39 —aumento, disminución, cesación o coparticipación: la
+  base es la diferencia y va por la escala de los incidentes— no está
+  implementado, y ahora la pantalla lo dice en vez de dejar creer que sí. Es el
+  punto 4 del plan.
+- **En el incidente se dice de dónde sale el 2 %-20 %**: del art. 33 de la Ley
+  21.839, porque el art. 47 de la 27.423 quedó observado. Es un criterio
+  declarado, no una transcripción, y ahora está declarado donde el usuario lo
+  lee.
+- **En uso y habitación se dice que el tope del 100 % la app no lo verifica.**
+  La base la ingresa el usuario, así que ese control es suyo.
+
+### El litisconsorcio, que era el punto 6 y no había nada que programar
+
+El art. 21 no pide una cuenta nueva: **dice cuál es la base**, y la base la
+ingresa el usuario. Si hay litisconsorcio corresponde el interés del
+litisconsorte de que se trate y no el total del pleito. Lo único que faltaba
+era decirlo, así que es una línea del `ayuda` en las 18 ramas donde puede
+haber litisconsorcio, más el párrafo del artículo en el `full`.
+
+No va en la sucesión —el art. 35 tiene su propia regla— ni en la liquidación
+del régimen patrimonial, donde el art. 45 ya manda tomar el patrimonio
+adjudicado a la parte, que es la misma idea dicha para ese caso.
+
+### Lo que cambió al leerlo Javier, el mismo día
+
+Cuatro cosas, y las cuatro valen como método porque ninguna se ve leyendo el
+código: hay que saber derecho.
+
+- **El litisconsorcio salió del `ayuda` visible.** Estaba como una línea en las
+  18 ramas donde puede haber litisconsorcio, y eso era doblemente malo: **es
+  una regla general del art. 21 y no de un proceso**, así que puesta en el
+  `ayuda` —que dice qué monto ingresar *en este caso*— o se repetía en todas o
+  quedaba desparejo, y quedó desparejo: faltaba en la cautelar, la homologación
+  y el incidente. Ahora va detrás del «por qué», uniforme, en todo proceso
+  salvo el sucesorio.
+
+  **Y no era inocuo, que es lo importante.** El caso de Javier: nulidad sobre
+  dos inmuebles de dos actores distintos, un solo perito que tasa los dos. Si
+  se ingresa el interés de un litisconsorte, el 5 %-10 % de los auxiliares
+  —que el art. 21 calcula **sobre el monto del proceso**— sale corto en esa
+  misma proporción. Un hint que manda ingresar la parte sin decir eso es media
+  verdad, y una línea no alcanza para decirlo. Ahora está dicho, junto al otro
+  reparo: que ese interés tiene que poder distinguirse.
+
+  La sucesión queda afuera **por una razón mejor que la que estaba escrita**:
+  no es que el art. 35 tenga su propia regla, es que el sucesorio tramita como
+  jurisdicción voluntaria y para esos el mismo art. 21 manda considerar que hay
+  una sola parte.
+- **«La base de la ejecución se resuelve por el art. 22» era engañoso.** No
+  siempre: si la condena fue a escriturar, la base sale del art. 46. **La regla
+  verdadera es que la base de la ejecución es la de la sentencia que se
+  ejecuta**, y el artículo que la determina es el que gobernó aquel proceso. Y
+  esa identidad es además lo que explica la mitad de la escala del art. 41: con
+  la misma base y la escala entera, ejecutar una sentencia se pagaría igual que
+  todo el juicio que la produjo.
+- **La cautelar decía «no el del juicio principal».** Puede coincidir exacta y
+  precisamente con él. Ahora dice que no es necesariamente el mismo.
+- **El ejecutivo ganó el anclaje procesal**: es propio del ejecutivo que la
+  obligación sea exigible y de cantidad líquida o fácilmente liquidable —art.
+  520 CPCCN—, así que el monto está en el título y el hueco del art. 34 pesa
+  menos que en otros procesos.
+
+### El 2 % al 20 % del incidente estaba en el lugar equivocado
+
+Lo puse en el paso de la base y no es una regla de base: **es el análogo de la
+escala del art. 21**. Se mudó a la pantalla del resultado, que es donde se
+aplica.
+
+Y ahí apareció algo peor, de la misma familia que la cita del art. 29 inc. e
+de la cautelar: **`IncidenteResult` mostraba el texto del art. 29 inc. g
+—que divide el incidente en dos etapas y no fija ninguna alícuota— debajo del
+2 % y el 20 %, y ni siquiera decía de qué artículo era.** El encabezado de la
+tarjeta remataba la impresión con `art. 29 inc. g` arriba de los porcentajes.
+Ahora hay dos citas separadas, cada una con lo que de verdad funda, y el
+encabezado va sin artículo.
+
+También se corrigió el `articulo` de las dos transformaciones de
+`buildIncidente()`, que decían `art. 29 inc. g`. Hoy no se muestran —para el
+incidente el dashboard renderiza solo `IncidenteResult`— pero
+`transformaciones` es el contrato del motor hacia afuera.
+
+### La jurisprudencia tiene lugar propio
+
+**`lib/legal/jurisprudencia.ts`**, nuevo. Decisión de Javier: cuando la app
+interpreta, la interpretación va con los fallos que la sostienen. **Una
+interpretación declarada con jurisprudencia se puede discutir; una sin nada
+detrás solo se puede creer o no.**
+
+El primero es el del 2 %-20 %: tres fallos de la CNCiv., dos con enlace a la
+sentencia en el CIJ. **La sala del tercero no está en la fuente y no se
+completó por analogía con el anterior**, aunque el orden de la cita lo sugiera:
+una cita a medias es corregible, una inventada no se distingue de una cierta.
+Está anotado en el propio archivo.
+
+### Verificación
+
+`npm run check` limpio: tipos y las 11 validaciones en verde, 830 afirmaciones.
+**Ningún número se movió.** De `lib/legal/` solo cambió una cadena de texto
+—el `articulo` del incidente—, que no interviene en ninguna cuenta.
+
+Las 24 ramas se barrieron llamando a `ayudaBase()` y `explicacionBase()` con
+las respuestas de cada una, en vez de recorrer la entrevista a mano: las dos
+únicas que caen en el texto genérico son las dos inalcanzables —sin tipo de
+proceso elegido, y el exhorto, que no tiene paso de base—.
+
+En el navegador: el incidente con base $50.000.000 sigue dando $1.000.000 y
+$10.000.000, y las dos citas nuevas abren con los tres fallos y sus enlaces.
+
+---
+
+## Lo del 7/8: las etapas que no pudieron existir
+
+Punto 3a del plan. **El art. 29 divide el proceso en tres tercios**: la demanda
+y su contestación (inc. a), las actuaciones de prueba (inc. b) y las demás
+diligencias hasta la terminación (inc. c). El 2/3 es la suma de los dos
+primeros, así que **incluye la prueba**.
+
+La banda de honorarios ofrecía siempre las tres fracciones, incluso cuando la
+entrevista ya había contestado que el proceso terminó **antes de la apertura a
+prueba**. Ahí esa etapa no existió, y el 2/3 era un importe que no corresponde
+a ninguna labor posible: un número que las propias respuestas desmienten.
+
+Ahora, en ese caso, el 2/3 no se ofrece —ni como tarjeta ni como opción del
+reparto entre profesionales— y en su lugar hay un «por qué» que explica cuál es
+la etapa que falta.
+
+**Cómo se detecta, y por qué así.** Por la transformación `escala-art25`, que
+el motor emite exactamente cuando `aperturaPrueba === false`. No se
+reimplementa la condición: se lee el factor que el motor ya emitió, que es la
+regla de `cadena.ts` y de todo el dashboard.
+
+**Lo que quedó sin decidir, y es una pregunta jurídica, no de código.** Si el
+proceso terminó antes de la apertura a prueba, el «completo» tampoco es la suma
+de tres etapas que ocurrieron. Se dejó como está por dos razones: el plan
+apuntaba al 2/3, y el «completo» es la regulación del proceso **tal como
+ocurrió** —el art. 25 ya le aplicó la mitad de la escala justamente por haber
+terminado temprano—, mientras que las fracciones sirven para el profesional que
+intervino en parte. Si la lectura correcta es otra, se cambia acá.
+
+**Verificado en las dos direcciones**, con conocimiento, modos anormales y base
+$50.000.000: antes de la prueba, la banda muestra solo el 1/3 y el reparto
+ofrece «completo» y «1/3»; después de la prueba, vuelven las dos fracciones y
+las tres opciones. Los importes de cada una son los de siempre.
 
 ---
 
@@ -465,7 +669,17 @@ Lo único que sigue abierto de esa tanda es la **fecha de vigencia de la UMA**
 - **Mensajes.** Varios pasos del wizard traen `brief: 'Ver más'`, que era el
   rótulo del botón viejo, no un resumen. Hoy se reemplaza en presentación por
   "Qué dice la ley sobre este paso" (ver `explanation-disclosure.tsx`), pero
-  **conviene escribir briefs reales en el schema**.
+  **conviene escribir briefs reales en el schema**. El paso `base` ya los
+  tiene, uno por cada una de sus 24 ramas: quedan los demás.
+- **Cuatro pasos siguen con el relleno de la plantilla en `explicacion`**, y no
+  son todos iguales. `tipoProceso` y `objeto` traen `full: ['Complete los datos
+  segun corresponda.']`, que es la cadena que `StepShell` reconoce como vacía:
+  el `Disclosure` no se muestra y el daño es que esos dos pasos no tienen
+  fundamento. **`desalojoVivienda` y `posesoriasTipo` son peores**: su `full`
+  dice «Complete el tipo de desalojo para continuar», que no es la cadena
+  reconocida, así que el `Disclosure` **sí** se abre y muestra esa frase en
+  serif —la tipografía que en toda la app significa «esto es el texto de la
+  ley»—. Cuesta poco y conviene arreglarlo.
 - El resto está en [ROADMAP](ROADMAP.md): caducidad, mediación, consumo del
   motor desde afuera, regulación redactada.
 
@@ -487,6 +701,14 @@ Lo único que sigue abierto de esa tanda es la **fecha de vigencia de la UMA**
   destraba.
 - **`setAnswer` del wizard toma un solo argumento** (el valor), no `(id, valor)`:
   aplica siempre al paso actual.
+- **El panel de respuestas salta directo a cualquier paso ya contestado**, y
+  eso existía desde siempre sin que se viera: la lista no tenía ni cursor de
+  mano ni `title`, así que parecía un resumen de solo lectura. Lo reportó
+  Javier el 7/8 preguntando si hacía falta un botón para limpiar todo. Se le
+  puso la señal, y además **«Reiniciar» en la barra durante la entrevista** —en
+  la barra y no al lado de «Atrás», porque tira todas las respuestas y en el
+  pie está el camino del pulgar; es la misma razón por la que el auto-avance
+  es solo por teclado—.
 - **`answers` no es un acumulador.** `setAnswer` poda las respuestas que dejaron
   de preguntarse. Si algo necesita sobrevivir a un cambio de rumbo, **no** se
   guarda en `answers` "por las dudas": se declara como paso en

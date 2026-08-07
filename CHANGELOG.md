@@ -27,6 +27,45 @@ posible —cambió la UMA— que no se podía comprobar.
 
 ---
 
+## 2.2.0 — 7 de agosto de 2026
+
+MENOR: entra contenido que no existía y ningún caso da distinto. Las 11
+validaciones siguen en verde y `lib/legal/calculate.ts` solo cambió en una
+cita, que no interviene en ninguna cuenta.
+
+- **Volvió el hint de la base.** El asistente clásico decía, arriba del campo,
+  **qué monto ingresar** según lo contestado antes; la migración se llevó el
+  campo y dejó el cuadro. Ahora son **24 ramas** en
+  `lib/wizard/indicacion-base.ts`, y para eso `ayuda` y `explicacion` de un
+  paso pueden derivarse de las respuestas —el tipo es `Derivable<T>`—.
+
+  Es la mitad del valor de la entrevista: la escala la controlan 830
+  afirmaciones en cada push, y la base la pone una persona sin que nada la
+  controle.
+- **Las leyendas dicen también qué *no* hace la app**, que es lo que el
+  clásico no tenía por qué decir: el segundo párrafo del art. 39 —aumento o
+  cesación de alimentos, que va por la escala de los incidentes y acá va por
+  la del 21— y el tope del 100 % del art. 23 inc. h), que la app no verifica
+  porque la base la ingresa el usuario.
+- **El litisconsorcio del art. 21 quedó dicho**, detrás del «por qué» y en
+  todos los procesos salvo el sucesorio, que tramita como jurisdicción
+  voluntaria y para el que el mismo artículo manda considerar una sola parte.
+  Va con el reparo que lo hace usable: **el 5 %-10 % de los auxiliares se
+  calcula sobre el monto del proceso**, no sobre el interés de un
+  litisconsorte, así que quien ingresa una parte se lleva un honorario de
+  perito corto en esa proporción.
+- **El 2 % al 20 % del incidente dejó de colgar del art. 29 inc. g.** Esa
+  pantalla mostraba el texto del inciso —que divide el incidente en dos etapas
+  y no fija ninguna alícuota— debajo de los dos porcentajes, y sin nombrar de
+  qué artículo era. Ahora hay dos citas separadas, cada una con lo que de
+  verdad funda, y el criterio del art. 33 de la Ley 21.839 va con la
+  jurisprudencia que lo sostiene: tres fallos de la CNCiv., dos con enlace a la
+  sentencia en el CIJ. Es el mismo error que la cita del art. 29 inc. e en la
+  cautelar, corregida el 6/8.
+- **`lib/legal/jurisprudencia.ts`**, nuevo. Una interpretación declarada con
+  jurisprudencia se puede discutir; una sin nada detrás solo se puede creer o
+  no.
+
 ## 2.1.1 — 5 de agosto de 2026
 
 PARCHE: el motor no se toca. Termina de cablear la procedencia de la UMA y
