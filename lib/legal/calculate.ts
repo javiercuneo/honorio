@@ -671,7 +671,12 @@ function buildIncidente(state: WizardState): CalculoResultado {
         id: 'incidente-minimo',
         etapa: 'honorarios',
         concepto: 'Honorarios m\u00ednimos para incidente (2% de la base)',
-        articulo: 'art. 29 inc. g',
+        // El 2 %-20 % no sale de la 27.423: su art. 47 quedo observado
+        // por el Decreto 1077/2017 y el 29 inc. g solo divide etapas.
+        // Decia 'art. 29 inc. g', que es el articulo equivocado —la
+        // misma clase de error que el art. 29 inc. e de la cautelar—.
+        // Ver lib/legal/jurisprudencia.ts.
+        articulo: 'Ley 21.839, art. 33',
         visible: true,
         valorPrevio: base,
         factor: porcentajeMin,
@@ -681,7 +686,12 @@ function buildIncidente(state: WizardState): CalculoResultado {
         id: 'incidente-maximo',
         etapa: 'honorarios',
         concepto: 'Honorarios m\u00e1ximos para incidente (20% de la base)',
-        articulo: 'art. 29 inc. g',
+        // El 2 %-20 % no sale de la 27.423: su art. 47 quedo observado
+        // por el Decreto 1077/2017 y el 29 inc. g solo divide etapas.
+        // Decia 'art. 29 inc. g', que es el articulo equivocado —la
+        // misma clase de error que el art. 29 inc. e de la cautelar—.
+        // Ver lib/legal/jurisprudencia.ts.
+        articulo: 'Ley 21.839, art. 33',
         visible: true,
         valorPrevio: base,
         factor: porcentajeMax,
