@@ -70,10 +70,15 @@ export function ContextPanel({
                 type="button"
                 disabled={!reachable}
                 onClick={() => reachable && onJump(i)}
+                // El salto directo existia desde siempre y no se veia:
+                // sin cursor ni titulo, la lista parecia un resumen de
+                // solo lectura y para corregir el paso 1 desde el 6
+                // habia que volver de a uno. Javier lo reporto el 7/8.
+                title={reachable ? `Volver a: ${step.resumenLabel}` : undefined}
                 className={cn(
                   'flex w-full items-start gap-2.5 rounded-md px-2 py-2 text-left transition-colors',
                   reachable
-                    ? 'hover:bg-secondary'
+                    ? 'cursor-pointer hover:bg-secondary'
                     : 'cursor-not-allowed opacity-50',
                   isCurrent && 'bg-secondary',
                 )}

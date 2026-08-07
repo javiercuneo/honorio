@@ -13,9 +13,19 @@
 import type { CardOption, Explanation, Answers } from '@/lib/legal/types'
 import { UMA_VIGENTE } from '@/lib/legal/uma'
 import { VALORES_UMA } from '@/lib/enlaces'
+import { ayudaBase, explicacionBase } from './indicacion-base'
 export type { Answers }
 
 // ---- Tipos del schema ----
+
+/**
+ * Un texto del schema que puede depender de lo ya contestado. Existe
+ * porque el paso `base` tiene que decir *que monto* ingresar, y eso
+ * cambia con el tipo de proceso y el objeto del juicio. Es el mismo
+ * mecanismo que ya usan las `condition`: una funcion pura de las
+ * respuestas, sin efectos.
+ */
+export type Derivable<T> = T | ((answers: Answers) => T)
 
 export interface BaseStepDef {
   id: string
@@ -23,9 +33,9 @@ export interface BaseStepDef {
   eyebrow: string
   pregunta: string
   /** Texto de ayuda bajo la pregunta */
-  ayuda: string
+  ayuda: Derivable<string>
   /** Explicacion legal desplegable */
-  explicacion: Explanation
+  explicacion: Derivable<Explanation>
   /** Etiqueta para el resumen lateral */
   resumenLabel: string
   /** IDs de pasos de los que depende (para visibilidad condicional) */
@@ -65,6 +75,25 @@ export interface NumericStepDef extends BaseStepDef {
 }
 
 export type WizardStepDef = CardsStepDef | NumericStepDef
+
+// ---- Resolucion de los textos derivables ----
+// La presentacion no decide nada: pide el texto para las respuestas
+// que tiene y recibe una cadena o una Explanation, sin saber si el
+// schema la traia fija o la derivo.
+
+function resolver<T>(valor: Derivable<T>, answers: Answers): T {
+  return typeof valor === 'function'
+    ? (valor as (a: Answers) => T)(answers)
+    : valor
+}
+
+export function ayudaDe(paso: WizardStepDef, answers: Answers): string {
+  return resolver(paso.ayuda, answers)
+}
+
+export function explicacionDe(paso: WizardStepDef, answers: Answers): Explanation {
+  return resolver(paso.explicacion, answers)
+}
 
 // ---- Helpers de formato ----
 
@@ -439,7 +468,10 @@ export const LEGAL_STEPS: WizardStepDef[] = [
     kind: 'numeric',
     eyebrow: 'Base',
     pregunta: 'Base regulatoria',
-    ayuda: 'Es el valor económico que se toma como referencia para aplicar la escala del art. 21',
+    // Las dos se derivan de lo contestado: el paso no pregunta "un
+    // monto" sino *que* monto, y eso cambia con el proceso y el objeto.
+    // Las quince leyendas estan en lib/wizard/indicacion-base.ts.
+    ayuda: ayudaBase,
     resumenLabel: 'Base regulatoria',
     unidad: 'pesos',
     prefix: '$',
@@ -448,11 +480,7 @@ export const LEGAL_STEPS: WizardStepDef[] = [
     step: 1,
     default: 0,
     format: pesos,
-    explicacion: {
-      brief: 'Ver más',
-      expanded: 'Esta informacion se utiliza para el calculo arancelario.',
-      full: ['Complete los datos segun corresponda.'],
-    },
+    explicacion: explicacionBase,
   },
 ]
 

@@ -15,7 +15,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { ALL_STEPS, type WizardStepDef } from '@/lib/wizard/wizard-schema'
+import { ALL_STEPS, ayudaDe, explicacionDe, type WizardStepDef } from '@/lib/wizard/wizard-schema'
 import { useWizard } from '@/hooks/useWizard'
 import { useLegacyReady } from '@/components/LegacyLoader'
 import { UMA_VIGENTE } from '@/lib/legal/uma'
@@ -233,6 +233,23 @@ export function InterviewExperience() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <AppTopbar caso={wizard.phase === 'question' ? 'Entrevista' : undefined}>
+        {/*
+          Reiniciar vive en la barra y no al lado de "Atrás" a
+          proposito: tira todas las respuestas, y en el pie esta el
+          camino del pulgar. Es la misma razon por la que el
+          auto-avance es solo por teclado.
+          Para corregir *una* respuesta no hace falta: el panel de
+          respuestas salta directo al paso.
+        */}
+        {wizard.phase === 'question' ? (
+          <button
+            type="button"
+            onClick={handleRestart}
+            className="rounded-md px-2.5 py-1.5 text-[13px] text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            Reiniciar
+          </button>
+        ) : null}
         <button
           type="button"
           onClick={() => setShowMinimos(true)}
@@ -273,8 +290,8 @@ export function InterviewExperience() {
                     <StepShell
                       eyebrow={currentStep.eyebrow}
                       question={currentStep.pregunta}
-                      helper={currentStep.ayuda}
-                      explanation={currentStep.explicacion}
+                      helper={ayudaDe(currentStep, wizard.answers)}
+                      explanation={explicacionDe(currentStep, wizard.answers)}
                     >
                       {currentStep.kind === 'numeric' ? (
                         <NumericField
