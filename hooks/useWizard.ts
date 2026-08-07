@@ -247,6 +247,7 @@ function syncToLegacy(stepId: string, value: string | string[] | number | boolea
     objeto: 'objetoBase',
     desalojoVivienda: 'desalojoVivienda',
     posesoriasTipo: 'posesoriasTipo',
+    alimentosTipo: 'alimentosTipo',
     base: 'baseValor',
   }
 
@@ -289,6 +290,7 @@ function transformToLegacy(
     // 'civil' | 'laboral') o null, igual que wizardState del motor clasico.
     case 'desalojoVivienda':
     case 'posesoriasTipo':
+    case 'alimentosTipo':
       return typeof value === 'string' && value ? value : null
 
     case 'tuvoExcepciones':

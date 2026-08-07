@@ -380,6 +380,21 @@ export const DESALOJO_TIPO: CardOption[] = [
   },
 ]
 
+export const ALIMENTOS_TIPO: CardOption[] = [
+  {
+    id: 'fijacion',
+    label: 'Se fija la cuota',
+    description: 'Base: 2 años de la cuota. Escala del art. 21',
+    hint: 'Art. 39, 1º párr.',
+  },
+  {
+    id: 'modificacion',
+    label: 'Aumento, disminución, cesación o coparticipación',
+    description: 'Base: 2 años de la diferencia. Escala de los incidentes',
+    hint: 'Art. 39, 2º párr.',
+  },
+]
+
 export const POSESORIAS_TIPO: CardOption[] = [
   {
     id: 'beneficio',
@@ -710,6 +725,27 @@ export const STEP_DESALOJO_TIPO: CardsStepDef = {
     },
 }
 
+export const STEP_ALIMENTOS_TIPO: CardsStepDef = {
+  id: 'alimentosTipo',
+  kind: 'cards',
+  select: 'single',
+  eyebrow: 'Alimentos',
+  pregunta: '¿Qué se resuelve sobre la cuota?',
+  ayuda: 'El art. 39 tiene dos supuestos, y no comparten ni la base ni la escala',
+  resumenLabel: 'Supuesto del art. 39',
+  options: ALIMENTOS_TIPO,
+  dependsOn: ['objeto'],
+  condition: (answers) => answers.objeto === 'familia_alimentos',
+  explicacion: {
+    brief: 'Los dos supuestos del art. 39, y en qué se diferencian',
+    expanded:
+      'El primer párrafo es la fijación de la cuota: la base son dos años de la cuota que se fije judicialmente y rige la escala progresiva del art. 21. El segundo trata la modificación de una cuota que ya existe —aumento, disminución, cesación o coparticipación— y cambia las dos cosas: la base son dos años de la diferencia entre la cuota vieja y la nueva, no de la cuota entera, y en lugar del art. 21 se aplica la escala de los incidentes. Esa escala es la misma que la app usa para los incidentes, el 2 % al 20 % del art. 33 de la Ley 21.839, porque el art. 47 de la 27.423 quedó observado por el Decreto 1077/2017 y no hay otra vigente. No son dos criterios: es uno solo aplicado donde la ley remite a lo mismo.',
+    full: [
+      'ARTÍCULO 39.- En los juicios de alimentos la base del cálculo de los honorarios será el importe correspondiente a dos (2) años de la cuota que se fijare judicialmente. En los casos de aumento, disminución, cesación o coparticipación en los alimentos, se tomará como base la diferencia que resulte del monto de la sentencia por el término de dos (2) años, aplicándose la escala de los incidentes.',
+    ],
+  },
+}
+
 export const STEP_POSESORIAS_TIPO: CardsStepDef = {
   id: 'posesoriasTipo',
   kind: 'cards',
@@ -734,9 +770,10 @@ export const STEP_POSESORIAS_TIPO: CardsStepDef = {
 export const PROCESS_STEP_MAP: Record<string, string[]> = {
   exhorto: ['umaInicio', 'tipoProceso'],
   incidente: ['umaInicio', 'tipoProceso', 'base'],
-  // desalojoVivienda y posesoriasTipo son sub-pasos mutuamente excluyentes de 'objeto':
-  // ambos se declaran aca y su `condition` decide cual se muestra.
-  conocimiento: ['umaInicio', 'tipoProceso', 'modoTerminacion', 'sentenciaResultado', 'caducidadCriterio', 'aperturaPrueba', 'objeto', 'desalojoVivienda', 'posesoriasTipo', 'base'],
+  // desalojoVivienda, posesoriasTipo y alimentosTipo son sub-pasos
+  // mutuamente excluyentes de 'objeto': los tres se declaran aca y su
+  // `condition` decide cual se muestra.
+  conocimiento: ['umaInicio', 'tipoProceso', 'modoTerminacion', 'sentenciaResultado', 'caducidadCriterio', 'aperturaPrueba', 'objeto', 'desalojoVivienda', 'posesoriasTipo', 'alimentosTipo', 'base'],
   ejecucion_sentencia: ['umaInicio', 'tipoProceso', 'modoTerminacion', 'sentenciaResultado', 'caducidadCriterio', 'aperturaPrueba', 'tuvoExcepciones', 'base'],
   ejecutivo: ['umaInicio', 'tipoProceso', 'modoTerminacion', 'sentenciaResultado', 'caducidadCriterio', 'aperturaPrueba', 'tuvoExcepciones', 'base'],
   sucesion: ['umaInicio', 'tipoProceso', 'sucesionUnicoLetrado', 'base'],
@@ -760,5 +797,6 @@ export const ALL_STEPS: WizardStepDef[] = [
   LEGAL_STEPS[2], // objeto
   STEP_DESALOJO_TIPO,
   STEP_POSESORIAS_TIPO,
+  STEP_ALIMENTOS_TIPO,
   LEGAL_STEPS[3], // base
 ]

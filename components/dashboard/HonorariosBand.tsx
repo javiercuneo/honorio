@@ -249,8 +249,34 @@ export function HonorariosBand({
         </div>
       ) : null}
 
-      {/* Donde cae la base y de donde sale el honorario */}
-      {escala ? (
+      {/*
+        Donde cae la base y de donde sale el honorario.
+
+        Solo para la escala del art. 21. Cuando corre la de los
+        incidentes -art. 39 segundo parrafo- la tabla de tramos y la
+        barra del excedente no significan nada: el rango es plano, del
+        2 % al 20 %, y no hay grado anterior que acumular. Mostrar la
+        tabla ahi seria decir que el honorario sale de un tramo del que
+        no sale.
+      */}
+      {escala && escala.regimen === 'incidentes' ? (
+        <div className="border-t border-hair px-7 py-5">
+          <Disclosure
+            concepto="Acá no rige la escala progresiva del art. 21"
+            articulo="art. 39, 2º párr."
+          >
+            <p>
+              Para el aumento, la disminución, la cesación o la coparticipación
+              de alimentos, el art. 39 manda aplicar la escala de los
+              incidentes. Es un rango plano del 2 % al 20 % sobre la base, sin
+              tramos ni piso del grado anterior, así que la tabla del art. 21 no
+              corresponde y no se muestra. De dónde sale ese 2 % al 20 % está
+              explicado donde se aplica a los incidentes: viene del art. 33 de
+              la Ley 21.839, porque el art. 47 de la 27.423 quedó observado.
+            </p>
+          </Disclosure>
+        </div>
+      ) : escala ? (
         <div className="space-y-3 border-t border-hair px-7 py-5">
           <ReglaArt21 baseEnUMA={escala.baseEnUMA} />
           {escala.escalera && cadena.pisoUMA !== null && cadena.aporteExcedenteUMA ? (

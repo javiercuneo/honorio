@@ -72,6 +72,7 @@ const MAPPING: Record<string, keyof WizardState> = {
   objeto: 'objetoBase',
   desalojoVivienda: 'desalojoVivienda',
   posesoriasTipo: 'posesoriasTipo',
+  alimentosTipo: 'alimentosTipo',
   base: 'baseValor',
 }
 
@@ -85,7 +86,8 @@ function transformToLegacy(stepId: string, value: unknown): unknown {
     case 'aperturaPrueba': return value === 'despues' ? true : value === 'antes' ? false : null
     case 'caducidadCriterio': return typeof value === 'string' ? value : ''
     case 'desalojoVivienda':
-    case 'posesoriasTipo': return typeof value === 'string' && value ? value : null
+    case 'posesoriasTipo':
+    case 'alimentosTipo': return typeof value === 'string' && value ? value : null
     case 'tuvoExcepciones': return value === 'si' ? true : value === 'no' ? false : null
     case 'sucesionUnicoLetrado': return value === 'unico' ? true : value === 'varios' ? false : null
     case 'medidaOposicion': return value === 'con' ? true : value === 'sin' ? false : null
@@ -101,7 +103,7 @@ function estadoDesde(answers: Answers): WizardState {
     sentenciaResultado: null, aperturaPrueba: null, caducidadCriterio: '',
     tuvoExcepciones: null, sucesionUnicoLetrado: null, medidaOposicion: null,
     homologacionVivienda: null, objetoBase: '', desalojoVivienda: null,
-    posesoriasTipo: null, baseValor: 0, esProvisorio: false,
+    posesoriasTipo: null, alimentosTipo: null, baseValor: 0, esProvisorio: false,
     desdeMinimos: false, desdeResultado: false,
   }
   for (const [stepId, value] of Object.entries(answers)) {

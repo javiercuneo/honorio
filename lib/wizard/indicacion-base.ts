@@ -267,14 +267,26 @@ function porObjeto(answers: Answers): Indicacion {
       }
 
     case 'familia_alimentos':
-      return {
-        ayuda:
-          'Ingresá el importe correspondiente a 2 años de la cuota que se fijó judicialmente.',
-        brief: 'Los dos supuestos del art. 39, y cuál de ellos calcula la app',
-        expanded:
-          'El primer párrafo del art. 39 fija la base en dos años de la cuota, y es el supuesto que la app calcula. El segundo párrafo trata otro caso: en el aumento, la disminución, la cesación o la coparticipación, la base es la diferencia que resulta del monto de la sentencia por dos años, y se aplica la escala de los incidentes en lugar de la del art. 21. Ese segundo supuesto la app todavía no lo distingue: manda todos los alimentos por la escala del art. 21, así que para un aumento o una cesación el resultado no es el del segundo párrafo.',
-        full: [ART_39],
-      }
+      // Las dos ramas del art. 39. La base es lo que mas cambia entre
+      // ellas y es donde mas facil es equivocarse: en la modificacion
+      // se toma **la diferencia**, no la cuota entera.
+      return answers.alimentosTipo === 'modificacion'
+        ? {
+            ayuda:
+              'Ingresá 2 años de la diferencia entre la cuota anterior y la que resulta de la sentencia, no de la cuota entera.',
+            brief: 'Por qué acá la base es la diferencia',
+            expanded:
+              'El segundo párrafo del art. 39 no toma la cuota sino la diferencia que resulta del monto de la sentencia, por dos años. Si una cuota de $100.000 se eleva a $150.000, la base son dos años de los $50.000 de aumento y no de los $150.000. En la cesación, la diferencia es la cuota que deja de pagarse. Es el error más fácil de cometer en esta rama y multiplica el honorario por tres o por más. Sobre esa base no corre la escala del art. 21 sino la de los incidentes, que es la que contestaste en el paso anterior.',
+            full: [ART_39],
+          }
+        : {
+            ayuda:
+              'Ingresá el importe correspondiente a 2 años de la cuota que se fijó judicialmente.',
+            brief: 'Qué toma el art. 39 como base en la fijación',
+            expanded:
+              'El primer párrafo del art. 39 fija la base en dos años de la cuota que se fije judicialmente, y sobre ella corre la escala del art. 21. El segundo párrafo, el de la modificación de una cuota que ya existe, toma otra base y otra escala: eso es lo que se contesta en el paso anterior.',
+            full: [ART_39],
+          }
 
     case 'familia_liquidacion':
       return {

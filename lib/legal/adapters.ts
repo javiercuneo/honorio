@@ -58,6 +58,7 @@ export function resetWizardState(): void {
     objetoBase: '',
     desalojoVivienda: null,
     posesoriasTipo: null,
+    alimentosTipo: null,
     baseValor: 0,
     esProvisorio: false,
     desdeMinimos: false,
