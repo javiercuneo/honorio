@@ -131,6 +131,25 @@ export function HonorariosBand({
   const baseReparto = escalar(rango, etapaElegida.factor)
   const a = porcentajeA / 100
 
+  // El art. 29 divide el proceso en tres tercios: la demanda y su
+  // contestacion (inc. a), las actuaciones de prueba (inc. b) y las
+  // demas diligencias hasta la terminacion (inc. c). El 2/3 es la
+  // suma de los dos primeros, asi que **incluye la prueba**.
+  //
+  // Si el proceso termino antes de la apertura a prueba, esa etapa no
+  // existio y ofrecer un 2/3 es enunciar un numero que las propias
+  // respuestas de la entrevista desmienten.
+  //
+  // Se detecta por la transformacion del art. 25, que el motor emite
+  // exactamente cuando `aperturaPrueba === false` —modos anormales, o
+  // caducidad tratada por ese criterio—. No se reimplementa la
+  // condicion: se lee el factor que el motor ya emitio, que es la
+  // regla de este archivo y la de cadena.ts.
+  const terminoAntesDePrueba = cadena.txEscala.some((t) => t.id === 'escala-art25')
+  const etapasOfrecidas = ETAPAS.filter(
+    (e) => e.key !== 'full' && !(terminoAntesDePrueba && e.key === 'dos'),
+  )
+
   const ajustaPorRol = Math.abs(cadena.factorRol - 1) > 0.001
   const ajuste = ajustaPorRol ? ajusteDesdeFactor(cadena.factorRol) : undefined
   const efectivo = cadena.porcentajeEfectivo
@@ -257,7 +276,7 @@ export function HonorariosBand({
         <div className="border-t border-border px-7 py-5">
           <Etiqueta>Por etapas</Etiqueta>
           <div className="mt-2.5 grid gap-3 sm:grid-cols-2">
-            {ETAPAS.filter((e) => e.key !== "full").map((e) => {
+            {etapasOfrecidas.map((e) => {
               const r = escalar(rango, e.factor)
               return (
                 <Tile
@@ -279,6 +298,24 @@ export function HonorariosBand({
               )
             })}
           </div>
+
+          {terminoAntesDePrueba ? (
+            <div className="mt-3">
+              <Disclosure
+                concepto="Por qué no está el 2/3"
+                articulo="art. 29 incs. a y b"
+              >
+                <p>
+                  El 2/3 es la suma de la demanda y su contestación (inc. a) más
+                  las actuaciones de prueba (inc. b). Contestaste que el proceso
+                  terminó antes de la apertura a prueba, así que esa segunda
+                  etapa no existió y ese importe no corresponde a ninguna labor
+                  posible. Es el mismo hecho que ya redujo la escala a la mitad
+                  por el art. 25.
+                </p>
+              </Disclosure>
+            </div>
+          ) : null}
         </div>
       )}
 
@@ -291,7 +328,10 @@ export function HonorariosBand({
               ariaLabel="Importe a repartir"
               value={repartoEtapa}
               onChange={setRepartoEtapa}
-              options={ETAPAS.map((e) => ({ value: e.key, label: e.corto }))}
+              options={[ETAPAS[0], ...etapasOfrecidas].map((e) => ({
+                value: e.key,
+                label: e.corto,
+              }))}
             />
           </div>
 
