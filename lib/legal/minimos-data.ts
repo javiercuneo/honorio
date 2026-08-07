@@ -143,6 +143,39 @@ export const MINIMOS_AUXILIARES_JUSTICIA: MinimoCategoria = {
   ],
 }
 
+/**
+ * Los pisos de los auxiliares que rigen cuando el juicio **si** es
+ * susceptible de apreciacion pecuniaria, que es el unico caso en que
+ * el dashboard tiene una base y un 5 %-10 % al lado del cual
+ * mostrarlos.
+ *
+ * Queda afuera el art. 60, que es expresamente de los procesos **no**
+ * susceptibles de apreciacion pecuniaria: ahi no hay base ni escala.
+ *
+ * Se derivan de los grupos de arriba y no se vuelven a escribir. Un
+ * numero de la ley copiado en dos lugares es un numero que algun dia
+ * va a discrepar consigo mismo. Que la derivacion siga encontrando los
+ * dos grupos lo comprueba minimosAuxiliares.validation.ts.
+ */
+export interface PisoAuxiliar {
+  articulo: string
+  concepto: string
+  uma: number
+}
+
+function pisoDe(prefijoTitulo: string, articulo: string): PisoAuxiliar[] {
+  const grupo = MINIMOS_AUXILIARES_JUSTICIA.grupos.find((g) =>
+    g.titulo?.startsWith(prefijoTitulo),
+  )
+  const item = grupo?.items[0]
+  return item ? [{ articulo, concepto: item.label, uma: item.uma }] : []
+}
+
+export const PISOS_AUXILIARES_CON_BASE: PisoAuxiliar[] = [
+  ...pisoDe('Art. 58', 'art. 58'),
+  ...pisoDe('Art. 61 bis', 'art. 61 bis'),
+]
+
 export const MINIMOS_ACCIONES_48: MinimoCategoria = {
   id: 'acciones_48',
   titulo: 'Mínimos del art. 48',
