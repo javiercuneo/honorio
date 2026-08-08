@@ -39,8 +39,10 @@ import {
 } from '@/components/dashboard/primitives'
 import { calcularDirecto, fraccionDeRango } from '@/lib/legal/calculo-directo'
 import type { EtapasRol } from '@/lib/legal/calculo-directo'
+import { calcularMediacion } from '@/lib/legal/mediacion'
+import { UHOM_VIGENTE } from '@/lib/legal/uhom'
 import type { Rango } from '@/lib/legal/types'
-import { pct, umaNum } from '@/components/dashboard/format'
+import { pesos, pct, umaNum } from '@/components/dashboard/format'
 import { AppTopbar } from './app-topbar'
 import { parseImporte } from './numeric-field'
 
@@ -115,6 +117,13 @@ export function CalculoDirectoView({
   const r = useMemo(
     () => (base && uma ? calcularDirecto(base, uma) : null),
     [base, uma],
+  )
+
+  // El honorario del mediador sale de la misma base y de otra unidad.
+  // No depende de la UMA, asi que no entra en el useMemo de arriba.
+  const med = useMemo(
+    () => (base ? calcularMediacion(base, UHOM_VIGENTE) : null),
+    [base],
   )
 
   const conFraccion = (etapas: EtapasRol): Rango =>
@@ -299,6 +308,91 @@ export function CalculoDirectoView({
                 />
               </div>
             </Card>
+
+            {/* ---- Mediador ----
+              Va pegado a auxiliares, igual que en el dashboard, y por
+              el mismo motivo: los dos se calculan sobre la base y no
+              sobre el honorario del abogado.
+
+              Aca no lleva la jurisprudencia de la base unica y en el
+              dashboard si. No es un olvido: esta pantalla **no aplica
+              ninguna reduccion**, asi que la discusion sobre si las de
+              los arts. 22 y 40 alcanzan al mediador no se plantea. El
+              regimen completo esta en la guia.
+
+              La unidad va primero y el peso al lado, como en toda esta
+              pantalla —solo que la unidad de acá es el UHOM—.
+            */}
+            {med ? (
+              <Card className="mt-6">
+                <CardHeader titulo="Mediador">
+                  <span className="font-mono text-[11px] tabular-nums text-muted-foreground">
+                    <span className="tracking-wider text-faint">UHOM</span>{' '}
+                    {pesos(UHOM_VIGENTE.valor)}
+                  </span>
+                </CardHeader>
+                <div className="px-6 pb-2">
+                  <LedgerRow
+                    concepto={
+                      <span>
+                        Honorario básico · ítem {med.item.item}{' '}
+                        <span className="ml-1 text-[11px] text-faint">
+                          Decreto 2536/2011, Anexo III
+                        </span>
+                      </span>
+                    }
+                    valor={
+                      <div className="text-right">
+                        <div className="font-meter tabular-nums text-[15px] text-foreground">
+                          {umaNum(med.honorarioUHOM)}
+                          <span className="ml-1 text-[11px] tracking-wider text-faint">
+                            UHOM
+                          </span>
+                        </div>
+                        <div className="mt-0.5 font-mono text-[11px] text-faint">
+                          <Cifra value={med.honorarioPesos} size="sm" />
+                        </div>
+                      </div>
+                    }
+                  />
+                  <LedgerRow
+                    concepto="Monto del asunto"
+                    valor={
+                      <div className="text-right">
+                        <div className="font-meter tabular-nums text-[15px] text-foreground">
+                          {umaNum(med.baseEnUHOM)}
+                          <span className="ml-1 text-[11px] tracking-wider text-faint">
+                            UHOM
+                          </span>
+                        </div>
+                        <div className="mt-0.5 font-mono text-[11px] text-faint">
+                          {med.item.descripcion}
+                        </div>
+                      </div>
+                    }
+                  />
+                  {med.porTope ? (
+                    <Disclosure
+                      concepto="Por qué no es el 2 % del monto"
+                      valor={
+                        <span className="font-mono text-[11px] text-faint">
+                          tope · 120 UHOM
+                        </span>
+                      }
+                    >
+                      <p className="text-[13px] leading-relaxed text-muted-foreground">
+                        Por encima de 1000 UHOM el honorario es el 2 % del monto
+                        del asunto, con un tope de 120 UHOM. Acá el 2 % daría{' '}
+                        {pesos(base! * 0.02)}, así que el tope lo recorta a{' '}
+                        {pesos(med.honorarioPesos)}. El tope es de ese último
+                        tramo y no de la escala: los seis anteriores llegan a
+                        20 UHOM como máximo.
+                      </p>
+                    </Disclosure>
+                  ) : null}
+                </div>
+              </Card>
+            ) : null}
 
             {/* ---- Segunda instancia ---- */}
             <Card className="mt-6">

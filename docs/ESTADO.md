@@ -57,7 +57,8 @@ en el otro repositorio.
 **Hecho:** `lib/legal/calculo-directo.ts`, su validación —la número 15— y
 `components/interview/calculo-directo-view.tsx`. Se prende con `showDirecto` en
 `interview-experience.tsx`, con entrada en la barra y en la intro, siguiendo el
-patrón de `minimos-view.tsx`.
+patrón de `minimos-view.tsx`. El 8/8 se le agregó el bloque del mediador, entre
+los auxiliares y la segunda instancia; ver [Mediación](#mediacion--empezado-el-88).
 
 **No espera al motor legacy**, a diferencia de la pantalla de mínimos: toda su
 aritmética es TypeScript propio y no toca `public/legacy/`.
@@ -143,6 +144,23 @@ en el otro repositorio.
 `data/uhom.json`, la extensión de `scripts/actualizar-uma.mjs`, la validación
 número 16 y `components/dashboard/MediacionSection.tsx`, colgada del `Dashboard`
 justo debajo de los auxiliares.
+
+**Está en las dos pantallas que tienen una base**, y en las dos pegado a los
+auxiliares por el mismo motivo: los dos salen de la base y no del honorario del
+abogado.
+
+- En el **dashboard**, con la jurisprudencia de la base única.
+- En el **cálculo directo**, en el idioma de esa pantalla —`LedgerRow`, la
+  unidad primero y el peso al lado, solo que la unidad es el UHOM— y **sin la
+  jurisprudencia**. No es un olvido: ahí no se aplica ninguna reducción, así que
+  la discusión sobre si las de los arts. 22 y 40 alcanzan al mediador no se
+  plantea.
+
+La diferencia entre las dos se ve con la misma cifra: base $8.000.000 da
+**$259.200** en el cálculo directo —617,28 UHOM, ítem F— y **$207.360** en el
+dashboard si la demanda se desestimó, porque ahí el art. 22 baja la base a
+$5.600.000 y la hace caer al ítem E. Es exactamente lo que la decisión de la
+base única produce, y conviene tenerlo a mano porque parece un error y no lo es.
 
 **Verificado en el navegador** con el caso que el plan usa de ejemplo: juicio de
 conocimiento, sentencia rechazada, sumas de dinero, base $8.000.000. La base
