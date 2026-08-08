@@ -30,12 +30,14 @@ import { LandingView } from './landing-view'
 import { IntroView } from './intro-view'
 import { DashboardView } from './dashboard-view'
 import { MinimosView } from './minimos-view'
+import { CalculoDirectoView } from './calculo-directo-view'
 
 const transition = { duration: 0.4, ease: [0.22, 1, 0.36, 1] as const }
 
 export function InterviewExperience() {
   const [showLanding, setShowLanding] = useState(true)
   const [showMinimos, setShowMinimos] = useState(false)
+  const [showDirecto, setShowDirecto] = useState(false)
   const { ready, error: legacyError, umaValorCargado } = useLegacyReady()
   const initialUma = umaValorCargado ? { umaInicio: umaValorCargado } : undefined
   const wizard = useWizard(ALL_STEPS, initialUma)
@@ -213,6 +215,19 @@ export function InterviewExperience() {
     )
   }
 
+  // ---- Calculo directo ----
+  // No espera al motor legacy: toda su aritmetica es de
+  // lib/legal/calculo-directo.ts, que es TypeScript propio y no toca
+  // los scripts de public/legacy/.
+  if (showDirecto) {
+    return (
+      <CalculoDirectoView
+        onBack={() => setShowDirecto(false)}
+        umaValor={umaValorCargado ?? UMA_VIGENTE.valor}
+      />
+    )
+  }
+
   // ---- Dashboard ----
   // La cabecera la pone DashboardView (AppTopbar): una sola para toda
   // la pantalla, con la marca, el caso y los controles.
@@ -252,6 +267,13 @@ export function InterviewExperience() {
         ) : null}
         <button
           type="button"
+          onClick={() => setShowDirecto(true)}
+          className="rounded-md px-2.5 py-1.5 text-[13px] text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          Cálculo directo
+        </button>
+        <button
+          type="button"
           onClick={() => setShowMinimos(true)}
           className="rounded-md px-2.5 py-1.5 text-[13px] text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
@@ -285,7 +307,7 @@ export function InterviewExperience() {
                   transition={transition}
                 >
                   {wizard.phase === 'intro' ? (
-                    <IntroView onStart={() => go(1, () => wizard.jumpTo(0))} onShowMinimos={() => setShowMinimos(true)} />
+                    <IntroView onStart={() => go(1, () => wizard.jumpTo(0))} onShowMinimos={() => setShowMinimos(true)} onShowDirecto={() => setShowDirecto(true)} />
                   ) : currentStep ? (
                     <StepShell
                       eyebrow={currentStep.eyebrow}

@@ -24,8 +24,8 @@ solas en CI.
 Pantallas terminadas sobre el mismo sistema visual: **dashboard**, **wizard**,
 **portada**, **intro** y **mínimos**. Falta pulido de mensajes.
 
-**Empezado el 7/8: el cálculo directo.** Está el motor y su validación; **falta
-la pantalla**. Ver [El cálculo directo](#el-calculo-directo--empezado-el-78).
+**El cálculo directo está terminado (7/8).** Motor, validación y pantalla. Ver
+[El cálculo directo](#el-calculo-directo--empezado-el-78).
 
 El 5/8 se cerraron los tres pendientes inmediatos —**autoría**, **informe
 imprimible** y **vuelta al repositorio**— y se sacó la UMA del navegador del
@@ -50,11 +50,19 @@ los tres roles, sus etapas y los auxiliares. El plan entero está en
 [`PLAN_CALCULO_DIRECTO.md`](https://github.com/javiercuneo/herramientas-judiciales/blob/main/docs/PLAN_CALCULO_DIRECTO.md),
 en el otro repositorio.
 
-**Hecho:** `lib/legal/calculo-directo.ts` y su validación, que es la número 15.
-**Falta la pantalla**, que es por donde sigue la próxima sesión. El patrón a
-copiar es `minimos-view.tsx`: una vista de consulta, sin entrevista, que se
-prende con un booleano en `interview-experience.tsx` y tiene su entrada en la
-barra y en la intro.
+**Hecho:** `lib/legal/calculo-directo.ts`, su validación —la número 15— y
+`components/interview/calculo-directo-view.tsx`. Se prende con `showDirecto` en
+`interview-experience.tsx`, con entrada en la barra y en la intro, siguiendo el
+patrón de `minimos-view.tsx`.
+
+**No espera al motor legacy**, a diferencia de la pantalla de mínimos: toda su
+aritmética es TypeScript propio y no toca `public/legacy/`.
+
+**Verificado en el navegador** con la misma base de la hoja ($21.368.714,99):
+209,34 UMA, 5ª escala, patrocinante 41,90–44,87, apoderado 58,66–62,82,
+auxiliares 10,47–20,93 y punto medio 15,70. Cambiando a «1 etapa» da 13,97–14,96
+y con la fracción al 25 %, 3,49–3,74 —el «1/4 etapa» de la hoja—. Sin errores de
+consola.
 
 **Lo que gobierna el módulo, y conviene no deshacerlo:** «sin reducciones» no es
 un caso, es la ausencia de caso. **No arma un `WizardState` con respuestas por

@@ -20,7 +20,15 @@ const notes = [
   { icon: ShieldCheck, label: 'Sin caja negra: se ve cómo se llega' },
 ]
 
-export function IntroView({ onStart, onShowMinimos }: { onStart: () => void; onShowMinimos: () => void }) {
+export function IntroView({
+  onStart,
+  onShowMinimos,
+  onShowDirecto,
+}: {
+  onStart: () => void
+  onShowMinimos: () => void
+  onShowDirecto: () => void
+}) {
   const [open, setOpen] = useState(false)
 
   return (
@@ -66,6 +74,19 @@ export function IntroView({ onStart, onShowMinimos }: { onStart: () => void; onS
           className="ml-2 underline underline-offset-2 hover:text-foreground"
         >
           Ver
+        </button>
+      </p>
+
+      {/* La entrevista pregunta el caso; esto solo aplica la escala. Va
+          aca y no arriba a proposito: quien no sabe cual necesita, la
+          entrevista es el camino seguro. */}
+      <p className="mt-2 text-[13px] text-muted-foreground">
+        ¿Ya sabés el encuadre y solo querés la escala sobre un monto?
+        <button
+          onClick={onShowDirecto}
+          className="ml-2 underline underline-offset-2 hover:text-foreground"
+        >
+          Cálculo directo
         </button>
       </p>
 
