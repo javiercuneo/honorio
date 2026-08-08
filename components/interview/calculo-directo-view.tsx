@@ -35,7 +35,6 @@ import {
   Etiqueta,
   LedgerRow,
   Disclosure,
-  Norma,
   Segmented,
 } from '@/components/dashboard/primitives'
 import { calcularDirecto, fraccionDeRango } from '@/lib/legal/calculo-directo'
@@ -144,82 +143,80 @@ export function CalculoDirectoView({
           Es el punto de partida de una regulación, no el honorario de un caso.
         </p>
 
-        {/* ---- Entradas ---- */}
-        <Card className="mt-7 p-6">
-          <div className="grid gap-5 sm:grid-cols-[1fr_auto]">
-            <label className="block">
-              <Etiqueta>Base regulatoria</Etiqueta>
-              <input
-                type="text"
-                inputMode="decimal"
-                autoFocus
-                value={baseTexto}
-                onChange={(e) => setBaseTexto(e.target.value)}
-                placeholder="0,00"
-                aria-label="Base regulatoria en pesos"
-                className="mt-2 w-full rounded-md border border-border bg-card px-3 py-2 font-meter text-[22px] tabular-nums text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              />
-            </label>
-            <label className="block sm:w-44">
-              <Etiqueta>Valor de la UMA</Etiqueta>
-              <input
-                type="text"
-                inputMode="decimal"
-                value={umaTexto}
-                onChange={(e) => setUmaTexto(e.target.value)}
-                aria-label="Valor de la UMA"
-                className="mt-2 w-full rounded-md border border-border bg-card px-3 py-2 font-mono text-[15px] tabular-nums text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              />
-            </label>
+        {/* ---- Entradas y escala, en paralelo ----
+             En la misma card y a la misma altura para que los
+             honorarios, que es lo que se viene a ver, no queden
+             debajo del pliegue. */}
+        <Card className="mt-7">
+          <div className="grid gap-x-9 gap-y-7 p-6 md:grid-cols-2">
+            <div className="space-y-5">
+              <label className="block">
+                <Etiqueta>Base regulatoria</Etiqueta>
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  autoFocus
+                  value={baseTexto}
+                  onChange={(e) => setBaseTexto(e.target.value)}
+                  placeholder="0,00"
+                  aria-label="Base regulatoria en pesos"
+                  className="mt-2 w-full rounded-md border border-border bg-card px-3 py-2 font-meter text-[22px] tabular-nums text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                />
+              </label>
+              <label className="block">
+                <Etiqueta>Valor de la UMA</Etiqueta>
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  value={umaTexto}
+                  onChange={(e) => setUmaTexto(e.target.value)}
+                  aria-label="Valor de la UMA"
+                  className="mt-2 w-full rounded-md border border-border bg-card px-3 py-2 font-mono text-[15px] tabular-nums text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                />
+              </label>
+            </div>
+
+            <div className="md:border-l md:border-hair md:pl-9">
+              <Etiqueta>La escala</Etiqueta>
+              {!r ? (
+                <p className="mt-3 text-[13px] text-faint">
+                  Ingresá la base para ver el cálculo.
+                </p>
+              ) : (
+                <dl className="mt-3 space-y-3.5">
+                  <div>
+                    <dt className="text-[12px] text-faint">Base en UMA</dt>
+                    <dd className="font-meter tabular-nums text-[19px] text-foreground">
+                      <EnUMA value={r.baseEnUMA} />
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-[12px] text-faint">Escala aplicable</dt>
+                    <dd className="text-[13px] leading-snug text-foreground">
+                      {r.escala.titulo}
+                    </dd>
+                  </div>
+                  {r.escala.limiteAnterior > 0 ? (
+                    <div>
+                      <dt className="text-[12px] text-faint">
+                        Excedente sobre {umaNum(r.escala.limiteAnterior)} UMA
+                      </dt>
+                      <dd className="font-meter tabular-nums text-[15px] text-foreground">
+                        <EnUMA value={r.escala.excedente} />
+                        <span className="ml-2 font-mono text-[11px] text-faint">
+                          el tramo anterior aporta {umaNum(r.escala.maximoEscalaAnterior)} UMA
+                        </span>
+                      </dd>
+                    </div>
+                  ) : null}
+                </dl>
+              )}
+            </div>
           </div>
         </Card>
 
-        {!r ? (
-          <p className="mt-8 text-[13px] text-faint">
-            Ingresá la base para ver el cálculo.
-          </p>
-        ) : (
+        {!r ? null : (
           <>
-            {/* ---- La escala ---- */}
-            <Card className="mt-6">
-              <CardHeader titulo="La escala" />
-              <div className="px-6 pb-2">
-                <LedgerRow
-                  concepto="Base en UMA"
-                  valor={
-                    <span className="font-meter tabular-nums text-[15px]">
-                      <EnUMA value={r.baseEnUMA} />
-                    </span>
-                  }
-                />
-                <LedgerRow
-                  concepto="Escala aplicable"
-                  valor={
-                    <span className="text-[13px] text-foreground">{r.escala.titulo}</span>
-                  }
-                />
-                {r.escala.limiteAnterior > 0 ? (
-                  <LedgerRow
-                    concepto={
-                      <span>
-                        Excedente sobre {umaNum(r.escala.limiteAnterior)} UMA
-                      </span>
-                    }
-                    valor={
-                      <span className="font-meter tabular-nums text-[15px]">
-                        <EnUMA value={r.escala.excedente} />
-                      </span>
-                    }
-                    sub={
-                      <span className="font-mono text-[11px] text-faint">
-                        el tramo anterior aporta {umaNum(r.escala.maximoEscalaAnterior)} UMA
-                      </span>
-                    }
-                  />
-                ) : null}
-              </div>
-            </Card>
-
             {/* ---- Los roles ---- */}
             <Card className="mt-6">
               <CardHeader titulo="Honorarios" />
@@ -243,7 +240,7 @@ export function CalculoDirectoView({
               {/* Fraccion de la etapa elegida. */}
               <div className="border-t border-hair px-6 py-5">
                 <div className="flex flex-wrap items-center justify-between gap-3">
-                  <Etiqueta>Parte de la etapa que se trabajó</Etiqueta>
+                  <Etiqueta>Porcentaje de la etapa</Etiqueta>
                   <span className="font-meter tabular-nums text-[13px] text-foreground">
                     {pct(fraccion)}
                   </span>
@@ -256,7 +253,7 @@ export function CalculoDirectoView({
                     step={5}
                     value={fraccion}
                     onChange={(e) => setFraccion(Number(e.target.value))}
-                    aria-label="Parte de la etapa que se trabajó"
+                    aria-label="Porcentaje de la etapa"
                     className="h-1 flex-1 cursor-pointer accent-primary"
                   />
                   <input
@@ -271,11 +268,6 @@ export function CalculoDirectoView({
                     className="w-14 shrink-0 rounded-sm border border-border bg-card px-2 py-1 text-right font-mono text-[12px] tabular-nums text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   />
                 </div>
-                <p className="mt-3 text-[12px] leading-relaxed text-faint">
-                  Toma esa parte de <strong>una sola</strong> regulación, porque se
-                  trabajó parte de la etapa. No es el reparto entre dos
-                  profesionales: lo que queda afuera no es de nadie en particular.
-                </p>
               </div>
             </Card>
 
@@ -306,16 +298,6 @@ export function CalculoDirectoView({
                   }
                 />
               </div>
-              <div className="px-6 pb-5">
-                <Disclosure concepto="De dónde sale el punto medio">
-                  <Norma>
-                    El art. 21 fija la banda del 5 % al 10 % y no manda promediar.
-                    El punto medio no sale de la ley: se muestra porque es lo que
-                    se usa cuando no hay razón para ir a un extremo, y elegir
-                    dentro de la banda es del juez.
-                  </Norma>
-                </Disclosure>
-              </div>
             </Card>
 
             {/* ---- Segunda instancia ---- */}
@@ -335,22 +317,12 @@ export function CalculoDirectoView({
                   valor={<ParUMA rango={r.segundaInstancia.patrocinante.revocada} />}
                 />
               </div>
-              <div className="px-6 pb-5">
-                <Disclosure concepto="Art. 30">
-                  <Norma>
-                    Se calcula sobre el honorario de primera instancia completo, no
-                    sobre la etapa elegida arriba: es otra regulación sobre lo
-                    mismo. El 40 % se reserva a la revocación en todas sus partes
-                    en favor del apelante.
-                  </Norma>
-                </Disclosure>
-              </div>
             </Card>
 
             {/* ---- Lo que no hace ---- */}
             <Card className="mt-6">
-              <CardHeader titulo="Lo que esta pantalla no hace" />
-              <div className="px-6 pb-6">
+              <div className="px-6 py-1">
+                <Disclosure concepto="Lo que esta pantalla no hace">
                 <p className="text-[13px] leading-relaxed text-muted-foreground">
                   No aplica <strong>ninguna</strong> reducción. Si el caso tiene
                   alguna de estas, el número de arriba no es el que corresponde y
@@ -368,6 +340,7 @@ export function CalculoDirectoView({
                   Tampoco decide el punto dentro de la banda. La escala da un
                   mínimo y un máximo; elegir adentro es del juez.
                 </p>
+                </Disclosure>
               </div>
             </Card>
           </>
