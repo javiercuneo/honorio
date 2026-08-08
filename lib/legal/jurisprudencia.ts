@@ -43,13 +43,35 @@ export interface Criterio {
  * Ley 21.839, derogada, y estos fallos son la razon por la que ese
  * criterio es defendible y no una invencion nuestra.
  */
+/**
+ * De donde sale que el honorario del mediador se calcule sobre la base
+ * del expediente, con las reducciones de los arts. 22 y 40 ya
+ * aplicadas, y no sobre la base propia que el Decreto 696/2025 le da
+ * en su art. 31 inc. d).
+ *
+ * Es una interpretacion, y de las que mueven el numero. Estos fallos
+ * son la razon por la que es defendible y no una comodidad nuestra.
+ */
 export const MEDIACION_BASE_UNICA: Criterio = {
   sostiene:
-    'A los efectos regulatorios un juicio es una unidad jurídica y procesal, de modo que tiene un solo monto y no pueden existir dos bases regulatorias diferentes.',
+    'A los efectos regulatorios el juicio es una unidad jurídica, de modo tal que tiene un solo monto pecuniario y no pueden existir dos bases regulatorias diferentes, según sea letrado o auxiliar de la justicia.',
   fallos: [
-    // Va primero porque es el unico que decide el punto exacto: reduce
-    // la base un 30 % por el art. 22 y regula a la mediadora sobre esa
-    // base, en la misma resolucion.
+    // Va primero porque es el que decide el punto y no una analogia: el
+    // apelante era un perito ingeniero que planteo que la reduccion del
+    // 30 % del art. 22 no le alcanzaba por ser auxiliar de justicia y no
+    // letrado. La Sala lo rechazo, y agrego que "la ley arancelaria no
+    // contempla excepcion ni distincion alguna que altere la reduccion
+    // del 30 % [...] de acuerdo al profesional de que se trate".
+    {
+      tribunal: 'CNCiv., Sala K',
+      expediente: 'expte. 2896/2021',
+      caratula:
+        'MARCHAND, HUGO ALBERTO Y OTRO c/ FREYRE PENABAD, NELLY MARIA FLORINDA s/ PRESCRIPCION ADQUISITIVA',
+      fecha: '22/06/2026',
+    },
+    // La misma Sala aplicandolo a un mediador: reduce la base un 30 %
+    // por el art. 22 y regula a la mediadora sobre esa base, en la misma
+    // resolucion.
     {
       tribunal: 'CNCiv., Sala K',
       expediente: 'expte. 8451/2022',
@@ -57,8 +79,9 @@ export const MEDIACION_BASE_UNICA: Criterio = {
         'OBRA SOCIAL DE LA INDUSTRIA DEL FOSFORO ENCENDIDO Y AFINES c/ VARELA, CARLOS ALBERTO s/ DAÑOS Y PERJUICIOS - RESP. PROF. ABOGADOS',
       fecha: '09/05/2025',
     },
-    // El origen de la doctrina. La transcripcion se leyo dentro de la
-    // sentencia de la Sala M en el expte. 55198/2020, del 16/09/2024.
+    // El origen de la doctrina. Los dos fallos de la Sala K remiten a
+    // el; la transcripcion se leyo ademas dentro de la sentencia de la
+    // Sala M en el expte. 55198/2020, del 16/09/2024.
     {
       tribunal: 'CNCiv., en pleno',
       expediente: 'plenario',

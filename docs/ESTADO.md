@@ -27,8 +27,8 @@ Pantallas terminadas sobre el mismo sistema visual: **dashboard**, **wizard**,
 **El cálculo directo está terminado (7/8).** Motor, validación y pantalla. Ver
 [El cálculo directo](#el-calculo-directo--empezado-el-78).
 
-**Mediación arrancó el 8/8**: el motor del honorario del mediador, el UHOM
-versionado y la validación 16. Falta la pantalla. Ver
+**Mediación está terminada (8/8).** El honorario del mediador con su escala en
+UHOM, el UHOM versionado, la validación 16 y la sección del dashboard. Ver
 [Mediación](#mediacion--empezado-el-88).
 
 El 5/8 se cerraron los tres pendientes inmediatos —**autoría**, **informe
@@ -173,11 +173,15 @@ no se pudo resolver no se escribe. Falta el texto consolidado del Anexo III.
 arts. 22 y 40 de la Ley 27.423 ya aplicadas. Es la misma cifra que reciben la
 escala del art. 21 y los auxiliares.
 
-Es una interpretación, y está fundada: **CNCiv., Sala K, expte. 8451/2022,
-9/5/2025**, que reduce la base un 30 % por el art. 22 y regula a la mediadora
-sobre esa base en la misma resolución, apoyándose en que «un juicio es una
-unidad jurídica […] no pueden existir dos bases regulatorias diferentes». La
-doctrina viene del plenario **`Murguía`** (CNCiv. en pleno, 2/10/2001).
+Es una interpretación, y está fundada. El fallo que resuelve el planteo exacto
+es **CNCiv., Sala K, expte. 2896/2021, 22/6/2026**: el apelante era un perito
+que sostenía que la reducción del 30 % del art. 22 no lo alcanzaba **por ser
+auxiliar de la Justicia y no letrado**, y la Sala lo rechazó —«el juicio es una
+unidad jurídica […] no pueden existir dos bases regulatorias diferentes, según
+sea letrado o auxiliar de la justicia», y «la ley arancelaria no contempla
+excepción ni distinción alguna» según el profesional—. La misma Sala lo aplicó a
+una mediadora en el expte. 8451/2022, del 9/5/2025. La doctrina viene del
+plenario **`Murguía`** (CNCiv. en pleno, 2/10/2001).
 
 **El decreto define una base propia y en cuatro supuestos da distinto** —demanda
 desestimada, desalojo, alimentos y reconvención—. Está en el plan, con la tabla.
@@ -187,6 +191,25 @@ produce tantas bases como profesionales intervengan.
 
 **Consecuencia práctica: cero preguntas nuevas en la entrevista.** El módulo es
 una función pura de siete ramas sobre una cifra que el motor ya tiene.
+
+### Qué prosa va en el dashboard, y qué prosa no
+
+La primera versión de la sección traía tres desplegables largos: la escala
+entera, todo lo que el número no incluye y la discusión sobre el número de
+artículo. **Era demasiado**, y el informe fundado salía de diez hojas. La regla
+que quedó, y que vale para las secciones que vengan:
+
+> En el dashboard va **lo que solo se puede decir al lado de este número**. Lo
+> que describe la herramienta es documentación, y va a `documentacion.html` del
+> sitio de herramientas.
+
+Quedaron dos cosas: que la base es una interpretación —con sus fallos, porque es
+lo único que mueve la cifra en pantalla— y por qué el 2 % dejó de ser 2 %, solo
+cuando el tope efectivamente mordió.
+
+**Un dato para no sobrecorregir:** los desplegables son `<details>` y un
+`<details>` cerrado no imprime su contenido; `imprimir.tsx` los abre según el
+interruptor de fundamentos. El informe desnudo nunca creció.
 
 ### Tres cosas del módulo que conviene no deshacer
 
