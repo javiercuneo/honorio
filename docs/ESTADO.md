@@ -18,11 +18,14 @@ Se actualiza en el mismo commit que el trabajo, para que nunca mienta.
 
 Versión **3.0.0**. El rediseño visual está cerrado y el bug del flujo hacia
 atrás de la entrevista —que arrastraba respuestas de un proceso a otro— quedó
-resuelto. Las 14 validaciones de `lib/legal/__tests__` están en verde y corren
+resuelto. Las 15 validaciones de `lib/legal/__tests__` están en verde y corren
 solas en CI.
 
 Pantallas terminadas sobre el mismo sistema visual: **dashboard**, **wizard**,
 **portada**, **intro** y **mínimos**. Falta pulido de mensajes.
+
+**Empezado el 7/8: el cálculo directo.** Está el motor y su validación; **falta
+la pantalla**. Ver [El cálculo directo](#el-calculo-directo--empezado-el-78).
 
 El 5/8 se cerraron los tres pendientes inmediatos —**autoría**, **informe
 imprimible** y **vuelta al repositorio**— y se sacó la UMA del navegador del
@@ -37,6 +40,64 @@ dominio, conservando la ruta.
 
 **El 6/8 se corrigió la medida cautelar**, que decía al revés lo que hacía. Ver
 abajo. Ningún número se movió.
+
+---
+
+## El cálculo directo — empezado el 7/8
+
+Un modo sin entrevista: entra la base y sale la escala del art. 21 desnuda, con
+los tres roles, sus etapas y los auxiliares. El plan entero está en
+[`PLAN_CALCULO_DIRECTO.md`](https://github.com/javiercuneo/herramientas-judiciales/blob/main/docs/PLAN_CALCULO_DIRECTO.md),
+en el otro repositorio.
+
+**Hecho:** `lib/legal/calculo-directo.ts` y su validación, que es la número 15.
+**Falta la pantalla**, que es por donde sigue la próxima sesión. El patrón a
+copiar es `minimos-view.tsx`: una vista de consulta, sin entrevista, que se
+prende con un booleano en `interview-experience.tsx` y tiene su entrada en la
+barra y en la intro.
+
+**Lo que gobierna el módulo, y conviene no deshacerlo:** «sin reducciones» no es
+un caso, es la ausencia de caso. **No arma un `WizardState` con respuestas por
+defecto para llamar a `buildGeneral()`.** Sería más corto y estaría mal: cada
+respuesta por defecto es una afirmación jurídica —«sentencia admitida» sostiene
+que la demanda prosperó— y el día que se agregue una regla que dependa de una de
+ellas, este modo empezaría a aplicarla en silencio. Compone las funciones puras
+de `calculate.ts` y no tiene aritmética propia.
+
+**Por eso no puede divergir de la entrevista, y hay un control que lo prueba.**
+`calculoDirecto.validation.ts` corre los dos caminos —el modo directo y un
+conocimiento con sentencia admitida y apertura a prueba, que no dispara ninguna
+de las nueve reglas de `resolveReglas()`— y compara rol por rol. Son 171
+afirmaciones. **Se comprobó que el control muerde**: mutando el patrocinante un
+0,1 % fallan los cinco casos cruzados.
+
+Además ancla contra la hoja de cálculo que se usaba antes —base $21.368.714,99,
+UMA $102.076—, cuyos números **coinciden con el motor hasta el tercer decimal**.
+Ese es el único dato de la validación que no sale del motor, así que es el que
+avisa si el motor se mueve.
+
+**Dos cosas que la hoja enseñó y quedaron en el módulo:**
+
+- **Cuenta etapas, no fracciones.** `EtapasRol` es `tres`, `dos`, `una` y no
+  «completo / 2/3 / 1/3». Es el mismo número; la formulación es la del art. 29,
+  que divide el proceso en etapas y cuenta cuántas se trabajaron.
+- **`fraccionDeRango()` no es el reparto entre dos profesionales.** El del
+  dashboard parte un importe en dos porciones que suman 100 %. Esto toma una
+  sola porción —un profesional se lleva el 30 % de una etapa porque hizo el 30 %
+  del trabajo de esa etapa— y el resto no es de nadie en particular. **Dan el
+  mismo número y significan distinto**, que es la clase de error que no mueve una
+  cifra y deja un rótulo mintiendo.
+
+**La base no se redondea, y hay un test que lo cuida.**
+`calculadoras/honorarios.html` redondeaba la base en UMA cerca de los bordes de
+tramo **y calculaba con el redondeo**; por eso se dio de baja. La validación
+comprueba que 15,4 UMA no se trate como 15 en los seis cortes.
+
+**Queda decidido para la pantalla, y sale de cómo se usa la hoja:** la unidad
+principal es la **UMA**, con el peso al lado en menor jerarquía —«regulo en
+UMA»—. Eso invierte lo que hace el dashboard, que lidera con pesos. Es
+deliberado: son dos públicos distintos. Si alguna vez se unifica, la discusión
+es del plan de regulación en prosa, no de acá.
 
 **El 7/8 se hizo entero el [`PLAN_COBERTURA_LEY.md`][plan]** —el plan vive en el
 repositorio de herramientas— en dos tandas.
@@ -877,7 +938,7 @@ Lo único que sigue abierto de esa tanda es la **fecha de vigencia de la UMA**
 ## Cómo verificar un cambio
 
 ```bash
-npm run check    # tipos + las 14 validaciones. Es lo que corre CI.
+npm run check    # tipos + las 15 validaciones. Es lo que corre CI.
 npm run build    # el export estatico, que es lo que se publica
 npm run uma      # trae el valor de la UMA de la planilla, si cambio
 ```

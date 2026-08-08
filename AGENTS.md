@@ -59,7 +59,7 @@ Orden de prioridades cuando entran en conflicto:
 Un solo comando, y es el mismo que corre CI:
 
 ```bash
-npm run check      # tipos + las 14 validaciones
+npm run check      # tipos + las 15 validaciones
 ```
 
 Por separado, si necesitás aislar:
