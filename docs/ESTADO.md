@@ -3,7 +3,7 @@
 Documento de continuidad entre sesiones. **Leer antes de empezar a trabajar.**
 Se actualiza en el mismo commit que el trabajo, para que nunca mienta.
 
-Última actualización: 2026-08-07
+Última actualización: 2026-08-08
 
 > Honorio salió de
 > [herramientas-judiciales](https://github.com/javiercuneo/herramientas-judiciales),
@@ -18,7 +18,7 @@ Se actualiza en el mismo commit que el trabajo, para que nunca mienta.
 
 Versión **3.0.0**. El rediseño visual está cerrado y el bug del flujo hacia
 atrás de la entrevista —que arrastraba respuestas de un proceso a otro— quedó
-resuelto. Las 15 validaciones de `lib/legal/__tests__` están en verde y corren
+resuelto. Las 16 validaciones de `lib/legal/__tests__` están en verde y corren
 solas en CI.
 
 Pantallas terminadas sobre el mismo sistema visual: **dashboard**, **wizard**,
@@ -26,6 +26,10 @@ Pantallas terminadas sobre el mismo sistema visual: **dashboard**, **wizard**,
 
 **El cálculo directo está terminado (7/8).** Motor, validación y pantalla. Ver
 [El cálculo directo](#el-calculo-directo--empezado-el-78).
+
+**Mediación arrancó el 8/8**: el motor del honorario del mediador, el UHOM
+versionado y la validación 16. Falta la pantalla. Ver
+[Mediación](#mediacion--empezado-el-88).
 
 El 5/8 se cerraron los tres pendientes inmediatos —**autoría**, **informe
 imprimible** y **vuelta al repositorio**— y se sacó la UMA del navegador del
@@ -125,6 +129,89 @@ cambio que mueve el número. El caso concreto está en el
 Del plan quedan solo cosas anotadas sin fecha.
 
 [plan]: https://github.com/javiercuneo/herramientas-judiciales/blob/main/docs/PLAN_COBERTURA_LEY.md
+
+---
+
+## Mediación — empezado el 8/8
+
+El honorario básico del mediador, al lado del de los auxiliares. El plan
+completo, con las normas leídas y las decisiones con su motivo, está en
+[`PLAN_MEDIACION.md`](https://github.com/javiercuneo/herramientas-judiciales/blob/main/docs/PLAN_MEDIACION.md),
+en el otro repositorio.
+
+**Hecho: el motor, sin la pantalla.** `lib/legal/mediacion.ts`,
+`lib/legal/uhom.ts`, `data/uhom.json`, la extensión de
+`scripts/actualizar-uma.mjs` y la validación número 16.
+
+### La escala, y por qué la cita no lleva número de artículo
+
+Sale del **ANEXO III del Decreto 1467/2011, sustituido por el Decreto
+2536/2011**. El Decreto 696/2025 reemplazó el Anexo I entero —el régimen pasó
+del art. 28 al art. 31— pero no tocó el Anexo III: lo cita seis veces como
+derecho vigente.
+
+**Las tres fuentes no coinciden en la numeración del artículo** —«2°» según el
+696/2025 y el propio Anexo, «4° y 5°» según el art. 28 inc. b) del 2536/2011,
+«4°» según la tabla oficial de 2026—. Los números del honorario son idénticos
+en las tres, así que no afecta ningún cálculo: afecta la cita, y una cita que
+no se pudo resolver no se escribe. Falta el texto consolidado del Anexo III.
+
+### La decisión que gobierna el módulo
+
+**La base del mediador es la del expediente**, con las reducciones de los
+arts. 22 y 40 de la Ley 27.423 ya aplicadas. Es la misma cifra que reciben la
+escala del art. 21 y los auxiliares.
+
+Es una interpretación, y está fundada: **CNCiv., Sala K, expte. 8451/2022,
+9/5/2025**, que reduce la base un 30 % por el art. 22 y regula a la mediadora
+sobre esa base en la misma resolución, apoyándose en que «un juicio es una
+unidad jurídica […] no pueden existir dos bases regulatorias diferentes». La
+doctrina viene del plenario **`Murguía`** (CNCiv. en pleno, 2/10/2001).
+
+**El decreto define una base propia y en cuatro supuestos da distinto** —demanda
+desestimada, desalojo, alimentos y reconvención—. Está en el plan, con la tabla.
+El motivo de apartarse es el art. 1°, segundo párrafo, de la Ley 27.423: el
+arancel se aplica supletoriamente a todos los auxiliares, y la alternativa
+produce tantas bases como profesionales intervengan.
+
+**Consecuencia práctica: cero preguntas nuevas en la entrevista.** El módulo es
+una función pura de siete ramas sobre una cifra que el motor ya tiene.
+
+### Tres cosas del módulo que conviene no deshacer
+
+- **`calcularMediacion()` recibe el `ValorUHOM` entero, no el número.**
+  `calcularDirecto()` recibe la UMA suelta; acá no, a propósito. Con dos
+  `number` nada impediría pasarle la UMA: son $102.076 donde van $12.960, un
+  factor de ocho sin ningún error visible. El campo `unidad` del tipo existe
+  para eso y para nada más.
+- **El tope de 120 UHOM es del ítem G**, no de la escala. Da el mismo número
+  siempre —A a F topean en 20 UHOM— así que ninguna validación numérica lo
+  cazaría: es un error de rótulo, que es la clase que ya costó caro dos veces.
+  La calculadora vieja lo dice mal.
+- **Los ítems H, I y el familiar quedan afuera por construcción**, no por
+  decisión: `baseValor` es un `number` y `ObjetoBase` no tiene ninguna opción
+  sin monto, así que no hay recorrido que llegue.
+
+### El UHOM no se comporta como la UMA
+
+Se mueve **todos los meses** —junio 2026 $12.450, julio $12.720, agosto
+$12.960— y es derivado: **UR-SINEP × 12, redondeado a la decena próxima
+superior**, comprobado en los tres meses. De ahí que el script tenga umbral
+propio (15 % y no 60 %) y un control de forma que la UMA no puede tener: el
+valor siempre termina en cero.
+
+**Falta la procedencia.** La planilla trae el número del UHOM pero no su norma
+—la fila `Acordada` describe la UMA—. Mientras no existan las filas
+`UHOM_FUENTE` y `UHOM_URL`, cada valor nuevo entra sin cita y el script avisa.
+El de agosto está cargado a mano con la que trae la tabla oficial.
+
+> **Un bug que se encontró corriendo el script de verdad, y por eso conviene
+> correrlo.** La primera versión completaba la procedencia con
+> `previo.fuente = fuente` a secas, y en la primera pasada real le **borró al
+> UHOM la norma cargada a mano**, porque la planilla no la trae y `fuente`
+> llegaba en `null`. Ahora la procedencia **solo se completa, nunca se borra**:
+> que la planilla no diga nada no es que diga que no hay norma. El mismo arreglo
+> protege a la UMA el día que se vacíe la celda `Acordada`.
 
 ---
 

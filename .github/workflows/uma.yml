@@ -1,24 +1,27 @@
 # ------------------------------------------------------------------
-# Trae el valor de la UMA de la planilla y lo commitea si cambio.
+# Trae de la planilla los valores de la UMA y del UHOM y los commitea
+# si cambiaron.
 #
 # La planilla la lee este workflow, no el navegador del visitante: la
 # app declara que nada de lo que se escribe sale del navegador, y con
 # un fetch a Google en cada carga esa afirmacion dependia de Google.
-# El porque completo esta en lib/legal/uma.ts.
+# El porque completo esta en lib/legal/uma.ts y en lib/legal/uhom.ts.
 #
-# El push a main dispara Deploy Pages, asi que el sitio queda con el
-# valor nuevo sin que nadie toque nada.
+# El push a main dispara Deploy Pages, asi que el sitio queda con los
+# valores nuevos sin que nadie toque nada.
 #
-# El cron corre los dias 1 y 15 porque la Corte publica el valor
-# durante el mes y no siempre el mismo dia; dos pasadas alcanzan para
-# que nunca pase mas de dos semanas desactualizado. Igual queda el
-# disparo manual para el dia que sale y no se quiere esperar.
+# El cron corre los dias 1 y 15 porque la Corte publica la UMA durante
+# el mes y no siempre el mismo dia; dos pasadas alcanzan para que nunca
+# pase mas de dos semanas desactualizada. Al UHOM le viene bien la
+# misma cadencia por otro motivo: cambia todos los meses y rige desde
+# el dia 1, asi que la pasada del 1 lo toma el mismo dia. Igual queda
+# el disparo manual.
 #
 # Si la planilla no responde, o trae algo que no pasa los controles,
-# el script falla y no toca el archivo. Publicar con el valor de ayer
-# es mejor que publicar con uno inventado.
+# el script falla y no toca ningun archivo. Publicar con el valor de
+# ayer es mejor que publicar con uno inventado.
 # ------------------------------------------------------------------
-name: UMA
+name: UMA y UHOM
 
 on:
   schedule:
@@ -42,17 +45,17 @@ jobs:
         with:
           node-version: 24
 
-      - name: Traer el valor de la planilla
+      - name: Traer los valores de la planilla
         run: node scripts/actualizar-uma.mjs
 
       - name: Commitear si cambio
         run: |
-          if git diff --quiet -- data/uma.json; then
+          if git diff --quiet -- data/uma.json data/uhom.json; then
             echo "Sin cambios."
             exit 0
           fi
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/uma.json
-          git commit -m "chore: actualizar el valor de la UMA"
+          git add data/uma.json data/uhom.json
+          git commit -m "chore: actualizar los valores de la UMA y el UHOM"
           git push
