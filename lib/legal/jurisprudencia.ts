@@ -43,6 +43,39 @@ export interface Criterio {
  * Ley 21.839, derogada, y estos fallos son la razon por la que ese
  * criterio es defendible y no una invencion nuestra.
  */
+export const MEDIACION_BASE_UNICA: Criterio = {
+  sostiene:
+    'A los efectos regulatorios un juicio es una unidad jurídica y procesal, de modo que tiene un solo monto y no pueden existir dos bases regulatorias diferentes.',
+  fallos: [
+    // Va primero porque es el unico que decide el punto exacto: reduce
+    // la base un 30 % por el art. 22 y regula a la mediadora sobre esa
+    // base, en la misma resolucion.
+    {
+      tribunal: 'CNCiv., Sala K',
+      expediente: 'expte. 8451/2022',
+      caratula:
+        'OBRA SOCIAL DE LA INDUSTRIA DEL FOSFORO ENCENDIDO Y AFINES c/ VARELA, CARLOS ALBERTO s/ DAÑOS Y PERJUICIOS - RESP. PROF. ABOGADOS',
+      fecha: '09/05/2025',
+    },
+    // El origen de la doctrina. La transcripcion se leyo dentro de la
+    // sentencia de la Sala M en el expte. 55198/2020, del 16/09/2024.
+    {
+      tribunal: 'CNCiv., en pleno',
+      expediente: 'plenario',
+      caratula:
+        'MURGUIA, ELENA JOSEFINA c/ GREEN, ERNESTO BERNARDO s/ CUMPLIMIENTO DE CONTRATO',
+      fecha: '02/10/2001',
+    },
+    {
+      tribunal: 'CNCiv., Sala A',
+      expediente: 'expte. 74879/2018',
+      caratula:
+        'ZOLZINSKY, ESTHER c/ POCHINKI, EDUARDO JAVIER Y OTRO s/ NULIDAD DE ACTO JURIDICO',
+      fecha: '08/07/2025',
+    },
+  ],
+}
+
 export const INCIDENTE_ESCALA: Criterio = {
   sostiene:
     'El criterio del art. 33 de la Ley 21.839 se considera, aun pese a su derogación, como una referencia análoga para regular los honorarios de los incidentes.',

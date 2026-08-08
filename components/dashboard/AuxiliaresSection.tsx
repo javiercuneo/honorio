@@ -108,7 +108,8 @@ export function AuxiliaresSection({
             No incluye las pautas de las leyes especiales que reglamentan cada
             actividad profesional, ni a administradores, interventores,
             liquidadores, árbitros o mediadores, que tienen régimen propio
-            (art. 32).
+            (art. 32). El del mediador se calcula acá abajo, con su escala en
+            UHOM.
           </p>
         </Disclosure>
         <Disclosure

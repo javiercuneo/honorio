@@ -139,9 +139,20 @@ completo, con las normas leídas y las decisiones con su motivo, está en
 [`PLAN_MEDIACION.md`](https://github.com/javiercuneo/herramientas-judiciales/blob/main/docs/PLAN_MEDIACION.md),
 en el otro repositorio.
 
-**Hecho: el motor, sin la pantalla.** `lib/legal/mediacion.ts`,
-`lib/legal/uhom.ts`, `data/uhom.json`, la extensión de
-`scripts/actualizar-uma.mjs` y la validación número 16.
+**Hecho, motor y pantalla.** `lib/legal/mediacion.ts`, `lib/legal/uhom.ts`,
+`data/uhom.json`, la extensión de `scripts/actualizar-uma.mjs`, la validación
+número 16 y `components/dashboard/MediacionSection.tsx`, colgada del `Dashboard`
+justo debajo de los auxiliares.
+
+**Verificado en el navegador** con el caso que el plan usa de ejemplo: juicio de
+conocimiento, sentencia rechazada, sumas de dinero, base $8.000.000. La base
+baja a $5.600.000 por el art. 22, que son **432,10 UHOM** con el UHOM de agosto
+—$12.960—, cae en el **ítem E** y da **$207.360**, o sea 16 UHOM. La tarjeta
+muestra el valor del UHOM con su procedencia al lado. Sin errores de consola.
+
+**La sección no causa desbordes**: se midió en 375 px y el ancho del documento
+es el mismo con ella y sin ella. El desborde que sí hay en móvil es de la barra
+de acciones del resultado y es anterior a esto.
 
 ### La escala, y por qué la cita no lleva número de artículo
 

@@ -10,6 +10,7 @@ import { SegundaInstanciaBand } from "./SegundaInstanciaBand"
 import { ActuacionesPosterioresSection } from "./ActuacionesPosterioresSection"
 import { CadenaCalculo } from "./CadenaCalculo"
 import { AuxiliaresSection } from "./AuxiliaresSection"
+import { MediacionSection } from "./MediacionSection"
 import { PartidorSection } from "./PartidorSection"
 import { ExhortoResult } from "./ExhortoResult"
 import { IncidenteResult } from "./IncidenteResult"
@@ -186,6 +187,14 @@ function DashboardGeneral({
           esProvisorio={resultado.esProvisorio}
         />
       ) : null}
+
+      {/*
+        Va pegado a auxiliares porque comparten de donde salen: los dos
+        se calculan sobre la base y no sobre el honorario del abogado.
+        Se le pasa `baseFinal` —la misma cifra— y no el resultado
+        entero, porque mediacion no comparte la unidad: va en UHOM.
+      */}
+      <MediacionSection baseFinal={resultado.baseFinal} />
 
       {resultado.partidor ? (
         <PartidorSection
