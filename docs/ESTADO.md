@@ -326,6 +326,43 @@ apagado. El mediador da 3.858,02 UHOM, ítem G, 77,16 UHOM y $1.000.000, que es 
 > `app/verificar/` temporal que arma el resultado con `buildGeneral` y monta la
 > sección sola. **Se borró después de verificar**, que es lo que la hace útil.
 
+### Las correcciones del 10/8, después de que Javier lo usara
+
+Todas salieron de leer el texto real, y dos eran errores de fondo:
+
+- **El artículo se repetía.** El `concepto` de varias transformaciones ya termina
+  en su artículo —`50% por ejecucion de sentencia (art.41)`— y el generador
+  agregaba además el campo `articulo`. Salía «(art.41) (art. 41)». Ahora se
+  limpia el paréntesis final del concepto y manda el campo, que es el
+  normalizado.
+- **Las reducciones del honorario no se escribían.** `etapa: 'honorarios'` es una
+  de las tres del motor y no tenía sección: el −10 % del art. 41 aparecía solo
+  como una alícuota efectiva más baja, **sin decir por qué**. El texto mostraba
+  la consecuencia y se guardaba la causa. Ahora tiene sección propia.
+- **La alícuota efectiva iba antes de la reducción que la causa.** Se leía
+  «resultan de 8,50 % a 11,00 %» y recién después «Aplico 50 % por homologación».
+  Invertido, y con «Hechas esas reducciones» adelante.
+- **El exhorto y el incidente no redactaban**, porque salen por su propia rama del
+  `Dashboard` y nunca llegaban a la sección. Ahora las tres ramas la tienen.
+- **Y el incidente destapó algo peor.** Sus dos transformaciones —el 2 % y el
+  20 %— son de etapa `honorarios`, así que caían bajo «Reducciones del honorario»
+  y **no son reducciones**: son cómo se arma la banda. Tiene sección propia, que
+  además dice de dónde sale el criterio.
+- **Los atajos se derivan de las bandas** y ya no de una lista fija. La lista
+  filtrada por banda existente dejaba el incidente con un solo chip —el del
+  mediador— porque ningún atajo nombraba su banda. Ahora cada banda tiene su chip
+  o no tiene ninguno.
+- Menores: secciones numeradas `a) b) c)`, los artículos de cada sección en su
+  encabezado, `letrado/a` y `perito/a`, chip de perito contador, el plazo sin
+  «corridos» —era del juzgado— y `data-imprimir="no"`, porque el informe ya lleva
+  los mismos números.
+
+**Los artículos del encabezado salen de las `transformaciones` que el motor
+emitió.** Si una sección no tiene ninguna, no lleva artículo: no se completa por
+lo que «debería» corresponder. Por eso la base de una sucesión sale sin cita —el
+motor no emite ninguna transformación de base ahí— y eso es correcto aunque se
+lea incompleto.
+
 ### Los tres controles
 
 1. **Ningún número inventado.** `verificarNumeros()` extrae los importes del

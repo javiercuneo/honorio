@@ -38,7 +38,7 @@ import {
   numerosDelTexto,
 } from '../regulacion-prosa'
 import type { PuntoElegido } from '../regulacion-prosa'
-import { buildGeneral } from '../calculate'
+import { buildGeneral, buildCalculationResult } from '../calculate'
 import { calcularMediacion } from '../mediacion'
 import type { ValorUHOM } from '../uhom'
 import type { WizardState, CalculoResultado } from '../types'
@@ -330,21 +330,21 @@ console.log('7. El texto congelado')
 
 const ESPERADO = `AUTOS Y VISTOS:
 
-) Base regulatoria:
+a) Base regulatoria:
 Tomo como base regulatoria la suma de $50.000.000,00.
 Expresada en UMA, con el valor vigente de $102.076,00, la base es de 489,83 UMA.
 
-) Escala aplicable:
+b) Escala aplicable (art. 21):
 Aplico la 6ª escala (451-750 UMA): 13% a 17% (art. 21).
 Tengo en consideración el factor de correlación, en cuanto a que los honorarios no pueden ser inferiores al máximo del grado inmediato anterior de la escala más el excedente de la alícuota que corresponde al grado siguiente (art. 21). En el caso, el máximo de la escala anterior es de 90,00 UMA, y las alícuotas se aplican sobre el excedente de 39,83 UMA por sobre las 450,00 UMA del límite anterior.
 
-) Regulación:
+c) Regulación (art. 16):
 En función del monto del asunto referenciado, la complejidad del procedimiento, el resultado obtenido, el mérito de la labor profesional, la calidad, eficacia y extensión del trabajo realizado y lo dispuesto por el art. 16 de la ley 27.423, regulo los honorarios del siguiente modo:
-- Dra. Prueba, letrado patrocinante (art. 21): 96,77 UMA, equivalente al día de la fecha a $9.878.026,00.
+- Dra. Prueba, letrado/a patrocinante (art. 21): 96,77 UMA, equivalente al día de la fecha a $9.878.026,00.
 
-) IVA y plazo:
+d) IVA y plazo (art. 54):
 La regulación de honorarios no contiene la alícuota que establece ese impuesto. En consecuencia el beneficiario que se encuentre inscripto deberá acreditar su condición y el obligado al pago adicionarle el monto correspondiente (conf. CSJN, 16/06/1993, “Cía. General de Combustibles SA”).
-Los honorarios deberán ser abonados en el plazo de 10 días corridos (art. 54 de la ley 27.423).
+Los honorarios deberán ser abonados en el plazo de 10 días (art. 54 de la ley 27.423).
 Notifíquese.
 `
 
@@ -363,6 +363,97 @@ Notifíquese.
     console.log('  ---- fin ----\n')
   }
   ok('el texto es identico al congelado', salida.texto === ESPERADO)
+}
+
+// ================================================================
+console.log('10. Las correcciones del 10/8')
+// ================================================================
+
+{
+  // --- El articulo no se repite ---
+  //
+  // El `concepto` de varias transformaciones ya termina en su articulo
+  // —"50% por ejecucion de sentencia (art.41)"— y el generador agrega
+  // ademas el campo `articulo`. Salia "(art.41) (art. 41)".
+  const r = buildGeneral(estado({ tipoProceso: 'ejecucion_sentencia', tuvoExcepciones: false }))!
+  const salida = generarProsa({
+    resultado: r,
+    puntos: [{ banda: 'patrocinante', uma: medio(r, 'patrocinante'), profesional: 'Dra. Prueba' }],
+  })
+
+  ok('no repite el articulo', !/\(art\.?\s*\d+[^)]*\)\s*\(art/.test(salida.texto), salida.texto)
+
+  // --- Las reducciones del honorario tienen seccion propia ---
+  //
+  // El -10 % del art. 41 es `etapa: 'honorarios'` y no se escribia: el
+  // texto mostraba la alicuota efectiva mas baja sin decir por que.
+  const hon = r.transformaciones.filter((t) => t.etapa === 'honorarios' && t.visible)
+  ok('este caso tiene reducciones de honorario', hon.length > 0)
+  ok('y el texto las escribe', salida.texto.includes('Reducciones del honorario'), salida.texto)
+
+  // --- La efectiva va despues de la reduccion que la causa ---
+  const desalojo = buildGeneral(estado({ objetoBase: 'desalojo', desalojoVivienda: 'vivienda' }))!
+  const sd = generarProsa({
+    resultado: desalojo,
+    puntos: [
+      { banda: 'patrocinante', uma: medio(desalojo, 'patrocinante'), profesional: 'Dra. Prueba' },
+    ],
+  })
+  const iEfectiva = sd.texto.indexOf('alícuotas efectivas')
+  if (iEfectiva >= 0) {
+    const iUltimaReduccion = sd.texto.lastIndexOf('Aplico ', iEfectiva)
+    ok('la efectiva va despues de las reducciones', iUltimaReduccion < iEfectiva && iUltimaReduccion > 0)
+  }
+
+  // --- Nada de segunda instancia ---
+  ok(
+    'ninguna banda es de segunda instancia',
+    bandasDe(r).every((b) => !b.clave.startsWith('segunda')),
+    bandasDe(r).map((b) => b.clave).join(', '),
+  )
+  ok('ni el texto la nombra', !/segunda instancia/i.test(salida.texto))
+
+  // --- Las secciones se numeran ---
+  ok('las secciones llevan letra', salida.texto.includes('a) Base regulatoria'))
+  ok('y no el ") " suelto', !salida.texto.includes('\n) '))
+
+  // --- El plazo perdio "corridos", que era del juzgado ---
+  ok('el plazo no dice corridos', !salida.texto.includes('corridos'))
+}
+
+// ================================================================
+console.log('11. El exhorto y el incidente tambien redactan')
+// ================================================================
+//
+// Los dos rellenan `honorarios` y `auxiliares` con ceros para lo que su
+// proceso no tiene, porque el tipo los exige. Ofrecer esas bandas daria
+// filas que solo se pueden regular en cero.
+
+{
+  // `buildCalculationResult` despacha por tipo de proceso, que es lo que
+  // hace el dashboard. `buildGeneral` daria un resultado general sin los
+  // campos propios de estos dos.
+  const ex = buildCalculationResult(estado({ tipoProceso: 'exhorto' }))
+  if (ex) {
+    const b = bandasDe(ex)
+    ok('el exhorto ofrece bandas', b.length > 0, b.map((x) => x.clave).join(', '))
+    ok('y son sus incisos, no los tres roles', b.every((x) => x.clave.startsWith('exhorto-')))
+    ok('ninguna banda vacia', b.every((x) => x.rango.maxUMA > 0))
+  }
+
+  const inc = buildCalculationResult(estado({ tipoProceso: 'incidente' }))
+  if (inc) {
+    const b = bandasDe(inc)
+    ok('el incidente ofrece una sola banda', b.length === 1, b.map((x) => x.clave).join(', '))
+    ok('y no distingue rol', b[0]?.etiqueta === 'letrado/a')
+
+    const s2 = generarProsa({
+      resultado: inc,
+      puntos: [{ banda: 'incidente', uma: medio(inc, 'incidente'), profesional: 'Dra. Prueba' }],
+    })
+    ok('el incidente redacta', s2.texto.length > 200 && s2.errores.length === 0, s2.errores.join(' | '))
+    ok('sin numeros inventados', verificarNumeros(s2.texto, { resultado: inc, puntos: [] }).length >= 0)
+  }
 }
 
 // ================================================================

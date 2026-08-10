@@ -41,11 +41,26 @@ type DashboardProps = Omit<ChipsCasoProps, "tipoProceso" | "valorUMA" | "transfo
 export function Dashboard({ resultado, ...caso }: DashboardProps) {
   const [rol, setRol] = useState<RolKey>("patrocinante")
 
+  // El exhorto y el incidente salen por su propia rama, con su propia
+  // pantalla. **La prosa va en las tres**, envuelta y no dentro de cada
+  // una: es la salida del calculo y no una parte del calculo, asi que
+  // no depende de como se presente el numero. Hasta el 10/8 estos dos
+  // no ofrecian texto, y no era una decision.
   if (resultado.tipoProceso === "exhorto") {
-    return <ExhortoResult resultado={resultado} />
+    return (
+      <div className="space-y-10">
+        <ExhortoResult resultado={resultado} />
+        <ProsaSection resultado={resultado} />
+      </div>
+    )
   }
   if (resultado.tipoProceso === "incidente") {
-    return <IncidenteResult resultado={resultado} />
+    return (
+      <div className="space-y-10">
+        <IncidenteResult resultado={resultado} />
+        <ProsaSection resultado={resultado} />
+      </div>
+    )
   }
 
   return (

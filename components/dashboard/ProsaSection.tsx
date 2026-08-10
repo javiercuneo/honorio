@@ -35,6 +35,11 @@
 // ocultan nunca": es lo que permite ver si el punto quedo pegado a un
 // borde.
 //
+// **No se imprime.** Lleva `data-imprimir="no"`, como los controles:
+// el informe imprimible ya contiene los mismos numeros, y agregarle el
+// texto lo duplicaria en el mismo papel. El texto se copia y se pega,
+// que es para lo que existe.
+//
 // Toda la redaccion es de lib/legal/regulacion-prosa.ts. Aca no se
 // escribe ni una frase del texto.
 // ---------------------------------------------------------------
@@ -47,7 +52,7 @@ import {
   generarProsa,
   verificarNumeros,
 } from "@/lib/legal/regulacion-prosa"
-import type { PuntoElegido } from "@/lib/legal/regulacion-prosa"
+import type { PuntoElegido, BandaRegulable } from "@/lib/legal/regulacion-prosa"
 import { calcularMediacion } from "@/lib/legal/mediacion"
 import { UHOM_VIGENTE } from "@/lib/legal/uhom"
 import type { CalculoResultado } from "@/lib/legal/types"
@@ -65,16 +70,39 @@ interface Fila {
 }
 
 /**
- * Los atajos. **Escriben un rotulo, no eligen una escala**: el rotulo
- * queda editable justamente para dejarlo claro.
+ * Los atajos, **derivados de las bandas que el resultado ofrece** y no
+ * de una lista fija.
+ *
+ * La primera version tenia una lista escrita a mano —patrocinante,
+ * apoderado, peritos— y filtraba por banda existente. En el incidente
+ * eso dejaba un solo chip, el del mediador: su unica banda es la del
+ * 2 %-20 % y ninguno de los atajos la nombraba. **Cada banda tiene su
+ * chip o no tiene ninguno**, y derivarlos lo hace imposible de olvidar.
+ *
+ * Las variantes de perito son lo unico escrito a mano, y **escriben un
+ * rotulo, no eligen una escala**: medico, contador, caligrafo e
+ * ingeniero cobran el mismo 5 %-10 % del art. 21. Por eso el rotulo
+ * queda editable.
  */
-const ATAJOS: { texto: string; banda: string; profesional: string }[] = [
-  { texto: "+ patrocinante", banda: "patrocinante", profesional: "" },
-  { texto: "+ apoderado", banda: "apoderado", profesional: "" },
-  { texto: "+ perito médico", banda: "auxiliares", profesional: "perito médico " },
-  { texto: "+ perito ingeniero", banda: "auxiliares", profesional: "perito ingeniero " },
-  { texto: "+ perito calígrafo", banda: "auxiliares", profesional: "perito calígrafo " },
-]
+const PERITOS = ['médico/a', 'contador/a', 'ingeniero/a', 'calígrafo/a']
+
+function atajosDe(bandas: BandaRegulable[]) {
+  const chips: { texto: string; banda: string; profesional: string }[] = []
+  for (const b of bandas) {
+    if (b.clave === 'auxiliares') {
+      for (const tipo of PERITOS) {
+        chips.push({
+          texto: '+ perito ' + tipo.replace('/a', ''),
+          banda: b.clave,
+          profesional: 'perito/a ' + tipo + ' ',
+        })
+      }
+      continue
+    }
+    chips.push({ texto: '+ ' + b.etiqueta, banda: b.clave, profesional: '' })
+  }
+  return chips
+}
 
 let proximoId = 1
 
@@ -89,6 +117,7 @@ export function ProsaSection({ resultado }: { resultado: CalculoResultado }) {
     () => new Map(bandas.map((b) => [b.clave, b])),
     [bandas],
   )
+  const atajos = useMemo(() => atajosDe(bandas), [bandas])
 
   const mediacion = useMemo(
     () => (conMediador ? calcularMediacion(resultado.baseFinal, UHOM_VIGENTE) : null),
@@ -139,7 +168,7 @@ export function ProsaSection({ resultado }: { resultado: CalculoResultado }) {
   }
 
   return (
-    <section>
+    <section data-imprimir="no">
       <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1 pb-3">
         <h2 className="font-mono text-[11px] uppercase tracking-[0.18em] text-foreground">
           Regulación redactada
@@ -152,7 +181,16 @@ export function ProsaSection({ resultado }: { resultado: CalculoResultado }) {
       <Prosa>
         Es un <strong>borrador para revisar</strong>, no una resolución. Dice
         únicamente lo que Honorio calculó: el resto del expediente —quién
-        intervino, qué hizo, la ley aplicable a cada etapa— lo agregás vos.
+        intervino, qué hizo, la ley aplicable a cada etapa— lo agregás vos. Y es
+        una <strong>regulación de primera instancia</strong>: la segunda no entra
+        acá.
+      </Prosa>
+
+      <Prosa className="mt-2">
+        El texto lo arma una función del programa, no un modelo de lenguaje:{" "}
+        <strong>el mismo cálculo produce siempre el mismo texto</strong>, palabra
+        por palabra, y hay una validación que lo comprueba. Nada de lo que
+        escribís sale del navegador.
       </Prosa>
 
       <Disclosure concepto="Por qué hay que cargar los profesionales a mano">
@@ -169,9 +207,9 @@ export function ProsaSection({ resultado }: { resultado: CalculoResultado }) {
 
       {/* ---- Los atajos ---- */}
       <div className="mt-4 flex flex-wrap gap-2">
-        {ATAJOS.filter((a) => porClave.has(a.banda)).map((a) => (
+        {atajos.map((a) => (
           <Button
-            key={a.texto}
+            key={a.texto + a.banda}
             variant="outline"
             size="sm"
             className="font-mono text-[12px]"
