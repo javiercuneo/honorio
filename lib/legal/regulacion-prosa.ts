@@ -143,7 +143,7 @@ export function bandasDe(resultado: CalculoResultado): BandaRegulable[] {
   bandas.push({
     clave: 'auxiliares',
     etiqueta: 'auxiliar de la Justicia',
-    articulo: 'art. 21, ultimo parrafo',
+    articulo: 'art. 21, último párrafo',
     rango: resultado.auxiliares,
   })
 
@@ -161,8 +161,8 @@ export function bandasDe(resultado: CalculoResultado): BandaRegulable[] {
     for (const rol of roles) {
       bandas.push({
         clave: 'posteriores-' + rol,
-        etiqueta: 'actuaciones posteriores a la ejecucion, letrado ' + rol,
-        articulo: 'art. 41, ultima oracion',
+        etiqueta: 'actuaciones posteriores a la ejecución, letrado ' + rol,
+        articulo: 'art. 41, última oración',
         rango: resultado.actuacionesPosteriores[rol],
       })
     }
@@ -215,7 +215,7 @@ export function generarProsa(opciones: OpcionesProsa): TextoRegulacion {
       continue
     }
     if (!Number.isFinite(punto.uma)) {
-      errores.push(banda.etiqueta + ': el punto no es un numero.')
+      errores.push(banda.etiqueta + ': el punto no es un número.')
       continue
     }
     if (punto.uma < banda.rango.minUMA - EPS || punto.uma > banda.rango.maxUMA + EPS) {
@@ -254,11 +254,11 @@ export function generarProsa(opciones: OpcionesProsa): TextoRegulacion {
 
   // ---- Regulacion ----
   if (puntos.length > 0) {
-    p.push(') Regulacion:')
+    p.push(') Regulación:')
     p.push(
-      'En funcion del monto del asunto referenciado, la complejidad del ' +
-        'procedimiento, el resultado obtenido, el merito de la labor profesional, ' +
-        'la calidad, eficacia y extension del trabajo realizado y lo dispuesto por ' +
+      'En función del monto del asunto referenciado, la complejidad del ' +
+        'procedimiento, el resultado obtenido, el mérito de la labor profesional, ' +
+        'la calidad, eficacia y extensión del trabajo realizado y lo dispuesto por ' +
         'el art. 16 de la ley 27.423, regulo los honorarios del siguiente modo:',
     )
     for (const punto of puntos) {
@@ -275,7 +275,7 @@ export function generarProsa(opciones: OpcionesProsa): TextoRegulacion {
           banda.articulo +
           '): ' +
           fmtUMA(punto.uma) +
-          ' UMA, equivalente al dia de la fecha a ' +
+          ' UMA, equivalente al día de la fecha a ' +
           fmtPesos(pesos) +
           '.',
       )
@@ -291,12 +291,12 @@ export function generarProsa(opciones: OpcionesProsa): TextoRegulacion {
     p.push(
       'La base expresada en UHOM es ' +
         fmtUHOM(mediacion.baseEnUHOM) +
-        ', que corresponde al item ' +
+        ', que corresponde al ítem ' +
         mediacion.item.item +
-        ' de la escala del art. 2 del Anexo III del Decreto 1467/2011, ' +
+        ' de la escala del art. 2° del Anexo III del Decreto 1467/2011, ' +
         'sustituido por el Anexo I del Decreto 2536 (ley 26.589).' +
         (mediacion.porTope
-          ? ' El honorario quedo limitado por el tope de 120,00 UHOM previsto para ese item.'
+          ? ' El honorario quedó limitado por el tope de 120,00 UHOM previsto para ese ítem.'
           : ''),
     )
     p.push(
@@ -304,7 +304,7 @@ export function generarProsa(opciones: OpcionesProsa): TextoRegulacion {
         (nombre || HUECO_PROFESIONAL) +
         ', mediador/a: ' +
         fmtUHOM(mediacion.honorarioUHOM) +
-        ' UHOM, equivalente al dia de la fecha a ' +
+        ' UHOM, equivalente al día de la fecha a ' +
         fmtPesos(mediacion.honorarioPesos) +
         ' (UHOM de ' +
         fmtPesos(mediacion.uhom.valor) +
@@ -316,13 +316,13 @@ export function generarProsa(opciones: OpcionesProsa): TextoRegulacion {
   // ---- IVA y plazo ----
   p.push(') IVA y plazo:')
   p.push(
-    'La regulacion de honorarios no contiene la alicuota que establece ese ' +
+    'La regulación de honorarios no contiene la alícuota que establece ese ' +
       'impuesto. En consecuencia el beneficiario que se encuentre inscripto ' +
-      'debera acreditar su condicion y el obligado al pago adicionarle el monto ' +
-      'correspondiente (conf. CSJN, 16/06/1993, "Cia. General de Combustibles SA").',
+      'deberá acreditar su condición y el obligado al pago adicionarle el monto ' +
+      'correspondiente (conf. CSJN, 16/06/1993, “Cía. General de Combustibles SA”).',
   )
-  p.push('Los honorarios deberan ser abonados en el plazo de 10 dias corridos (art. 54 de la ley 27.423).')
-  p.push('Notifiquese.')
+  p.push('Los honorarios deberán ser abonados en el plazo de 10 días corridos (art. 54 de la ley 27.423).')
+  p.push('Notifíquese.')
 
   return { texto: p.join('\n').trimEnd() + '\n', huecos, errores }
 }
@@ -371,7 +371,7 @@ function seccionEscala(r: CalculoResultado): string | null {
     // El rango es plano: no hay tramos, no hay correlacion y no hay
     // excedente. Escribir la escalera aca seria describir el art. 21.
     lineas.push(
-      'Aplico la escala de los incidentes, con alicuotas de ' +
+      'Aplico la escala de los incidentes, con alícuotas de ' +
         fmtPct(e.porcentajeMin) +
         ' a ' +
         fmtPct(e.porcentajeMax) +
@@ -386,17 +386,17 @@ function seccionEscala(r: CalculoResultado): string | null {
 
     if (e.escalera) {
       lineas.push(
-        'Tengo en consideracion el factor de correlacion, en cuanto a que los ' +
-          'honorarios no pueden ser inferiores al maximo del grado inmediato ' +
-          'anterior de la escala mas el excedente de la alicuota que corresponde ' +
-          'al grado siguiente (art. 21). En el caso, el maximo de la escala ' +
+        'Tengo en consideración el factor de correlación, en cuanto a que los ' +
+          'honorarios no pueden ser inferiores al máximo del grado inmediato ' +
+          'anterior de la escala más el excedente de la alícuota que corresponde ' +
+          'al grado siguiente (art. 21). En el caso, el máximo de la escala ' +
           'anterior es de ' +
           fmtUMA(e.escalera.maximoEscalaAnterior) +
-          ' UMA, y las alicuotas se aplican sobre el excedente de ' +
+          ' UMA, y las alícuotas se aplican sobre el excedente de ' +
           fmtUMA(e.escalera.excedente) +
           ' UMA por sobre las ' +
           fmtUMA(e.escalera.limiteAnterior) +
-          ' UMA del limite anterior.',
+          ' UMA del límite anterior.',
       )
     }
 
@@ -405,7 +405,7 @@ function seccionEscala(r: CalculoResultado): string | null {
       Math.abs(e.porcentajeMaxAplicado - e.porcentajeMax) > EPS
     ) {
       lineas.push(
-        'Las alicuotas efectivas sobre la base resultan de ' +
+        'Las alícuotas efectivas sobre la base resultan de ' +
           fmtPct(e.porcentajeMinAplicado) +
           ' a ' +
           fmtPct(e.porcentajeMaxAplicado) +

@@ -336,16 +336,16 @@ Expresada en UMA, con el valor vigente de $102.076,00, la base es de 489,83 UMA.
 
 ) Escala aplicable:
 Aplico la 6ª escala (451-750 UMA): 13% a 17% (art. 21).
-Tengo en consideracion el factor de correlacion, en cuanto a que los honorarios no pueden ser inferiores al maximo del grado inmediato anterior de la escala mas el excedente de la alicuota que corresponde al grado siguiente (art. 21). En el caso, el maximo de la escala anterior es de 90,00 UMA, y las alicuotas se aplican sobre el excedente de 39,83 UMA por sobre las 450,00 UMA del limite anterior.
+Tengo en consideración el factor de correlación, en cuanto a que los honorarios no pueden ser inferiores al máximo del grado inmediato anterior de la escala más el excedente de la alícuota que corresponde al grado siguiente (art. 21). En el caso, el máximo de la escala anterior es de 90,00 UMA, y las alícuotas se aplican sobre el excedente de 39,83 UMA por sobre las 450,00 UMA del límite anterior.
 
-) Regulacion:
-En funcion del monto del asunto referenciado, la complejidad del procedimiento, el resultado obtenido, el merito de la labor profesional, la calidad, eficacia y extension del trabajo realizado y lo dispuesto por el art. 16 de la ley 27.423, regulo los honorarios del siguiente modo:
-- Dra. Prueba, letrado patrocinante (art. 21): 96,77 UMA, equivalente al dia de la fecha a $9.878.026,00.
+) Regulación:
+En función del monto del asunto referenciado, la complejidad del procedimiento, el resultado obtenido, el mérito de la labor profesional, la calidad, eficacia y extensión del trabajo realizado y lo dispuesto por el art. 16 de la ley 27.423, regulo los honorarios del siguiente modo:
+- Dra. Prueba, letrado patrocinante (art. 21): 96,77 UMA, equivalente al día de la fecha a $9.878.026,00.
 
 ) IVA y plazo:
-La regulacion de honorarios no contiene la alicuota que establece ese impuesto. En consecuencia el beneficiario que se encuentre inscripto debera acreditar su condicion y el obligado al pago adicionarle el monto correspondiente (conf. CSJN, 16/06/1993, "Cia. General de Combustibles SA").
-Los honorarios deberan ser abonados en el plazo de 10 dias corridos (art. 54 de la ley 27.423).
-Notifiquese.
+La regulación de honorarios no contiene la alícuota que establece ese impuesto. En consecuencia el beneficiario que se encuentre inscripto deberá acreditar su condición y el obligado al pago adicionarle el monto correspondiente (conf. CSJN, 16/06/1993, “Cía. General de Combustibles SA”).
+Los honorarios deberán ser abonados en el plazo de 10 días corridos (art. 54 de la ley 27.423).
+Notifíquese.
 `
 
 {
@@ -366,7 +366,51 @@ Notifiquese.
 }
 
 // ================================================================
-console.log('8. El lector de numeros lee lo que el generador escribe')
+console.log('8. El texto sale con tildes')
+// ================================================================
+//
+// La convencion del repositorio es espanol rioplatense **con tildes**,
+// y en un texto que se pega en un expediente no es una convencion de
+// estilo: una resolucion sin acentos no se puede usar.
+//
+// Va como control porque es facil de perder. Los comentarios de
+// lib/legal/ se escriben sin tildes —es la convencion del codigo— y la
+// primera version del generador arrastro esa costumbre a las cadenas
+// de salida, que son otra cosa.
+
+{
+  const r = buildGeneral(estado({}))!
+  const salida = generarProsa({
+    resultado: r,
+    puntos: [{ banda: 'patrocinante', uma: medio(r, 'patrocinante'), profesional: 'Dra. Prueba' }],
+  })
+
+  const SIN_TILDE = [
+    'Regulacion',
+    'regulacion',
+    'alicuota',
+    'dia de la fecha',
+    'Notifiquese',
+    'consideracion',
+    'correlacion',
+    'funcion del monto',
+    'merito',
+    'extension',
+    'deberan',
+    'debera',
+    'condicion',
+    'maximo del grado',
+    'limite anterior',
+  ]
+  for (const palabra of SIN_TILDE) {
+    ok('no escribe «' + palabra + '» sin tilde', !salida.texto.includes(palabra))
+  }
+
+  ok('y si escribe las formas acentuadas', salida.texto.includes('Regulación') && salida.texto.includes('Notifíquese'))
+}
+
+// ================================================================
+console.log('9. El lector de numeros lee lo que el generador escribe')
 // ================================================================
 //
 // El control 1 vale lo que valga este: si `numerosDelTexto` no ve un

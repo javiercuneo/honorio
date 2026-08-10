@@ -321,6 +321,19 @@ UHOM y todo porcentaje. Un número de artículo, uno de decreto y un año nunca 
 llevan. Hay un control propio —el 8— que comprueba las dos mitades: que lea las
 cifras y que **no** lea los identificadores.
 
+### Y un control que parece trivial y no lo es: las tildes
+
+El texto sale **con tildes**, y hay una validación que lo comprueba palabra por
+palabra. No es una convención de estilo acá: **una resolución sin acentos no se
+puede pegar en un expediente.**
+
+Va como control porque es fácil de perder, y de hecho se perdió: los comentarios
+de `lib/legal/` se escriben sin tildes —es la convención del código— y la primera
+versión del generador arrastró esa costumbre **a las cadenas de salida**, que son
+otra cosa. El texto completo salía «Regulacion», «alicuota», «Notifiquese». La
+regla que queda: en este directorio los comentarios van sin tildes y **todo lo
+que el usuario lee, con**.
+
 ### Lo que el generador no escribe, y está validado
 
 Son decisiones y por eso se validan: si alguna vuelve a aparecer, tiene que ser a
