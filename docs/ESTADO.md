@@ -278,8 +278,13 @@ entero, con la lectura de los trece modelos de resolución, está en
 [`PLAN_REGULACION_EN_PROSA.md`](https://github.com/javiercuneo/herramientas-judiciales/blob/main/docs/PLAN_REGULACION_EN_PROSA.md),
 en el otro repositorio.
 
-**Hecho:** `lib/legal/regulacion-prosa.ts` y `regulacionProsa.validation.ts`, la
-número 17, en el mismo commit. **Falta la pantalla.**
+**Hecho:** `lib/legal/regulacion-prosa.ts`, `regulacionProsa.validation.ts` —la
+número 17— y `components/dashboard/ProsaSection.tsx`, que es la última sección
+del dashboard.
+
+**Va en el dashboard y no en una pantalla propia**, a diferencia del cálculo
+directo y de los mínimos: se alimenta del mismo `CalculoResultado`. Es la tercera
+forma de la misma salida —el número, el informe imprimible y el texto—.
 
 **Que la validación entre con el módulo y no después no es prolijidad.** Esta
 feature produce prosa con forma de resolución judicial, y las dieciséis
@@ -288,6 +293,38 @@ ya estaba pago —«el mismo proceso produce código que funciona y prosa
 confiadamente falsa, porque uno tiene realimentación y la otra no»— así que la
 prosa sin control era el problema que la feature creaba, no una deuda a saldar
 más tarde.
+
+### La sección pide profesionales, y esa es la razón por la que existe
+
+**Honorio no sabe cuántos profesionales intervinieron ni en qué carácter**, y la
+entrevista no lo pregunta porque el número no depende de eso: la escala del
+art. 21 da una banda por rol, y esa banda es la misma haya un letrado o cuatro.
+Un texto de regulación, en cambio, lleva una línea por profesional. La sección
+pide eso y nada más.
+
+**Los atajos escriben un rótulo, no eligen una escala.** Un perito médico, uno
+calígrafo y uno ingeniero cobran el mismo 5 %-10 % del art. 21; el atajo ahorra
+tipeo y por eso el rótulo queda editable. Si el tipo cambiara la cuenta, no
+podría ser un campo de texto.
+
+**El campo del punto arranca vacío** y la banda se ve al lado, con el importe en
+pesos apareciendo recién cuando el punto es válido. Un punto fuera de la banda
+deja el campo en rojo, vacía el texto y deshabilita el botón de copiar: los tres
+a la vez, porque el texto no se redacta con un número que perfora la escala.
+
+**Verificado en el navegador**, con `buildGeneral` sobre base $50.000.000: un
+patrocinante en 96,77 UMA y un perito en 40,00 UMA salen redactados con
+$9.877.894,52 y $4.083.040,00; con 500 UMA el texto desaparece y el aviso dice
+«cae fuera de la banda de 95,18 a 96,77 UMA»; sin nombre queda `[PROFESIONAL]` en
+el texto y «Falta: el nombre del letrado patrocinante» abajo, con el botón
+apagado. El mediador da 3.858,02 UHOM, ítem G, 77,16 UHOM y $1.000.000, que es el
+2 % de la base. Sin errores de consola.
+
+> **Para llegar al dashboard hay que recorrer la entrevista, y con el panel del
+> navegador cerrado el paso del wizard no llega a montarse** —la trampa de
+> `AnimatePresence mode="wait"` que está más abajo—. La salida fue una página
+> `app/verificar/` temporal que arma el resultado con `buildGeneral` y monta la
+> sección sola. **Se borró después de verificar**, que es lo que la hace útil.
 
 ### Los tres controles
 

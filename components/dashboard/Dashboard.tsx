@@ -11,6 +11,7 @@ import { ActuacionesPosterioresSection } from "./ActuacionesPosterioresSection"
 import { CadenaCalculo } from "./CadenaCalculo"
 import { AuxiliaresSection } from "./AuxiliaresSection"
 import { MediacionSection } from "./MediacionSection"
+import { ProsaSection } from "./ProsaSection"
 import { PartidorSection } from "./PartidorSection"
 import { ExhortoResult } from "./ExhortoResult"
 import { IncidenteResult } from "./IncidenteResult"
@@ -202,6 +203,13 @@ function DashboardGeneral({
           esProvisorio={resultado.esProvisorio}
         />
       ) : null}
+
+      {/*
+        La prosa va ultima porque es la salida y no un paso del calculo:
+        se arma con los numeros que estan arriba. Es la tercera forma de
+        la misma salida —el numero, el informe imprimible y el texto—.
+      */}
+      <ProsaSection resultado={resultado} />
     </div>
   )
 }
