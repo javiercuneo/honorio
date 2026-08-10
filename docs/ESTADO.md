@@ -3,7 +3,7 @@
 Documento de continuidad entre sesiones. **Leer antes de empezar a trabajar.**
 Se actualiza en el mismo commit que el trabajo, para que nunca mienta.
 
-Última actualización: 2026-08-08
+Última actualización: 2026-08-10
 
 > Honorio salió de
 > [herramientas-judiciales](https://github.com/javiercuneo/herramientas-judiciales),
@@ -18,7 +18,7 @@ Se actualiza en el mismo commit que el trabajo, para que nunca mienta.
 
 Versión **3.0.0**. El rediseño visual está cerrado y el bug del flujo hacia
 atrás de la entrevista —que arrastraba respuestas de un proceso a otro— quedó
-resuelto. Las 16 validaciones de `lib/legal/__tests__` están en verde y corren
+resuelto. Las 17 validaciones de `lib/legal/__tests__` están en verde y corren
 solas en CI.
 
 Pantallas terminadas sobre el mismo sistema visual: **dashboard**, **wizard**,
@@ -30,6 +30,10 @@ Pantallas terminadas sobre el mismo sistema visual: **dashboard**, **wizard**,
 **Mediación está terminada (8/8).** El honorario del mediador con su escala en
 UHOM, el UHOM versionado, la validación 16 y la sección del dashboard. Ver
 [Mediación](#mediacion--empezado-el-88).
+
+**La regulación en prosa arrancó el 10/8: está el motor, no la pantalla.**
+`lib/legal/regulacion-prosa.ts` y la validación 17. Ver
+[La regulación en prosa](#la-regulacion-en-prosa--empezada-el-108).
 
 El 5/8 se cerraron los tres pendientes inmediatos —**autoría**, **informe
 imprimible** y **vuelta al repositorio**— y se sacó la UMA del navegador del
@@ -264,6 +268,82 @@ El de agosto está cargado a mano con la que trae la tabla oficial.
 > llegaba en `null`. Ahora la procedencia **solo se completa, nunca se borra**:
 > que la planilla no diga nada no es que diga que no hay norma. El mismo arreglo
 > protege a la UMA el día que se vacíe la celda `Acordada`.
+
+---
+
+## La regulación en prosa — empezada el 10/8
+
+Que la app devuelva el texto de la regulación para copiar y pegar. El plan
+entero, con la lectura de los trece modelos de resolución, está en
+[`PLAN_REGULACION_EN_PROSA.md`](https://github.com/javiercuneo/herramientas-judiciales/blob/main/docs/PLAN_REGULACION_EN_PROSA.md),
+en el otro repositorio.
+
+**Hecho:** `lib/legal/regulacion-prosa.ts` y `regulacionProsa.validation.ts`, la
+número 17, en el mismo commit. **Falta la pantalla.**
+
+**Que la validación entre con el módulo y no después no es prolijidad.** Esta
+feature produce prosa con forma de resolución judicial, y las dieciséis
+validaciones anteriores comparan números: **ninguna mira prosa.** El diagnóstico
+ya estaba pago —«el mismo proceso produce código que funciona y prosa
+confiadamente falsa, porque uno tiene realimentación y la otra no»— así que la
+prosa sin control era el problema que la feature creaba, no una deuda a saldar
+más tarde.
+
+### Los tres controles
+
+1. **Ningún número inventado.** `verificarNumeros()` extrae los importes del
+   texto y comprueba que cada uno esté en el `CalculoResultado` que lo originó.
+   Barre seis casos que recorren las tres etapas de transformación, más la
+   sucesión —que trae partidor— y la ejecución de sentencia —que trae actuaciones
+   posteriores—, **regulando todas las bandas que cada resultado ofrece**. Una
+   banda nueva del motor entra sola a este control.
+2. **El texto congelado.** Para un resultado fijo, el texto tiene que ser
+   idéntico carácter por carácter. Si falla no significa que algo esté mal:
+   significa que la redacción cambió, y hay que leer el diff antes de actualizar
+   la constante.
+3. **La banda se respeta.** Un punto fuera de la banda **no se redacta**:
+   devuelve error y texto vacío. Los bordes exactos sí son válidos.
+
+**El control 1 muerde, y está probado que muerde:** un importe agregado a mano
+se caza, y también un cero de más en un importe que sí existe.
+
+### El error que encontró el propio control, y por qué vale escribirlo
+
+La primera versión de `numerosDelTexto()` leía **todos** los enteros y salteaba
+los menores a 2100, con la idea de que «eso es un artículo o un año». Falló en la
+primera corrida con el mediador adentro: **`Decreto 2536` se leyó como si fuera
+un importe inventado.**
+
+Subir el umbral habría movido el problema en vez de resolverlo. La regla que
+quedó es de formato y no de magnitud: **el lector solo lee números con dos
+decimales**, que es como el generador escribe todo importe, toda cifra en UMA o
+UHOM y todo porcentaje. Un número de artículo, uno de decreto y un año nunca los
+llevan. Hay un control propio —el 8— que comprueba las dos mitades: que lea las
+cifras y que **no** lea los identificadores.
+
+### Lo que el generador no escribe, y está validado
+
+Son decisiones y por eso se validan: si alguna vuelve a aparecer, tiene que ser a
+propósito y con el control en rojo. El motivo de cada una está en el plan.
+
+- **La narración del expediente** —quién intervino, qué hizo, a qué fojas—.
+  **Y no va como hueco:** un hueco afirmaría que ese párrafo es parte de lo que
+  Honorio produce. La prosa dice únicamente lo que el motor atrapa.
+- **La ley aplicable por etapa.** Tres modelos aplican también la Ley 21.839; el
+  motor calcula solo por la 27.423.
+- **Notificación, elevación y apertura de cuenta en el BNA.** Son texto fijo, y
+  por eso eran lo más barato de generar, pero son prácticas de un juzgado.
+
+### Dos decisiones del módulo que conviene no deshacer
+
+- **El punto dentro de la banda entra por parámetro y no tiene valor por
+  defecto.** El motor devuelve rangos a propósito porque elegir adentro es el
+  acto jurisdiccional. Un default en el medio de la banda sería una decisión
+  jurisdiccional disfrazada de conveniencia.
+- **`bandasDe()` deriva las bandas del resultado, no de una lista escrita a
+  mano.** Si el resultado no trae `partidor`, no hay banda de partidor y no hay
+  párrafo. Es la contracara de «un bloque por sección del dashboard»: agregar una
+  regla al motor no se puede olvidar en la prosa.
 
 ---
 
@@ -1085,7 +1165,7 @@ Lo único que sigue abierto de esa tanda es la **fecha de vigencia de la UMA**
 ## Cómo verificar un cambio
 
 ```bash
-npm run check    # tipos + las 15 validaciones. Es lo que corre CI.
+npm run check    # tipos + las 17 validaciones. Es lo que corre CI.
 npm run build    # el export estatico, que es lo que se publica
 npm run uma      # trae el valor de la UMA de la planilla, si cambio
 ```
