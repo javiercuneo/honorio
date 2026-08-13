@@ -37,7 +37,11 @@ const ACENTO = '#7a99ff'
 const wordmark = readFileSync(join(raiz, 'public', 'honorio-wordmark.svg'), 'utf8')
   .replace(/currentColor/g, TEXTO)
 
-const ANCHO_MARCA = 560
+// La frase es la misma que el TITULO de app/layout.tsx. Si cambia
+// alla, cambia aca y se vuelve a correr el script.
+const FRASE = 'Si querés entender la regulación, andá por una avenida'
+
+const ANCHO_MARCA = 520
 
 const marca = await sharp(Buffer.from(wordmark))
   .resize({ width: ANCHO_MARCA })
@@ -46,19 +50,28 @@ const marca = await sharp(Buffer.from(wordmark))
 
 const { height: altoMarca } = await sharp(marca).metadata()
 
+// Todo centrado sobre el eje del lienzo. La composicion anterior estaba
+// alineada a la izquierda y dejaba media tarjeta vacia a la derecha:
+// en la miniatura de una conversacion eso se lee como un error de
+// carga, no como aire.
+const CENTRO = Math.round(ANCHO / 2)
+
+// El bloque —marca, frase y dominio— se centra vertical como una sola
+// pieza, en vez de acomodar cada linea a ojo.
+const ALTO_BLOQUE = altoMarca + 58 + 62
+const ARRIBA = Math.round((ALTO - ALTO_BLOQUE) / 2)
+
 // El texto va en su propia capa y no en el SVG del wordmark: asi el
 // tipografiado no depende de como resuelva las fuentes el rasterizador
 // del wordmark, que viene de un trazado y no tiene ninguna.
 const texto = `<svg xmlns="http://www.w3.org/2000/svg" width="${ANCHO}" height="${ALTO}">
   <style>
-    .titulo { font-family: "Segoe UI", Arial, Helvetica, sans-serif; font-size: 38px; fill: ${TEXTO}; }
-    .bajada { font-family: "Segoe UI", Arial, Helvetica, sans-serif; font-size: 30px; fill: ${TENUE}; }
-    .dominio { font-family: "Consolas", "Courier New", monospace; font-size: 24px; fill: ${ACENTO}; letter-spacing: 3px; }
+    .frase { font-family: "Segoe UI", Arial, Helvetica, sans-serif; font-size: 37px; fill: ${TEXTO}; }
+    .dominio { font-family: "Consolas", "Courier New", monospace; font-size: 21px; fill: ${ACENTO}; letter-spacing: 4px; }
   </style>
   <rect x="0" y="0" width="${ANCHO}" height="6" fill="${ACENTO}"/>
-  <text class="titulo" x="90" y="392">Honorarios de la Ley 27.423</text>
-  <text class="bajada" x="90" y="444">con cada paso del cálculo a la vista</text>
-  <text class="dominio" x="90" y="548">HONORIO.AR</text>
+  <text class="frase" x="${CENTRO}" y="${ARRIBA + altoMarca + 58}" text-anchor="middle">${FRASE}</text>
+  <text class="dominio" x="${CENTRO}" y="${ARRIBA + altoMarca + 120}" text-anchor="middle">HONORIO.AR · LEY 27.423</text>
 </svg>`
 
 await sharp({
@@ -70,7 +83,7 @@ await sharp({
   },
 })
   .composite([
-    { input: marca, left: 90, top: Math.round(300 - altoMarca) },
+    { input: marca, left: CENTRO - Math.round(ANCHO_MARCA / 2), top: ARRIBA },
     { input: Buffer.from(texto), left: 0, top: 0 },
   ])
   .png()

@@ -38,15 +38,27 @@ const sourceSerif = Source_Serif_4({
 // navegador, y tiene que ser absoluta. El sitio canonico es honorio.ar
 // aunque el mismo build se sirva ademas desde el repositorio viejo.
 //
-// La imagen se genera con `node scripts/og.mjs` y esta commiteada.
+// La imagen se genera con `node scripts/og.mjs` y esta commiteada. La
+// frase que lleva adentro es esta misma: si cambia el TITULO, hay que
+// volver a correr el script.
+//
+// Titulo y descripcion salen de una constante y no estan escritos en
+// cada bloque. Antes estaban tres veces —pestana, Open Graph y
+// Twitter— y se desincronizaron al primer cambio: la pestana decia una
+// cosa y la tarjeta de WhatsApp seguia diciendo la vieja.
+const TITULO = 'Honorio: si querés entender la regulación, andá por una avenida'
+
+const DESCRIPCION =
+  'Asistente para la regulación de honorarios. Gratis, sin registro y sin ' +
+  'enviar datos a ningún lado.'
+
 export const metadata: Metadata = {
   metadataBase: new URL(HONORIO),
   title: {
-    default: 'Honorio: si querés entender la regulación, andá por una avenida',
+    default: TITULO,
     template: '%s · Honorio',
   },
-  description:
-    'Asistente para la regulación de honorarios. Gratis, sin registro y sin enviar datos a ningún lado.',
+  description: DESCRIPCION,
   applicationName: 'Honorio',
   authors: [{ name: 'L. Javier Cúneo Libarona' }],
   alternates: {
@@ -57,25 +69,21 @@ export const metadata: Metadata = {
     locale: 'es_AR',
     url: '/',
     siteName: 'Honorio',
-    title: 'Honorio — Honorarios de la Ley 27.423',
-    description:
-      'Calcula honorarios de la Ley 27.423 y muestra cómo llegó al número. ' +
-      'Es gratis, abierto y no pide datos.',
+    title: TITULO,
+    description: DESCRIPCION,
     images: [
       {
         url: '/og.png',
         width: 1200,
         height: 630,
-        alt: 'Honorio — asistente para la regulación de honorarios',
+        alt: TITULO,
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Honorio — Honorarios de la Ley 27.423',
-    description:
-      'Calcula honorarios de la Ley 27.423 y muestra cómo llegó al número. ' +
-      'Es gratis, abierto y no pide datos.',
+    title: TITULO,
+    description: DESCRIPCION,
     images: ['/og.png'],
   },
   icons: {
