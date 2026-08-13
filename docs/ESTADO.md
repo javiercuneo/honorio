@@ -3,7 +3,7 @@
 Documento de continuidad entre sesiones. **Leer antes de empezar a trabajar.**
 Se actualiza en el mismo commit que el trabajo, para que nunca mienta.
 
-Última actualización: 2026-08-10
+Última actualización: 2026-08-12
 
 > Honorio salió de
 > [herramientas-judiciales](https://github.com/javiercuneo/herramientas-judiciales),
@@ -16,10 +16,15 @@ Se actualiza en el mismo commit que el trabajo, para que nunca mienta.
 
 ## Dónde estamos
 
-Versión **3.0.0**. El rediseño visual está cerrado y el bug del flujo hacia
+Versión **3.1.0**. El rediseño visual está cerrado y el bug del flujo hacia
 atrás de la entrevista —que arrastraba respuestas de un proceso a otro— quedó
 resuelto. Las 17 validaciones de `lib/legal/__tests__` están en verde y corren
 solas en CI.
+
+**El 12/8 arrancó el trabajo de adopción y la app dejó de ser solo una
+pantalla:** un cálculo se puede compartir por enlace, citar y reportar como
+mal. Ver [Compartir un cálculo](#compartir-un-calculo--el-128). El plan de
+adopción está fuera del repositorio, en `C:\IA\notas\adopcion.md`.
 
 Pantallas terminadas sobre el mismo sistema visual: **dashboard**, **wizard**,
 **portada**, **intro** y **mínimos**. Falta pulido de mensajes.
@@ -431,6 +436,146 @@ propósito y con el control en rojo. El motivo de cada una está en el plan.
   mano.** Si el resultado no trae `partidor`, no hay banda de partidor y no hay
   párrafo. Es la contracara de «un bloque por sección del dashboard»: agregar una
   regla al motor no se puede olvidar en la prosa.
+
+---
+
+## Compartir un cálculo — el 12/8
+
+Primer trabajo que no sale de la herramienta sino del plan de adopción: el
+objetivo de la sesión no era el motor, era que Honorio pueda llegarle a
+alguien. El plan entero quedó **fuera del repositorio**, en
+`C:\IA\notas\adopcion.md`, porque nombra personas y describe cómo llegar a
+cada una; acá va solo lo que se programó.
+
+**El caso viaja en el fragmento de la URL** (`lib/compartir.ts`). «Copiar
+enlace» en la barra del dashboard devuelve una dirección que lo lleva entero
+adentro y abre esa misma pantalla.
+
+### Por qué en el fragmento y no en la query
+
+Es la única decisión de diseño del módulo que no se puede deshacer sin romper
+una promesa. El fragmento (`#`) **no se envía al servidor**: ningún request
+lleva el caso, ni al host que sirve el sitio ni a nadie en el camino. Por eso
+compartir un cálculo no contradice el «nada de lo que escribís sale del
+navegador» que la app declara en la portada. En la query (`?`), la misma
+función la rompería —el caso quedaría en los logs de quien sirva el sitio— y
+nadie lo notaría al leer el código.
+
+El formato lleva versión (`c1`). Si cambia la forma de codificar, el número
+sube y los enlaces viejos dejan de abrir en vez de decodificarse mal: un enlace
+que abre torcido es peor que uno que no abre.
+
+### La UMA de un caso restaurado es la del enlace
+
+`useWizard` lleva un `restauradoRef` que apaga el efecto que sincroniza la UMA
+cuando termina de cargar el motor. Sin eso, el motor pisaría la UMA del enlace
+con la vigente y **el mismo enlace daría un número distinto el día que cambie
+la UMA** —exactamente lo que compartir un cálculo tiene que impedir—. Al
+reiniciar vuelve la vigente: el valor del enlace muere con el enlace.
+
+### Las respuestas de afuera entran por la misma puerta que las tipeadas
+
+`decodificarCaso` descarta los ids que el schema no pregunta y los valores que
+no son respuestas posibles; después `restore()` corre `podarInalcanzables`
+igual que `setAnswer`. Un enlace con respuestas incoherentes queda en un caso
+coherente, no en un número calculado sobre una combinación que la entrevista
+nunca habría producido.
+
+### La trampa que costó el rato: `hashchange`
+
+Al probarlo en el navegador, el caso no aparecía. No era el código: **cambiar
+solo el fragmento no recarga la página.** Es navegación dentro del mismo
+documento, así que el efecto de montaje no vuelve a correr. Le pasa a
+cualquiera que pegue un enlace compartido teniendo Honorio ya abierto, que es
+un caso muy real —se comparte por WhatsApp entre gente que ya lo tenía en una
+pestaña—. Se escucha `hashchange` además del montaje.
+
+De ahí salió también la guarda nueva: al dashboard se llegaba siempre por la
+entrevista, que ya había esperado al motor legacy. Un caso restaurado entra
+directo, así que la espera hay que hacerla también ahí; sin ella el dashboard
+decía «no se pudo generar el cálculo», que era mentira —solo faltaba esperar—.
+
+### Cómo se verificó
+
+El ida y vuelta del codificador se comprobó con trece casos contra los módulos
+reales: caso completo, fragmento con `#` y sin, base64 roto, JSON que no es
+objeto, fragmento cortado a la mitad, ids inventados, valores que no son
+respuestas, y la poda de un caso incoherente. **No quedó como validación
+permanente y es una deuda anotada a propósito:** `scripts/validate.mjs` corre
+`lib/legal/__tests__/*.validation.ts` y meter ahí algo que no es el motor
+diluiría lo que significa «las 17 validaciones del motor». Si el módulo crece,
+merece su propio corredor.
+
+En el navegador se restauró un enlace y el resultado coincidió con los valores
+de referencia que ya estaban escritos acá para esa base ($21.368.714,99 →
+209,34 UMA, 5ª escala, patrocinante 41,90–44,87). Sin errores de consola.
+
+### La pasada de celular — el 13/8
+
+El desborde del ledger quedó resuelto, y era más grande de lo que se veía.
+
+**Las filas no envolvían.** `LedgerRow` y `Disclosure` eran `flex` sin
+`flex-wrap`, con el valor y la etiqueta «por qué» en `shrink-0`. El valor no se
+puede achicar —lleva `whitespace-nowrap` porque partir una cifra al medio es
+peor que cualquier alternativa— y en un teléfono solo el valor mide más de la
+mitad del ancho. Resultado: la fila empujaba a **toda la página** a un scroll
+horizontal.
+
+La solución que conviene no deshacer: `flex-wrap` más `justify-end`, y
+`min-w-0` en el concepto. **`justify-end` no hace nada en la primera línea**
+—el punteado tiene `flex-1` y se come el espacio libre— y alinea a la derecha
+la segunda, que es donde cae el valor cuando no entra. Por eso en pantalla
+grande no cambió un pixel.
+
+**El selector de rol se asomaba fuera de la pantalla en 320 px.** Es el único
+control del dashboard que mueve el número, así que no podía quedar medio
+afuera justo en el teléfono más chico. Envuelve.
+
+**La regulación redactada llega plegada.** Primitiva nueva,
+`PlegadoEnCelular`: el título de la sección queda siempre a la vista y se
+pliega el contenido. El criterio es de Javier y vale para lo que venga —nadie
+va a redactar una regulación desde el teléfono, pero tiene que enterarse de que
+la app la redacta—. **Se pliega el contenido, no la existencia.**
+
+Lo que gobierna la primitiva: el estado inicial es cerrado y `md:block` lo pisa
+en pantalla grande. Nada de `matchMedia` en un efecto, que abriría y cerraría
+el bloque a la vista del lector y además discreparía con el prerender al
+hidratar.
+
+Medido con el mismo caso restaurado: **de 8,3 pantallas de scroll a 5,7**, cero
+desborde en 375 px y en 320 px, y en escritorio el pliegue no existe aunque el
+estado interno esté cerrado.
+
+Lo que se arregló el 12/8 en la misma línea: la barra del dashboard medía
+683 px de controles en 375 de pantalla.
+
+**Lo que no se tocó, y es una decisión:** el tamaño de letra. Javier marcó que
+«queda chico» en el teléfono, y es cierto, pero la escala tipográfica es del
+sistema visual entero y cambiarla es una decisión suya, no un arreglo de
+responsive.
+
+### Las otras dos cosas de la misma tanda
+
+- **La tarjeta del enlace** (Open Graph, en `app/layout.tsx`). Antes honorio.ar
+  pegado en un WhatsApp era una URL pelada. La imagen se genera con
+  `node scripts/og.mjs` y está commiteada: no corre en el build, para que
+  publicar no dependa de que sharp pueda rasterizar en la máquina que publica.
+- **«Cómo citar este cálculo»** y **«Este cálculo no cierra»**, al pie, junto a
+  la firma. La cita es lo único de ese bloque que se imprime, porque en el
+  papel el enlace es lo único que queda para volver. El reporte abre un correo
+  con el caso ya adentro: reportar un error dejó de exigir que quien lo
+  encontró sepa explicarlo.
+
+### Lo que falta de la Fase 0 y no es código
+
+- **La medición.** Decidido el 12/8 y prendido el 13/8: el dominio ya estaba en
+  Cloudflare desde que se registró, así que fue pasar los registros a
+  *Proxied*. SSL/TLS quedó en *Automatic*, que resuelve en Full (strict) porque
+  GitHub Pages habla HTTPS; lo que **no** hay que poner nunca es *Flexible*, que
+  con Pages da bucle de redirección. Falta el renglón honesto en el sitio.
+- **El video de 90 segundos: descartado.** El permalink hace el mismo trabajo
+  mejor y ya está hecho. Un enlace que abre un cálculo terminado demuestra en
+  tres segundos más que noventa de pantalla grabada.
 
 ---
 

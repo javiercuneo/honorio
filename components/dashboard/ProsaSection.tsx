@@ -57,7 +57,7 @@ import { calcularMediacion } from "@/lib/legal/mediacion"
 import { UHOM_VIGENTE } from "@/lib/legal/uhom"
 import type { CalculoResultado } from "@/lib/legal/types"
 import { pesos, umaNum } from "./format"
-import { Disclosure, Etiqueta, Prosa } from "./primitives"
+import { Disclosure, Etiqueta, PlegadoEnCelular, Prosa } from "./primitives"
 
 /** Una fila de la lista: un profesional con su banda y su punto. */
 interface Fila {
@@ -178,6 +178,11 @@ export function ProsaSection({ resultado }: { resultado: CalculoResultado }) {
         </span>
       </div>
 
+      {/* Es la seccion mas larga del informe —una pantalla y media en un
+          telefono— y la que menos sentido tiene ahi: nadie carga cuatro
+          profesionales y copia una regulacion con el pulgar. Pero tiene
+          que saber que existe, para buscarla despues en la computadora. */}
+      <PlegadoEnCelular etiqueta="Ver el texto redactado">
       <Prosa>
         Es un <strong>borrador para revisar</strong>, no una resolución. Dice
         únicamente lo que Honorio calculó: el resto del expediente —quién
@@ -392,6 +397,7 @@ export function ProsaSection({ resultado }: { resultado: CalculoResultado }) {
           ) : null}
         </div>
       </div>
+      </PlegadoEnCelular>
     </section>
   )
 }

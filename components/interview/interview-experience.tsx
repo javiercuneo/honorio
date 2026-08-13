@@ -16,6 +16,7 @@ import { AnimatePresence, motion } from 'motion/react'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ALL_STEPS, ayudaDe, explicacionDe, type WizardStepDef } from '@/lib/wizard/wizard-schema'
+import { decodificarCaso } from '@/lib/compartir'
 import { useWizard } from '@/hooks/useWizard'
 import { useLegacyReady } from '@/components/LegacyLoader'
 import { UMA_VIGENTE } from '@/lib/legal/uma'
@@ -62,8 +63,46 @@ export function InterviewExperience() {
   }
 
   const handleRestart = () => {
+    // El fragmento describe el caso que se esta yendo. Si sobreviviera,
+    // el proximo recargado volveria a abrir el caso viejo.
+    if (window.location.hash) {
+      window.history.replaceState(null, '', window.location.pathname + window.location.search)
+    }
     go(-1, () => wizard.restart())
   }
+
+  // ---- El caso que vino en la URL ----
+  // Se lee despues del montaje y no durante el render: el sitio es un
+  // export estatico y el HTML se prerenderiza sin `window`. Leerlo
+  // antes discreparia con el servidor al hidratar.
+  //
+  // El precio es que quien entra por un enlace compartido ve la portada
+  // un instante antes del calculo. Se paga: la alternativa es demorar
+  // el primer pintado para todos los demas.
+  //
+  // Y se escucha `hashchange`, que no es un detalle: pegar un enlace
+  // compartido en la barra de direcciones **teniendo Honorio abierto**
+  // no recarga nada —cambia solo el fragmento, que es navegacion dentro
+  // del mismo documento—. Sin esto, el caso no aparece y la pantalla se
+  // queda como estaba, que es la peor de las respuestas posibles: la
+  // que parece que el enlace no sirve.
+  const restoreRef = useRef(wizard.restore)
+  restoreRef.current = wizard.restore
+
+  useEffect(() => {
+    const abrirCaso = () => {
+      const caso = decodificarCaso(window.location.hash)
+      if (!caso) return
+      setShowLanding(false)
+      setShowMinimos(false)
+      setShowDirecto(false)
+      restoreRef.current(caso)
+    }
+
+    abrirCaso()
+    window.addEventListener('hashchange', abrirCaso)
+    return () => window.removeEventListener('hashchange', abrirCaso)
+  }, [])
 
   const hasAnswer = wizard.currentStep
     ? isStepAnswered(wizard.currentStep, wizard.answers)
@@ -229,6 +268,37 @@ export function InterviewExperience() {
   }
 
   // ---- Dashboard ----
+  // Antes se llegaba aca siempre por la entrevista, que ya habia
+  // esperado al motor. Un caso restaurado desde la URL entra directo,
+  // asi que la espera hay que hacerla tambien aca: sin el motor,
+  // DashboardView no calcula y muestra "no se pudo generar el calculo",
+  // que seria mentira —solo falta esperar—.
+  if (wizard.phase === 'dashboard' && !ready) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
+        <div className="max-w-md text-center">
+          {legacyError ? (
+            <>
+              <p className="font-mono text-[13px] text-destructive">
+                Error al cargar el motor jurídico: {legacyError}
+              </p>
+              <p className="mt-2 text-[12px] text-muted-foreground">
+                Verifique que los archivos en /public/legacy/ existen.
+              </p>
+            </>
+          ) : (
+            <>
+              <div className="mb-4 mx-auto h-8 w-8 animate-spin rounded-full border-2 border-foreground border-t-transparent" />
+              <p className="font-mono text-[13px] text-muted-foreground">
+                Cargando motor jurídico...
+              </p>
+            </>
+          )}
+        </div>
+      </div>
+    )
+  }
+
   // La cabecera la pone DashboardView (AppTopbar): una sola para toda
   // la pantalla, con la marca, el caso y los controles.
   if (wizard.phase === 'dashboard') {

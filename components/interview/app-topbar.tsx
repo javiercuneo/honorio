@@ -166,7 +166,12 @@ export function AppTopbar({
           ) : null}
         </div>
 
-        <div className="flex shrink-0 items-center gap-1.5">
+        {/* Los controles envuelven en vez de empujar. Con `shrink-0` y
+            sin `flex-wrap`, en un telefono la fila de acciones medía
+            mas que la pantalla y arrastraba a toda la pagina a un
+            scroll horizontal: el pulgar se llevaba el informe de lado
+            al querer bajar. */}
+        <div className="flex flex-wrap items-center justify-end gap-1.5">
           {children}
           <span className="mx-1 h-5 w-px bg-hair" aria-hidden="true" />
           {/* honorio.ar es la puerta de entrada de mucha gente que

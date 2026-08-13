@@ -1,6 +1,7 @@
 ﻿import type { Metadata, Viewport } from 'next'
 import { Archivo, Geist, Geist_Mono, Source_Serif_4 } from 'next/font/google'
 import { withBasePath } from '@/lib/basePath'
+import { HONORIO } from '@/lib/enlaces'
 import './globals.css'
 
 const geistSans = Geist({
@@ -27,10 +28,58 @@ const sourceSerif = Source_Serif_4({
   variable: '--font-source-serif',
 })
 
+// La tarjeta que se ve cuando alguien pega el enlace en WhatsApp, en
+// LinkedIn o en un mail. Sin esto el enlace viaja pelado —una URL sin
+// titulo ni imagen— y hay que explicar de que se trata en el mensaje,
+// que es exactamente lo que un enlace tendria que evitar.
+//
+// `metadataBase` es el dominio y no el basePath a proposito: la imagen
+// de la tarjeta la va a buscar el servidor de WhatsApp, no el
+// navegador, y tiene que ser absoluta. El sitio canonico es honorio.ar
+// aunque el mismo build se sirva ademas desde el repositorio viejo.
+//
+// La imagen se genera con `node scripts/og.mjs` y esta commiteada.
 export const metadata: Metadata = {
-  title: 'Honorio',
+  metadataBase: new URL(HONORIO),
+  title: {
+    default: 'Honorio — Honorarios de la Ley 27.423',
+    template: '%s · Honorio',
+  },
   description:
-    'Asistente para la regulación de honorarios',
+    'Calculá honorarios de la Ley 27.423 con cada paso a la vista: la base, ' +
+    'las reducciones aplicadas, la escala del art. 21, el ajuste por rol y la ' +
+    'segunda instancia. Gratis, sin registro y sin enviar datos a ningún lado.',
+  applicationName: 'Honorio',
+  authors: [{ name: 'L. Javier Cúneo Libarona' }],
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'es_AR',
+    url: '/',
+    siteName: 'Honorio',
+    title: 'Honorio — Honorarios de la Ley 27.423',
+    description:
+      'Calcula honorarios de la Ley 27.423 y muestra cómo llegó al número. ' +
+      'Es gratis, abierto y no pide datos.',
+    images: [
+      {
+        url: '/og.png',
+        width: 1200,
+        height: 630,
+        alt: 'Honorio — asistente para la regulación de honorarios',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Honorio — Honorarios de la Ley 27.423',
+    description:
+      'Calcula honorarios de la Ley 27.423 y muestra cómo llegó al número. ' +
+      'Es gratis, abierto y no pide datos.',
+    images: ['/og.png'],
+  },
   icons: {
     icon: withBasePath('/honorio.png'),
     apple: withBasePath('/honorio.png'),

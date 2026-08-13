@@ -27,6 +27,78 @@ posible —cambió la UMA— que no se podía comprobar.
 
 ---
 
+## 3.1.0 — 12 de agosto de 2026
+
+MENOR: **un cálculo se puede compartir, citar y discutir.** Ningún número se
+movió: el motor no se tocó y las 17 validaciones siguen en verde. Lo que entra
+es la manera de que un número salga de la pantalla sin perder de dónde vino.
+
+- **El caso viaja en el enlace.** «Copiar enlace» en la barra del dashboard
+  devuelve una dirección que lleva el caso entero adentro y abre exactamente
+  esa pantalla. Quien lo recibe ve el mismo número con las mismas respuestas.
+
+  Va en el **fragmento** de la dirección (`#`) y no en la query (`?`), y eso no
+  es una preferencia de estilo: el fragmento no se envía al servidor. Ningún
+  request lleva el caso, ni al host que sirve el sitio ni a nadie en el camino,
+  así que compartir un cálculo no contradice la promesa de que nada de lo que
+  se escribe sale del navegador. En la query, la misma función la rompería.
+
+  El formato lleva versión (`c1`). Si alguna vez cambia, el número sube y los
+  enlaces viejos dejan de decodificarse en vez de decodificarse mal: un enlace
+  que abre torcido es peor que uno que no abre.
+
+- **Un caso restaurado se queda con su UMA.** La del enlace, no la de hoy. Es
+  la que produjo el número que alguien compartió o citó; si el motor la pisara
+  al terminar de cargar, el mismo enlace daría distinto el día que cambie la
+  UMA, que es justamente lo que compartir un cálculo tiene que impedir. Al
+  empezar de nuevo vuelve la vigente.
+
+- **Las respuestas que entran por la URL pasan por la misma puerta que las
+  tipeadas.** Se descartan los ids que el schema no pregunta y los valores que
+  no son respuestas posibles, y después se poda igual que siempre. Un enlace
+  con respuestas incoherentes queda en un caso coherente, no en un número
+  calculado sobre una combinación que la entrevista nunca habría producido.
+
+- **Cómo citar este cálculo**, al pie, junto a la firma: versión, fecha, UMA y
+  el enlace, en una línea para copiar. Es lo único de ese bloque que también se
+  imprime, porque en el papel el enlace es lo único que queda para volver.
+
+- **«Este cálculo no cierra»**, al lado de la cita: abre un correo con el caso
+  ya adentro. Reportar un error dejó de exigir que quien lo encontró sepa
+  explicarlo.
+
+- **La tarjeta del enlace.** Título, descripción e imagen para cuando alguien
+  pega honorio.ar en WhatsApp, LinkedIn o un correo. La imagen se genera con
+  `node scripts/og.mjs` y está commiteada; no corre en el build.
+
+- **La barra ya no empuja la página de costado en un teléfono.** Los controles
+  del dashboard envuelven en vez de desbordar. Antes medían más que la pantalla
+  y arrastraban a todo el informe a un scroll horizontal.
+
+- **El informe entra en un teléfono.** Eran tres cosas distintas y una sola
+  causa:
+
+  Las filas del ledger no envolvían. Un rango como «$4.277.105,25 a
+  $4.579.971,00» no se puede achicar —parte una cifra al medio— y solo el valor
+  ya mide más de la mitad de un teléfono, así que la fila empujaba a toda la
+  página. Ahora el valor cae a la línea de abajo, alineado a la derecha. En
+  pantalla grande no cambia nada: el punteado se come el espacio libre y la
+  fila entra igual que siempre.
+
+  El selector de rol —patrocinante, apoderado, procurador— se asomaba fuera de
+  la pantalla en 320 px. Es el único control del dashboard que mueve el número;
+  ahora envuelve.
+
+  Y la **regulación redactada llega plegada en el teléfono**, con el título a
+  la vista. Es la sección más larga del informe y la que menos sentido tiene
+  ahí —nadie carga cuatro profesionales y copia una regulación con el pulgar—,
+  pero tiene que saber que existe para buscarla después en la computadora. Se
+  pliega el contenido, no la existencia. En pantalla grande el pliegue no
+  existe.
+
+  Medido: de **8,3 pantallas de scroll a 5,7**, y cero desborde horizontal en
+  375 px y en 320 px.
+
 ## 3.0.0 — 7 de agosto de 2026
 
 MAYOR: **un caso da distinto que ayer, y da distinto a propósito.**

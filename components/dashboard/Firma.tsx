@@ -25,6 +25,7 @@
 
 import { useEffect, useState } from 'react'
 import { UMA_VIGENTE } from '@/lib/legal/uma'
+import type { Answers } from '@/lib/legal/types'
 import {
   CONTACTO,
   DOCUMENTACION,
@@ -32,6 +33,7 @@ import {
   LICENCIA,
   REPOSITORIO,
 } from '@/lib/enlaces'
+import { BloqueCita } from './compartir'
 import { pesos } from './format'
 import { Etiqueta } from './primitives'
 
@@ -52,7 +54,10 @@ function Enlace({ href, children }: { href: string; children: React.ReactNode })
   )
 }
 
-export function Firma() {
+// Las respuestas son opcionales porque la firma dice de donde vino el
+// calculo aunque no haya un caso que compartir; con ellas, ademas, dice
+// como volver a el.
+export function Firma({ answers }: { answers?: Answers }) {
   const [fecha, setFecha] = useState<string | null>(null)
 
   useEffect(() => {
@@ -106,6 +111,8 @@ export function Firma() {
         <span aria-hidden="true">·</span>
         <Enlace href={'mailto:' + CONTACTO}>{CONTACTO}</Enlace>
       </p>
+
+      {answers ? <BloqueCita answers={answers} /> : null}
 
       {/* Este descargo no es la disculpa preventiva que se saco del
           repositorio en agosto: es el correcto, y en un papel que se

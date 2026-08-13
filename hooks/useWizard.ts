@@ -40,6 +40,7 @@ export interface UseWizardReturn {
   back: () => void
   jumpTo: (target: number) => void
   restart: () => void
+  restore: (entrantes: Answers) => void
   calculate: () => string
 }
 
@@ -49,7 +50,18 @@ export function useWizard(allSteps: WizardStepDef[], initialValues?: Partial<Ans
   const [answers, setAnswers] = useState<Answers>((initialValues ?? {}) as Answers)
   const initialValuesRef = useRef(initialValues)
 
+  // Un caso restaurado desde la URL trae su propia UMA y esa es la que
+  // vale: es la que produjo el numero que alguien compartio o cito. Si
+  // el motor legacy la pisara al terminar de cargar, el mismo enlace
+  // daria un numero distinto el dia que cambie la UMA, que es
+  // exactamente lo que compartir un calculo tiene que impedir.
+  const restauradoRef = useRef(false)
+
   useEffect(() => {
+    if (restauradoRef.current) {
+      initialValuesRef.current = initialValues
+      return
+    }
     const newUma = initialValues?.umaInicio
     const oldUma = initialValuesRef.current?.umaInicio
     if (newUma !== undefined && newUma !== oldUma) {
@@ -189,7 +201,13 @@ export function useWizard(allSteps: WizardStepDef[], initialValues?: Partial<Ans
 
   const restart = useCallback(() => {
     setAnswers((prev) => {
-      const uma = prev.umaInicio
+      // Despues de restaurar un caso viejo, `prev.umaInicio` es la UMA
+      // de ese caso y no la de hoy. Empezar de nuevo es empezar con la
+      // vigente; el valor del enlace muere con el enlace.
+      const uma = restauradoRef.current
+        ? (initialValuesRef.current?.umaInicio ?? prev.umaInicio)
+        : prev.umaInicio
+      restauradoRef.current = false
       return (uma ? { umaInicio: uma } : {}) as Answers
     })
     setIndex(0)
@@ -197,6 +215,20 @@ export function useWizard(allSteps: WizardStepDef[], initialValues?: Partial<Ans
     setError(null)
     adapters.resetWizardState()
   }, [])
+
+  // ---- Restaurar un caso que vino de afuera ----
+  // Las respuestas entran por la misma puerta que si las hubiera
+  // tipeado una persona: se podan las que el schema no alcanza. Un
+  // enlace con respuestas incoherentes queda en un caso coherente, no
+  // en un numero calculado sobre una combinacion que la entrevista
+  // nunca habria producido.
+  const restore = useCallback((entrantes: Answers) => {
+    restauradoRef.current = true
+    setAnswers(podarInalcanzables(allSteps, entrantes))
+    setIndex(0)
+    setPhase('dashboard')
+    setError(null)
+  }, [allSteps])
 
   // ---- Ejecutar calculo final ----
   // El estado del motor se reconstruye entero, no se parchea: `wizardState`
@@ -225,6 +257,7 @@ export function useWizard(allSteps: WizardStepDef[], initialValues?: Partial<Ans
     back,
     jumpTo,
     restart,
+    restore,
     calculate,
   }
 }

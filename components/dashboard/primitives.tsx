@@ -19,7 +19,7 @@
 //   honorarios arts. 34, 38, 49      -> oxido
 // ---------------------------------------------------------------
 
-import type { ReactNode } from "react"
+import { useState, type ReactNode } from "react"
 import { cn } from "@/lib/utils"
 import { usePrefs } from "@/components/prefs"
 import { pesos, splitPesos, umaNum } from "./format"
@@ -278,7 +278,11 @@ export function Segmented<T extends string>({
     <div
       role="tablist"
       aria-label={ariaLabel}
-      className="inline-flex rounded-md border border-border bg-secondary p-0.5"
+      // Los tres roles no entran en una pantalla de 320: envuelven en
+      // vez de asomarse. El selector de rol es el unico control del
+      // dashboard que cambia el numero, asi que no puede quedar medio
+      // afuera de la pantalla justo en el telefono mas chico.
+      className="inline-flex flex-wrap rounded-md border border-border bg-secondary p-0.5"
     >
       {options.map((o) => {
         const active = o.value === value
@@ -313,6 +317,17 @@ const PUNTEADO =
 /**
  * Fila del ledger: concepto a la izquierda, valor a la derecha, unidos
  * por una linea de puntos. El ojo sigue la fila sin perderse.
+ *
+ * En una pantalla angosta la fila **envuelve** en vez de desbordar. Un
+ * rango como «$4.277.105,25 a $4.579.971,00» no se puede achicar —lleva
+ * `whitespace-nowrap` porque partir una cifra al medio es peor— y solo
+ * el valor ya mide mas de la mitad de un telefono. Sin envolver, la
+ * fila empujaba a **toda la pagina** a un scroll horizontal: el pulgar
+ * se llevaba el informe de lado al querer bajar.
+ *
+ * `justify-end` no hace nada en la primera linea —el punteado tiene
+ * `flex-1` y se come el espacio libre— y alinea a la derecha la
+ * segunda, que es donde cae el valor cuando no entra.
  */
 export function LedgerRow({
   concepto,
@@ -330,10 +345,16 @@ export function LedgerRow({
   className?: string
 }) {
   return (
-    <div data-ledger-row className={cn("flex items-baseline gap-3 py-2", className)}>
+    <div
+      data-ledger-row
+      className={cn(
+        "flex flex-wrap items-baseline justify-end gap-x-3 gap-y-0.5 py-2",
+        className,
+      )}
+    >
       <span
         className={cn(
-          "flex items-baseline gap-2 text-[13px]",
+          "flex min-w-0 items-baseline gap-2 text-[13px]",
           destacado ? "font-medium text-foreground" : "text-muted-foreground",
         )}
       >
@@ -368,8 +389,10 @@ export function Disclosure({
 }) {
   return (
     <details data-ledger-row className={cn("group", className)}>
-      <summary className="flex cursor-pointer list-none items-baseline gap-3 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-        <span className="flex items-baseline gap-2 text-[13px] text-muted-foreground">
+      {/* Envuelve por el mismo motivo que LedgerRow, y ademas tiene una
+          pieza mas que no se puede achicar: la etiqueta «por qué». */}
+      <summary className="flex cursor-pointer list-none flex-wrap items-baseline justify-end gap-x-3 gap-y-0.5 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+        <span className="flex min-w-0 items-baseline gap-2 text-[13px] text-muted-foreground">
           {concepto}
           {articulo ? <Articulo>{articulo}</Articulo> : null}
         </span>
@@ -389,6 +412,50 @@ export function Disclosure({
         {children}
       </div>
     </details>
+  )
+}
+
+/**
+ * Un bloque que en el telefono llega plegado y en el escritorio ni se
+ * entera de que existe el pliegue.
+ *
+ * El titulo de la seccion queda **siempre a la vista**: que alguien no
+ * vaya a redactar una regulacion desde el telefono no quiere decir que
+ * no tenga que enterarse de que la app la redacta. Se pliega el
+ * contenido, no la existencia.
+ *
+ * El estado inicial es «cerrado» y `md:block` lo pisa en pantalla
+ * grande, asi que no hace falta consultar el ancho al montar. Eso evita
+ * lo que pasaria con `matchMedia`: el bloque abriria y se cerraria solo
+ * a la vista del lector, y ademas el HTML prerenderizado discreparia
+ * con el cliente al hidratar.
+ */
+export function PlegadoEnCelular({
+  etiqueta,
+  children,
+}: {
+  /** Que se despliega, dicho en dos palabras. */
+  etiqueta: string
+  children: ReactNode
+}) {
+  const [abierto, setAbierto] = useState(false)
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setAbierto((v) => !v)}
+        aria-expanded={abierto}
+        className="flex w-full items-baseline gap-3 py-2 text-left font-mono text-[11px] uppercase tracking-wider text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:hidden"
+      >
+        <span>{abierto ? 'Ocultar' : etiqueta}</span>
+        <span className={PUNTEADO} aria-hidden="true" />
+      </button>
+
+      <div className={cn('md:block', abierto ? 'block' : 'hidden')}>
+        {children}
+      </div>
+    </>
   )
 }
 

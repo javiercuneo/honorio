@@ -9,6 +9,7 @@ import { calcularResultadoEstructurado } from "@/lib/legal/adapters"
 import { Dashboard } from "@/components/dashboard/Dashboard"
 import { Firma } from "@/components/dashboard/Firma"
 import { BotonImprimir, HOJA_PROPS } from "@/components/dashboard/imprimir"
+import { BotonCompartir } from "@/components/dashboard/compartir"
 import { PROCESO_LABEL, SENTENCIA_LABEL, EXCEPCIONES_LABEL } from "@/components/dashboard/format"
 import { AppTopbar } from "./app-topbar"
 
@@ -84,6 +85,7 @@ export function DashboardView({ wizard, onBack, onRestart, onShowMinimos }: Dash
           <FileSpreadsheet className="mr-1.5 h-3.5 w-3.5" />
           Minimos
         </Button>
+        <BotonCompartir answers={wizard.answers} />
         <BotonImprimir />
         <Button variant="outline" size="sm" onClick={onRestart} className="h-8 text-[13px]">
           <RotateCcw className="mr-1.5 h-3.5 w-3.5" />
@@ -132,7 +134,7 @@ export function DashboardView({ wizard, onBack, onRestart, onShowMinimos }: Dash
           </div>
         )}
 
-        {resultado ? <Firma /> : null}
+        {resultado ? <Firma answers={wizard.answers} /> : null}
       </motion.div>
     </div>
   )
