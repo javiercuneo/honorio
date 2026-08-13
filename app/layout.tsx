@@ -42,13 +42,11 @@ const sourceSerif = Source_Serif_4({
 export const metadata: Metadata = {
   metadataBase: new URL(HONORIO),
   title: {
-    default: 'Honorio — Honorarios de la Ley 27.423',
+    default: 'Honorio: si querés entender la regulación, andá por una avenida',
     template: '%s · Honorio',
   },
   description:
-    'Calculá honorarios de la Ley 27.423 con cada paso a la vista: la base, ' +
-    'las reducciones aplicadas, la escala del art. 21, el ajuste por rol y la ' +
-    'segunda instancia. Gratis, sin registro y sin enviar datos a ningún lado.',
+    'Asistente para la regulación de honorarios. Gratis, sin registro y sin enviar datos a ningún lado.',
   applicationName: 'Honorio',
   authors: [{ name: 'L. Javier Cúneo Libarona' }],
   alternates: {
