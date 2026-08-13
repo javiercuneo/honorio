@@ -43,7 +43,7 @@ export const REPOSITORIO = 'https://github.com/javiercuneo/honorio'
 export const LICENCIA = 'https://www.gnu.org/licenses/agpl-3.0.html'
 
 /** Para reportar un numero mal calculado. */
-export const CONTACTO = 'javiercuneol@hotmail.com'
+export const CONTACTO = 'javier@javiercuneo.com.ar'
 
 /**
  * La serie completa de valores de la UMA, mantenida por el CPACF.
