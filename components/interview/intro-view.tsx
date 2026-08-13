@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
-import { ArrowRight, Scale, FileText, ShieldCheck, HelpCircle } from 'lucide-react'
+import { ArrowRight, Scale, FileText, ShieldCheck, HelpCircle, Calculator } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 // La calculadora de mediacion vive en OTRO sitio, con el resto de las
@@ -18,6 +18,7 @@ const notes = [
   { icon: Scale, label: 'Cada regla, con su artículo' },
   { icon: FileText, label: 'Base, escala y honorario por separado' },
   { icon: ShieldCheck, label: 'Sin caja negra: se ve cómo se llega' },
+  { icon: Calculator, label: 'Los cálculos no usan IA' },
 ]
 
 export function IntroView({
@@ -123,6 +124,7 @@ export function IntroView({
                     <li>Esta herramienta es de carácter referencial; no sustituye el criterio del juez ni debe considerarse un dictamen profesional</li>
 <li>Los resultados se basan en interpretaciones de la <a href="https://servicios.infoleg.gob.ar/infolegInternet/anexos/305000-309999/305057/texact.htm" target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-foreground">Ley 27.423 </a>que podrían diferir de tu criterio o del de los distintos tribunales</li>                    <li>En cada paso, intentaremos explicitar el fundamento jurídico y su impacto en el cálculo</li>
                     <li>Los criterios que la app adopta donde la ley admite más de una lectura están escritos y publicados: <a href={DOCUMENTACION} target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-foreground">cómo se interpreta la ley</a></li>
+                    <li><strong className="font-medium text-foreground/85">Los cálculos no usan inteligencia artificial.</strong> Son funciones deterministas: el mismo caso da siempre el mismo número. El código se escribió con asistencia de modelos de lenguaje —está dicho en el <a href="https://github.com/javiercuneo/honorio" target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-foreground">repositorio</a>—, pero ningún modelo interviene en el resultado: cada cambio pasa por 17 suites de validación que comparan la salida contra casos conocidos, y si alguna falla el sitio no se publica</li>
                   </ul>
                 </div>
                 <div>
@@ -150,6 +152,21 @@ export function IntroView({
                     <li>Mediadores: tienen normativa propia (<a href="http://servicios.infoleg.gob.ar/infolegInternet/anexos/165000-169999/166999/texact.htm" target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-foreground"> Ley 26.589</a> y Decretos <a href="http://servicios.infoleg.gob.ar/infolegInternet/anexos/255000-259999/255741/norma.htm" target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-foreground"> 2536/15 </a>y <a href="https://servicios.infoleg.gob.ar/infolegInternet/anexos/415000-419999/418049/norma.htm" target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-foreground">696/2025</a>). Puede utilizar nuestra <a href={CALCULADORA_MEDIACION} target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-foreground">calculadora</a>.</li>
                   </ul>
                 </div>
+                {/* La medicion va escrita al lado de la promesa que
+                    matiza y no en un rincon: el sitio dice que nada de
+                    lo que escribis sale del navegador, y eso sigue
+                    siendo cierto, pero desde agosto de 2026 se cuentan
+                    las visitas. Decir lo primero y callar lo segundo
+                    seria administrar la verdad. */}
+                <div>
+                  <h4 className="text-[13px] font-medium text-foreground/85">Privacidad y medición</h4>
+                  <ul className="mt-2 list-disc space-y-1.5 pl-4 text-[13px] leading-relaxed text-muted-foreground">
+                    <li>Nada de lo que escribís sale del navegador. El cálculo se hace entero en tu máquina: no hay servidor que reciba los datos del expediente, ni base de datos donde queden guardados</li>
+                    <li>Eso incluye el enlace para compartir un cálculo: el caso viaja en el fragmento de la dirección, que por definición no se envía al servidor</li>
+                    <li>Sí se cuentan las visitas, en forma agregada y del lado del servidor: cuántas hubo y desde qué país. Sin cookies, sin identificar a nadie y sin ningún código de seguimiento en la página</li>
+                  </ul>
+                </div>
+
                 <div>
                   <h4 className="text-[13px] font-medium text-foreground/85">Reconvención y acumulación de acciones</h4>
                   <p className="mt-2 text-[13px] leading-relaxed text-muted-foreground">

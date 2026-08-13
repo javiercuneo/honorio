@@ -27,6 +27,37 @@ posible —cambió la UMA— que no se podía comprobar.
 
 ---
 
+## 3.1.1 — 13 de agosto de 2026
+
+PARCHE: interfaz y redacción. El motor no se tocó.
+
+- **«Los cálculos no usan inteligencia artificial», en la portada.** No es un
+  detalle técnico y por eso no está en la letra chica: es lo que alguien
+  necesita poder señalar cuando tenga que defender haberla usado. La confusión
+  entre *construido con asistencia de un modelo* y *calcula con un modelo* es
+  real, ya dejó a una usuaria sin poder decir que la usa, y no se arregla
+  difundiendo más. El desarrollo está en «Información adicional», con lo que
+  hace verificable la afirmación: funciones deterministas, 17 suites de
+  validación, y si alguna falla el sitio no se publica.
+
+- **La medición, dicha al lado de la promesa que matiza.** Desde agosto de 2026
+  se cuentan las visitas en forma agregada y del lado del servidor —sin
+  cookies, sin identificar a nadie y sin ningún código de seguimiento en la
+  página—. Que el cálculo no salga del navegador sigue siendo cierto; decir lo
+  primero y callar lo segundo sería administrar la verdad.
+
+- **Dos títulos, y nadie ve los dos.** El de la pestaña y el buscador dice lo
+  que alguien tipea cuando busca —«honorarios», «27.423»—, porque el título es
+  la señal más fuerte que tiene un buscador y gastarla en una frase linda es
+  caro. El de la tarjeta compite por otra cosa: la atención de alguien leyendo
+  un WhatsApp, donde el nombre de la ley no aporta nada porque el enlace se lo
+  mandó un colega. Quien busca ve el primero, quien recibe el enlace ve el
+  segundo.
+
+- **La tarjeta, centrada.** Estaba compuesta a la izquierda y dejaba media
+  imagen vacía a la derecha, que en una miniatura se lee como un error de carga
+  y no como aire.
+
 ## 3.1.0 — 12 de agosto de 2026
 
 MENOR: **un cálculo se puede compartir, citar y discutir.** Ningún número se

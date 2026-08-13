@@ -34,8 +34,17 @@ export function LandingView({ onStart }: { onStart: () => void }) {
           <ArrowRight className="ml-1.5 h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
         </Button>
 
+        {/* «Los cálculos no usan IA» esta en la portada y no enterrado
+            en la letra chica porque no es un detalle tecnico: es lo que
+            alguien necesita poder señalar cuando tenga que defender
+            haberla usado. La confusion entre «construido con asistencia
+            de un modelo» y «calcula con un modelo» es real y ya dejo a
+            un usuario sin poder decir que la usa. */}
         <p className="mt-8 font-mono text-[10px] uppercase tracking-[0.16em] text-faint">
           Herramienta de referencia · no sustituye el criterio del juez
+          <br className="sm:hidden" />
+          <span className="hidden sm:inline"> · </span>
+          los cálculos no usan IA
         </p>
       </div>
     </div>

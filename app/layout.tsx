@@ -38,19 +38,34 @@ const sourceSerif = Source_Serif_4({
 // navegador, y tiene que ser absoluta. El sitio canonico es honorio.ar
 // aunque el mismo build se sirva ademas desde el repositorio viejo.
 //
-// La imagen se genera con `node scripts/og.mjs` y esta commiteada. La
-// frase que lleva adentro es esta misma: si cambia el TITULO, hay que
-// volver a correr el script.
+// **Son dos titulos distintos a proposito, y nadie ve los dos.**
 //
-// Titulo y descripcion salen de una constante y no estan escritos en
-// cada bloque. Antes estaban tres veces —pestana, Open Graph y
-// Twitter— y se desincronizaron al primer cambio: la pestana decia una
-// cosa y la tarjeta de WhatsApp seguia diciendo la vieja.
-const TITULO = 'Honorio: si querés entender la regulación, andá por una avenida'
+// El de la pestana y el buscador tiene que decir lo que alguien tipea
+// cuando busca: «honorarios», «27.423». El titulo es la señal mas
+// fuerte que tiene un buscador y gastarla en una frase linda es caro.
+//
+// El de la tarjeta compite por otra cosa: la atencion de una persona
+// que esta leyendo un WhatsApp. Ahi la frase gana y el nombre de la ley
+// no aporta nada, porque quien recibe el enlace ya sabe de que se
+// trata: se lo mando un colega.
+//
+// Quien busca ve el primero. Quien recibe el enlace ve el segundo.
+//
+// Cada uno se escribe una sola vez. Antes estaban los dos repetidos en
+// tres bloques y se desincronizaron al primer cambio: la pestana decia
+// una cosa y la tarjeta de WhatsApp seguia diciendo la vieja.
+//
+// La imagen se genera con `node scripts/og.mjs` y esta commiteada; la
+// frase de abajo es la que lleva adentro. Si cambia, hay que volver a
+// correr el script.
+const TITULO = 'Honorio — Honorarios de la Ley 27.423'
+
+const FRASE = 'Honorio: si querés entender la regulación, andá por una avenida'
 
 const DESCRIPCION =
-  'Asistente para la regulación de honorarios. Gratis, sin registro y sin ' +
-  'enviar datos a ningún lado.'
+  'Asistente para la regulación de honorarios de la Ley 27.423, con cada ' +
+  'paso del cálculo a la vista. Gratis, sin registro y sin enviar datos a ' +
+  'ningún lado.'
 
 export const metadata: Metadata = {
   metadataBase: new URL(HONORIO),
@@ -69,20 +84,20 @@ export const metadata: Metadata = {
     locale: 'es_AR',
     url: '/',
     siteName: 'Honorio',
-    title: TITULO,
+    title: FRASE,
     description: DESCRIPCION,
     images: [
       {
         url: '/og.png',
         width: 1200,
         height: 630,
-        alt: TITULO,
+        alt: FRASE,
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: TITULO,
+    title: FRASE,
     description: DESCRIPCION,
     images: ['/og.png'],
   },

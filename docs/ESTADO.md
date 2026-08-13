@@ -568,14 +568,35 @@ responsive.
 
 ### Lo que falta de la Fase 0 y no es código
 
-- **La medición.** Decidido el 12/8 y prendido el 13/8: el dominio ya estaba en
-  Cloudflare desde que se registró, así que fue pasar los registros a
-  *Proxied*. SSL/TLS quedó en *Automatic*, que resuelve en Full (strict) porque
-  GitHub Pages habla HTTPS; lo que **no** hay que poner nunca es *Flexible*, que
-  con Pages da bucle de redirección. Falta el renglón honesto en el sitio.
+- **La medición: andando.** Decidido el 12/8 y prendido el 13/8. El dominio ya
+  estaba en Cloudflare desde que se registró, así que fue pasar los registros
+  —los cuatro A y el CNAME de `www`— a *Proxied*. SSL/TLS quedó en *Automatic*,
+  que resuelve en Full (strict) porque GitHub Pages habla HTTPS; lo que **no**
+  hay que poner nunca es *Flexible*, que con Pages da bucle de redirección.
+  Primeros números el mismo día. El renglón honesto quedó escrito en
+  «Información adicional».
 - **El video de 90 segundos: descartado.** El permalink hace el mismo trabajo
   mejor y ya está hecho. Un enlace que abre un cálculo terminado demuestra en
   tres segundos más que noventa de pantalla grabada.
+
+**Fase 0 cerrada el 13/8.**
+
+### Por qué «los cálculos no usan IA» está en la portada
+
+Es el hallazgo que más cambió el plan y no salió de ninguna sesión de trabajo:
+salió de un WhatsApp. Una usuaria real usa Honorio y **no lo puede decir en su
+juzgado**, porque su jefa no distingue entre *construido con asistencia de un
+modelo* y *calcula con un modelo*.
+
+Eso no se arregla difundiendo más. Se arregla dándole una frase para señalar, y
+por eso la afirmación está en la portada y no en la letra chica. El desarrollo
+—que es lo que la hace verificable— está en «Información adicional»: funciones
+deterministas, 17 suites de validación, y si alguna falla el sitio no se
+publica.
+
+Sirve igual para el resto del plan: es la respuesta anticipada a la misma
+objeción en el colegio, en informática del fuero y en cualquier nota que se
+escriba sobre el proyecto.
 
 ---
 
