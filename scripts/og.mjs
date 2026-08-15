@@ -37,8 +37,10 @@ const ACENTO = '#7a99ff'
 const wordmark = readFileSync(join(raiz, 'public', 'honorio-wordmark.svg'), 'utf8')
   .replace(/currentColor/g, TEXTO)
 
-// La frase es la misma que el TITULO de app/layout.tsx. Si cambia
-// alla, cambia aca y se vuelve a correr el script.
+// La misma que la constante FRASE de app/layout.tsx —la de la tarjeta,
+// no la del buscador—, sin el «Honorio:» adelante porque el wordmark ya
+// lo dice arriba. Si cambia alla, cambia aca y se vuelve a correr el
+// script.
 const FRASE = 'Si querés entender la regulación, andá por una avenida'
 
 const ANCHO_MARCA = 520

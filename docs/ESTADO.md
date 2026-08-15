@@ -581,6 +581,32 @@ responsive.
 
 **Fase 0 cerrada el 13/8.**
 
+### Pendiente con fecha: el certificado, hacia mediados de noviembre de 2026
+
+**Esto es lo único de la medición que puede romper el sitio, y llega solo.**
+
+El certificado de GitHub Pages es de Let's Encrypt y dura 90 días; la
+renovación se intenta sola unas semanas antes de vencer. Para renovarlo, Let's
+Encrypt tiene que llegar al origen a validar el dominio — y desde el 13/8 el
+origen está detrás del proxy de Cloudflare, que es justo lo que se interpone.
+
+Suele funcionar igual. Cuando no funciona, el síntoma es claro: el navegador
+avisa que el certificado venció, o GitHub deja de mostrarlo como emitido.
+
+**Qué hacer si pasa**, y son dos minutos:
+
+1. Cloudflare → DNS → pasar los cuatro registros A y el CNAME de `www` a **DNS
+   only** (nube gris).
+2. Esperar a que GitHub renueve. En `github.com/javiercuneo/honorio` →
+   *Settings* → *Pages* se ve el estado del certificado.
+3. Volver a **Proxied** (naranja).
+
+**Cómo adelantarse:** entrar a *Settings → Pages* alrededor del **10 de
+noviembre de 2026** y mirar la fecha del certificado. Si dice que está emitido
+y vigente, no hay nada que hacer hasta febrero.
+
+La medición se corta mientras la nube esté gris. No importa: son unas horas.
+
 ### Por qué «los cálculos no usan IA» está en la portada
 
 Es el hallazgo que más cambió el plan y no salió de ninguna sesión de trabajo:
