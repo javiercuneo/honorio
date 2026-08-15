@@ -634,14 +634,18 @@ bloquea una parte de la herramienta, bloquea el uso entero. Vive en
 `SinIA`, en `primitives.tsx`, y **no se imprime**: en un expediente importa de
 qué se calculó y con qué versión —eso lo hace la firma—, no de qué no.
 
-### Nota abierta: el ejemplo del art. 22/25 que está publicado
+### Si vas a contar el caso del art. 22/25, copialo, no lo parafrasees
 
-El README de `herramientas-judiciales` cuenta, en «Sobre el uso de IA», que el
-motor acumulaba la reducción del art. 25 sobre una caducidad resuelta por el
-art. 22. **Javier avisó el 15/8 que no fue así.** El texto sigue publicado y
-hay que corregirlo: es el ejemplo con el que ese README ilustra dónde termina
-lo que un modelo puede hacer, y se cita solo. Falta que Javier diga cuál fue la
-corrección real.
+La versión correcta está en el README de `herramientas-judiciales`, sección
+«Sobre el uso de IA», y en `index.html` del sitio. Los dos dicen lo mismo y
+están bien.
+
+Se aclara acá porque ya se contó mal una vez, el 14/8, en un borrador: **el
+criterio nunca estuvo en duda** —está resuelto desde hace seis años y el
+asistente clásico ya lo distinguía—, y lo que falló fue la reescritura del
+código, en una capa que no es la jurídica. Contarlo como si el criterio se
+hubiera descubierto al programar invierte exactamente lo que el pasaje quiere
+decir.
 
 ---
 
