@@ -1,10 +1,10 @@
 {
-  "actualizado": "2026-08-08",
+  "actualizado": "2026-08-15",
   "historia": [
     {
       "valor": 12960,
-      "fuente": "UR-SINEP $1.079,61 × 12 — Decreto DECTO-2026-553-APN-PTE",
-      "url": null,
+      "fuente": "tabla oficial del Ministerio de Justicia",
+      "url": "https://www.argentina.gob.ar/sites/default/files/2018/07/39_tabla_honorarios_mediadores_decreto_2536_valores_junio_agosto_2026v2.pdf",
       "capturado": "2026-08-08"
     }
   ]
