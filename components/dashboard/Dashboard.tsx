@@ -201,6 +201,7 @@ function DashboardGeneral({
           rango={resultado.auxiliares}
           valorUMA={resultado.valorUMA}
           esProvisorio={resultado.esProvisorio}
+          aperturaPrueba={caso.aperturaPrueba}
         />
       ) : null}
 

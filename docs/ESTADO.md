@@ -634,6 +634,79 @@ bloquea una parte de la herramienta, bloquea el uso entero. Vive en
 `SinIA`, en `primitives.tsx`, y **no se imprime**: en un expediente importa de
 qué se calculó y con qué versión —eso lo hace la firma—, no de qué no.
 
+### La Ley 27.802 y los pisos de los auxiliares — el 15/8
+
+**Primer cambio del motor que entró por feedback de un usuario.** A Javier le
+señalaron en X que faltaba un disclaimer sobre la Ley 27.802. Al ir al texto
+—Título IV, arts. 95 a 97— aparecieron cuatro cosas, y la más grande no era la
+señalada.
+
+**Faltaba el art. 61.** La 27.802 sustituyó el 60 y el 61 e incorporó el
+61 bis; la app tenía 58, 60 y 61 bis. El 61 es el de los peritos en procesos
+susceptibles de apreciación pecuniaria, primera instancia hasta la sentencia
+—o sea, todo lo que Honorio calcula— y su piso de 2 UMA no estaba.
+
+**Su remisión al art. 32 no aterriza, y el piso no depende de ella.** El
+art. 32 regula administradores, interventores, liquidadores y árbitros con
+escalas sobre utilidades realizadas o bienes liquidados; nada de eso encaja con
+un perito médico. Pero *«los honorarios mínimos a regular alcanzan a dos (2)
+UMA»* se aplica solo. Descartar el artículo por la remisión rota se llevaba
+puesto el piso.
+
+**La ley separa por sujeto, no por tipo de juicio.** Es la clave para leer los
+cuatro pisos sin mezclarlos, y está escrita arriba de
+`MINIMOS_AUXILIARES_JUSTICIA`:
+
+| | Peritos y liquidadores de averías | Demás auxiliares |
+|---|---|---|
+| Sin monto | art. 60 — 2 UMA | normas específicas |
+| Con monto | art. 61 — 2 UMA | normas específicas; a falta de ellas, art. 58 — 4 UMA |
+
+Los arts. 60 y 61 cierran los dos con la misma frase —«en el caso de los demás
+auxiliares de la Justicia, se aplicarán las normas específicas»—, y eso es lo
+que impide leer el 61 como si desplazara al 58: no hablan del mismo sujeto.
+**Esa lectura se corrigió sobre la marcha:** la primera hipótesis fue que el 61
+desplazaba al 58, y era incorrecta.
+
+**Nada de esto toca la banda del 5 %-10 %**, que sale del art. 21,
+antepenúltimo párrafo, dice «auxiliares de la Justicia» y los alcanza a todos.
+La distinción por sujeto es solo de los pisos. Conviene no confundir los dos
+planos: la banda produce el número, el piso es un mínimo absoluto debajo de él.
+
+**El 1/4 de UMA no es un piso.** El tercer párrafo del 61 bis dice *«se le
+regulará»*, no «un mínimo de». Vive en `SIN_PERICIA_ART61BIS`, fuera de
+`PISOS_AUXILIARES_CON_BASE`, y hay una validación que falla si vuelve a
+aparecer entre los pisos.
+
+**Y se muestra cuando encaja.** El piso del 61 bis es «por cada pericia» y
+aparecía también en casos terminados antes de la apertura a prueba, donde no
+hubo ninguna —era la observación original de Javier—. Ahora ese piso queda
+marcado y al lado aparece el cuarto de UMA. **No se oculta ningún número:** es
+el mismo criterio del art. 478, mostrar los dos y no decidir.
+
+**Lo que la ley no resolvió y la app tampoco decide:** si el 61 bis, al decir
+que los honorarios del perito no se vinculan a la cuantía, desplaza el 5 %-10 %
+del art. 21, que no fue derogado. Hay argumentos de ley posterior y ley
+especial, pero un juez que tiene que poner un número hoy va a usar el
+porcentaje, porque es defendible y uniforme. Hasta que haya jurisprudencia,
+conviven. Está dicho en la app, en un «por qué» de la sección de auxiliares y
+en la intro.
+
+**Una incoherencia de la ley que conviene tener anotada**, porque no tiene
+lectura que la salve: el art. 60 dice que en un juicio *sin* monto al perito le
+basta aceptar el cargo para tener 2 UMA; el 61 bis dice que en un juicio *con*
+monto, si aceptó y no dictaminó porque hubo transacción, se le regula 1/4 de
+UMA. Mismo hecho, juicio más grande, ocho veces menos.
+
+**Verificación:** `minimosAuxiliares.validation.ts` pasó de 8 a 23
+afirmaciones. Cubre los tres pisos con su artículo y su `suponePericia`, que el
+1/4 no esté entre los pisos, que el texto legal traiga los tres artículos, que
+los cinco grupos sigan estando, y el cruce con el 5 % (40 y 80 UMA). Incluye
+una comprobación de la trampa que casi entra: `pisoDe('Art. 61')` **también
+matchea «Art. 61 bis»**, así que los prefijos llevan los dos puntos.
+
+Ningún honorario se movió: las validaciones de cálculo están todas en verde.
+
 ### Si vas a contar el caso del art. 22/25, copialo, no lo parafrasees
 
 La versión correcta está en el README de `herramientas-judiciales`, sección

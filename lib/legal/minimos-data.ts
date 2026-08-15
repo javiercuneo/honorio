@@ -119,26 +119,56 @@ export const MINIMOS_RECURSOS_CSJN: MinimoCategoria = {
   }],
 }
 
+// ---------------------------------------------------------------
+// La Ley 27.802 (Modernizacion Laboral, B.O. 06/03/2026) toco tres
+// articulos de este bloque: sustituyo el 60 y el 61, e incorporo el
+// 61 bis. **La ley separa por sujeto, no por tipo de juicio**, y esa
+// es la clave para leer los cuatro pisos sin mezclarlos:
+//
+//   peritos y liquidadores de averias   sin monto -> art. 60 (2 UMA)
+//                                       con monto -> art. 61 (2 UMA)
+//   demas auxiliares de la Justicia     normas especificas; a falta
+//                                       de ellas, art. 58 (4 UMA)
+//
+// El 60 y el 61 cierran los dos con la misma frase —"en el caso de los
+// demas auxiliares de la Justicia, se aplicaran las normas
+// especificas"—, que es lo que impide leer el 61 como si desplazara al
+// 58: no hablan del mismo sujeto.
+//
+// Nada de esto distingue la banda del 5 %-10 %: esa sale del art. 21,
+// antepenultimo parrafo, que dice "auxiliares de la Justicia" y los
+// alcanza a todos. La distincion por sujeto es solo de los pisos.
+// ---------------------------------------------------------------
 export const MINIMOS_AUXILIARES_JUSTICIA: MinimoCategoria = {
   id: 'auxiliares_justicia',
   titulo: 'Auxiliares de justicia',
-  articulo: 'Arts. 58, 60 y 61 bis',
-  textoLegal: 'ARTÍCULO 60 (B.O. 06/03/2026).- En los procesos no susceptibles de apreciación pecuniaria, los honorarios de los peritos y de los peritos liquidadores de averías serán fijados conforme a las pautas valorativas del artículo 16 y en un mínimo de 2 UMA, siendo suficiente para la fijación de los honorarios mínimos, la aceptación del cargo conferido. En el caso de los demás auxiliares de la Justicia, se aplicarán las normas específicas. Artículo 61 bis (B.O. 06/03/2026): Los honorarios de los peritos que intervengan en las controversias judiciales, no estarán vinculados a la cuantía del respectivo juicio, ni al porcentaje de incapacidad que se dictamine en caso de producirse una pericia médica. Su regulación responderá exclusivamente a la apreciación judicial de la labor técnica realizada en el pleito y su relevancia, calidad y extensión en lo concreto y deberá fijarse en un monto que asegure una adecuada retribución al perito. Por cada pericia, se fijará un monto mínimo de 2 UMA. En caso de finalizar el proceso por transacción, avenimiento y conciliación, sin que el perito haya presentado la pericia encargada, se le regulará 1/4 de UMA en tanto el perito haya aceptado el cargo.',
+  articulo: 'Arts. 58, 60, 61 y 61 bis',
+  textoLegal: 'ARTÍCULO 60 (B.O. 06/03/2026).- En los procesos no susceptibles de apreciación pecuniaria, los honorarios de los peritos y de los peritos liquidadores de averías serán fijados conforme a las pautas valorativas del artículo 16 y en un mínimo de dos (2) UMA, siendo suficiente para la fijación de los honorarios mínimos, la aceptación del cargo conferido. En el caso de los demás auxiliares de la Justicia, se aplicarán las normas específicas. ARTÍCULO 61 (B.O. 06/03/2026).- En los procesos susceptibles de apreciación pecuniaria, por las actuaciones de primera instancia hasta la sentencia, los honorarios del perito y del perito liquidador de averías serán fijados conforme lo establece el artículo 32. Para tales casos los honorarios mínimos a regular alcanzan a dos (2) UMA. En el caso de los demás auxiliares de la Justicia se aplicarán las normas específicas. ARTÍCULO 61 bis (B.O. 06/03/2026).- Los honorarios de los peritos que intervengan en las controversias judiciales, no estarán vinculados a la cuantía del respectivo juicio, ni al porcentaje de incapacidad que se dictamine en caso de producirse una pericia médica. Su regulación responderá exclusivamente a la apreciación judicial de la labor técnica realizada en el pleito y su relevancia; calidad y extensión en lo concreto y deberá fijarse en un monto que asegure una adecuada retribución al perito. Por cada pericia, se fijará un monto mínimo de dos (2) UMA. En caso de finalizar el proceso por transacción, avenimiento y conciliación, sin que el perito haya presentado la pericia encargada, se le regulará un cuarto (1/4) de UMA en tanto el perito haya aceptado el cargo.',
   grupos: [
     {
       titulo: 'Art. 58: juicios susceptibles de apreciación pecuniaria no previstos en otros artículos',
-      items: [{ label: 'Auxiliares de la Justicia', uma: 4 }],
+      items: [{ label: 'Demás auxiliares de la Justicia', uma: 4, alias: ['auxiliares de la justicia'] }],
     },
     {
-      titulo: 'Art. 60: procesos no susceptibles de apreciación pecuniaria',
-      items: [{ label: 'Peritos y liquidadores de averías', uma: 2 }],
+      titulo: 'Art. 60: peritos, procesos no susceptibles de apreciación pecuniaria',
+      items: [{ label: 'Peritos y liquidadores de averías. Basta la aceptación del cargo', uma: 2 }],
     },
     {
-      titulo: 'Art. 61 bis: controversias judiciales',
-      items: [
-        { label: 'Peritos, por cada pericia', uma: 2 },
-        { label: 'Peritos que aceptaron el cargo y no presentaron dictamen por transacción, avenimiento o conciliación', uma: 0.25, umaLabel: '1/4 de UMA' },
-      ],
+      titulo: 'Art. 61: peritos, procesos susceptibles de apreciación pecuniaria',
+      items: [{ label: 'Peritos y liquidadores de averías, primera instancia hasta la sentencia', uma: 2 }],
+    },
+    {
+      titulo: 'Art. 61 bis: peritos en controversias judiciales',
+      items: [{ label: 'Por cada pericia', uma: 2 }],
+    },
+    // El 1/4 de UMA va en su propio grupo y no junto al piso del
+    // 61 bis **porque no es un minimo**: el tercer parrafo dice "se le
+    // regulara", no "un minimo de". Es el honorario de ese supuesto,
+    // no un piso por debajo del cual no se puede bajar. Listarlo entre
+    // los minimos lo hacia parecer otra cosa.
+    {
+      titulo: 'Art. 61 bis, tercer párrafo: no es un mínimo, es el honorario de ese supuesto',
+      items: [{ label: 'El proceso terminó por transacción, avenimiento o conciliación y el perito aceptó el cargo pero no presentó la pericia', uma: 0.25, umaLabel: '1/4 de UMA' }],
     },
   ],
 }
@@ -161,20 +191,57 @@ export interface PisoAuxiliar {
   articulo: string
   concepto: string
   uma: number
+  /**
+   * Si el piso presupone que hubo una pericia producida.
+   *
+   * Solo el del art. 61 bis lo hace: es "por cada pericia". Mostrarlo
+   * en un caso que termino antes de la apertura a prueba afirma algo
+   * que no paso, y la propia ley resuelve ese supuesto en su tercer
+   * parrafo con un numero distinto.
+   */
+  suponePericia?: boolean
 }
 
-function pisoDe(prefijoTitulo: string, articulo: string): PisoAuxiliar[] {
+function pisoDe(prefijoTitulo: string, articulo: string, suponePericia = false): PisoAuxiliar[] {
   const grupo = MINIMOS_AUXILIARES_JUSTICIA.grupos.find((g) =>
     g.titulo?.startsWith(prefijoTitulo),
   )
   const item = grupo?.items[0]
-  return item ? [{ articulo, concepto: item.label, uma: item.uma }] : []
+  return item
+    ? [{ articulo, concepto: item.label, uma: item.uma, suponePericia }]
+    : []
 }
 
 export const PISOS_AUXILIARES_CON_BASE: PisoAuxiliar[] = [
   ...pisoDe('Art. 58', 'art. 58'),
-  ...pisoDe('Art. 61 bis', 'art. 61 bis'),
+  ...pisoDe('Art. 61:', 'art. 61'),
+  ...pisoDe('Art. 61 bis:', 'art. 61 bis', true),
 ]
+
+/**
+ * El honorario del perito que acepto el cargo y no dictamino porque el
+ * proceso termino antes (art. 61 bis, tercer parrafo).
+ *
+ * **No es un piso y por eso no esta en la lista de arriba.** Se expone
+ * aparte para poder mostrarlo cuando el caso encaja, que es justamente
+ * cuando el piso "por cada pericia" no encaja.
+ */
+export const SIN_PERICIA_ART61BIS: PisoAuxiliar = {
+  articulo: 'art. 61 bis',
+  concepto: 'El perito aceptó el cargo y no presentó la pericia',
+  uma: 0.25,
+}
+
+/**
+ * Debajo de que base, en UMA, cada piso deja de ser teorico.
+ *
+ * El 5 % del art. 21 crece con la base y los pisos no: hay un punto a
+ * partir del cual el porcentaje ya los supera y el piso no muerde
+ * nunca. Con 2 UMA de piso son 40 UMA de base; con 4, son 80.
+ */
+export function baseDondeElPisoDejaDeMorder(pisoEnUMA: number): number {
+  return pisoEnUMA / 0.05
+}
 
 export const MINIMOS_ACCIONES_48: MinimoCategoria = {
   id: 'acciones_48',

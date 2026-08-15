@@ -17,19 +17,30 @@
 // ---------------------------------------------------------------
 
 import type { Rango } from "@/lib/legal/types"
-import { PISOS_AUXILIARES_CON_BASE } from "@/lib/legal/minimos-data"
+import {
+  PISOS_AUXILIARES_CON_BASE,
+  SIN_PERICIA_ART61BIS,
+  baseDondeElPisoDejaDeMorder,
+} from "@/lib/legal/minimos-data"
 import { Cifra, Disclosure, EnUMA, Insignia, Tile } from "./primitives"
 
 interface AuxiliaresSectionProps {
   rango: Rango
   valorUMA: number
   esProvisorio?: boolean
+  /**
+   * `'antes'` si el proceso termino antes de la apertura a prueba. En
+   * ese caso no hubo pericia, y el piso del art. 61 bis —que es "por
+   * cada pericia"— presupone una que no existio.
+   */
+  aperturaPrueba?: string
 }
 
 export function AuxiliaresSection({
   rango,
   valorUMA,
   esProvisorio,
+  aperturaPrueba,
 }: AuxiliaresSectionProps) {
   // El unico dato que hace falta señalar: si el 5 % de la base queda
   // por debajo de alguno de los pisos. Es el caso en que el numero de
@@ -40,6 +51,12 @@ export function AuxiliaresSection({
     0,
   )
   const quedaCorto = rango.minUMA < pisoMasAlto
+
+  // Terminado antes de la apertura a prueba no hubo pericia. No se
+  // esconde ningun numero —los numeros no se ocultan nunca— pero se
+  // dice cual presupone un hecho que no ocurrio, y se muestra el
+  // supuesto que la ley previo para ese caso.
+  const sinPericia = aperturaPrueba === "antes"
 
   return (
     <section>
@@ -95,9 +112,35 @@ export function AuxiliaresSection({
                   className="text-foreground"
                 />
               }
-              sub={piso.concepto}
+              sub={
+                piso.suponePericia && sinPericia ? (
+                  <>
+                    {piso.concepto}
+                    <span className="block text-accent-foreground">
+                      supone una pericia, y este caso terminó antes de la
+                      apertura a prueba
+                    </span>
+                  </>
+                ) : (
+                  piso.concepto
+                )
+              }
             />
           ))}
+
+          {sinPericia ? (
+            <Tile
+              etiqueta={`${SIN_PERICIA_ART61BIS.articulo} · 1/4 de UMA`}
+              valor={
+                <Cifra
+                  value={SIN_PERICIA_ART61BIS.uma * valorUMA}
+                  size="lg"
+                  className="text-foreground"
+                />
+              }
+              sub={SIN_PERICIA_ART61BIS.concepto}
+            />
+          ) : null}
         </div>
       </div>
 
@@ -140,6 +183,46 @@ export function AuxiliaresSection({
             esta herramienta no tiene. Por eso muestra los dos números y no
             elige: el 5 %-10 % de la base y los pisos, para que la comparación
             la haga quien regula.
+          </p>
+          <p className="mt-2">
+            Conviene saber cuándo la comparación importa: el 5 % crece con la
+            base y los pisos no. Un piso de{" "}
+            <strong>2 UMA solo muerde por debajo de una base de{" "}
+            {baseDondeElPisoDejaDeMorder(2)} UMA</strong>, y uno de 4 UMA por
+            debajo de {baseDondeElPisoDejaDeMorder(4)}. Con bases mayores el
+            porcentaje del art. 21 ya los supera y los pisos quedan teóricos.
+          </p>
+        </Disclosure>
+
+        <Disclosure
+          concepto="Qué cambió la Ley 27.802, y qué quedó sin resolver"
+          articulo="B.O. 06/03/2026"
+        >
+          <p>
+            Sustituyó los arts. 60 y 61 e incorporó el 61 bis. Los tres fijan
+            pisos de <strong>2 UMA</strong> para los peritos, y la ley separa
+            por sujeto y no por tipo de juicio: los arts. 60 y 61 son de los
+            peritos y liquidadores de averías, y los dos cierran remitiendo a
+            las normas específicas «en el caso de los demás auxiliares de la
+            Justicia», que son los que siguen con el piso de 4 UMA del art. 58.
+          </p>
+          <p className="mt-2">
+            <strong>Lo que la ley no resolvió, y esta herramienta tampoco
+            decide.</strong> El art. 61 bis dice que los honorarios del perito
+            «no estarán vinculados a la cuantía del respectivo juicio», pero no
+            derogó el 5 % al 10 % del art. 21, que se calcula justamente sobre
+            la cuantía. Y el art. 61 remite, para fijarlos, al art. 32, que
+            regula administradores, interventores, liquidadores y árbitros con
+            escalas sobre utilidades o bienes liquidados: nada de eso encaja con
+            un perito médico o ingeniero. Hasta que haya jurisprudencia, las dos
+            reglas conviven y por eso se muestran las dos.
+          </p>
+          <p className="mt-2">
+            Un detalle del tercer párrafo del 61 bis: dice que al perito que
+            aceptó el cargo y no dictaminó porque el proceso terminó por
+            transacción, avenimiento o conciliación <em>«se le regulará»</em> un
+            cuarto de UMA. No dice «un mínimo de». Por eso acá no figura entre
+            los pisos.
           </p>
         </Disclosure>
       </div>

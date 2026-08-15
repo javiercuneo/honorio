@@ -27,6 +27,70 @@ posible —cambió la UMA— que no se podía comprobar.
 
 ---
 
+## 3.2.0 — 15 de agosto de 2026
+
+MENOR: **entra un piso que faltaba y ningún honorario cambia.** Las 17
+validaciones siguen en verde, incluidas todas las de cálculo. Lo que cambia es
+qué pisos ve quien regula, no el número que la app calcula.
+
+Salió de un señalamiento en redes sobre la Ley 27.802 (Modernización Laboral,
+B.O. 06/03/2026). Al ir al texto aparecieron cuatro cosas más.
+
+### Faltaba el art. 61, que es el del universo entero de la app
+
+La Ley 27.802 sustituyó los arts. 60 y 61 e incorporó el 61 bis. La app tenía
+el 58, el 60 y el 61 bis. **Faltaba justo el 61**, que es el de los peritos en
+procesos susceptibles de apreciación pecuniaria, primera instancia hasta la
+sentencia — es decir, todos los casos que Honorio calcula. Su piso de 2 UMA
+ahora está en la tabla de mínimos y entre los pisos del dashboard.
+
+Su remisión al art. 32 quedó afuera, y a propósito: el art. 32 regula
+administradores, interventores, liquidadores y árbitros con escalas sobre
+utilidades realizadas o bienes liquidados. Nada de eso encaja con un perito
+médico o ingeniero. **La remisión no aterriza, pero el mínimo de 2 UMA no
+depende de ella:** se aplica solo.
+
+### Los pisos dicen ahora de quién son
+
+La ley separa por sujeto y no por tipo de juicio: los arts. 60 y 61 son de los
+peritos y liquidadores de averías, y los dos cierran remitiendo a las normas
+específicas «en el caso de los demás auxiliares de la Justicia», que son los
+que siguen con el piso de 4 UMA del art. 58. Antes ese 4 UMA decía «Auxiliares
+de la Justicia», a secas, y se leía como si alcanzara a todos.
+
+Esto **no** distingue la banda del 5 % al 10 %: esa sale del art. 21,
+antepenúltimo párrafo, que dice «auxiliares de la Justicia» y los alcanza a
+todos. La distinción es solo de los pisos.
+
+### El 1/4 de UMA dejó de figurar como mínimo, porque no lo es
+
+El tercer párrafo del art. 61 bis dice que al perito que aceptó el cargo y no
+dictaminó porque el proceso terminó por transacción, avenimiento o conciliación
+**«se le regulará»** un cuarto de UMA. No dice «un mínimo de». Es el honorario
+de ese supuesto, no un piso.
+
+### Y ese supuesto ahora aparece cuando corresponde
+
+El piso del art. 61 bis es «por cada pericia», y se mostraba también en casos
+terminados **antes de la apertura a prueba**, donde no hubo ninguna. Ahora, en
+esos casos, ese piso queda marcado como lo que es —presupone una pericia que no
+existió— y al lado aparece el cuarto de UMA, que es el supuesto que la ley
+previó para exactamente eso. **Ningún número se oculta:** se muestran los dos y
+se dice cuál encaja.
+
+### Lo que la ley no resolvió, dicho en la app
+
+El art. 61 bis dice que los honorarios del perito «no estarán vinculados a la
+cuantía del respectivo juicio», y no derogó el 5 % al 10 % del art. 21, que se
+calcula sobre la cuantía. Las dos reglas conviven hasta que haya
+jurisprudencia. Honorio muestra las dos y no elige — el mismo criterio que ya
+aplicaba con el art. 478 CPCCN.
+
+Y una ayuda para saber cuándo la comparación importa: el 5 % crece con la base
+y los pisos no. **Un piso de 2 UMA solo muerde por debajo de una base de 40
+UMA; uno de 4, por debajo de 80.** Con bases mayores el porcentaje ya los supera
+y los pisos quedan teóricos.
+
 ## 3.1.2 — 15 de agosto de 2026
 
 PARCHE: una línea, en tres pantallas. El motor no se tocó.
