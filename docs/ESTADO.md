@@ -624,6 +624,25 @@ Sirve igual para el resto del plan: es la respuesta anticipada a la misma
 objeción en el colegio, en informática del fuero y en cualquier nota que se
 escriba sobre el proyecto.
 
+**El 15/8 subió también a las tres pantallas de resultado** —dashboard, cálculo
+directo y mínimos— porque en la portada llegaba tarde: la objeción no aparece
+al entrar, aparece **mirando el número**. Le volvieron a plantear la pregunta a
+Javier, esta vez sobre un resultado, y se desactivó en el acto.
+
+Es la excepción declarada a la regla de no agregar información: la objeción no
+bloquea una parte de la herramienta, bloquea el uso entero. Vive en
+`SinIA`, en `primitives.tsx`, y **no se imprime**: en un expediente importa de
+qué se calculó y con qué versión —eso lo hace la firma—, no de qué no.
+
+### Nota abierta: el ejemplo del art. 22/25 que está publicado
+
+El README de `herramientas-judiciales` cuenta, en «Sobre el uso de IA», que el
+motor acumulaba la reducción del art. 25 sobre una caducidad resuelta por el
+art. 22. **Javier avisó el 15/8 que no fue así.** El texto sigue publicado y
+hay que corregirlo: es el ejemplo con el que ese README ilustra dónde termina
+lo que un modelo puede hacer, y se cita solo. Falta que Javier diga cuál fue la
+corrección real.
+
 ---
 
 ## Lo del 7/8, segunda tanda: los tres que mueven números

@@ -36,6 +36,7 @@ import {
   LedgerRow,
   Disclosure,
   Segmented,
+  SinIA,
 } from '@/components/dashboard/primitives'
 import { calcularDirecto, fraccionDeRango } from '@/lib/legal/calculo-directo'
 import type { EtapasRol } from '@/lib/legal/calculo-directo'
@@ -144,6 +145,7 @@ export function CalculoDirectoView({
       </AppTopbar>
 
       <div className="mx-auto max-w-3xl px-6 pb-24 pt-8 md:px-8">
+        <SinIA className="mb-3" />
         <h1 className="font-meter text-[30px] leading-tight tracking-tight text-foreground md:text-[38px]">
           Cálculo directo
         </h1>

@@ -11,6 +11,7 @@ import { Firma } from "@/components/dashboard/Firma"
 import { BotonImprimir, HOJA_PROPS } from "@/components/dashboard/imprimir"
 import { BotonCompartir } from "@/components/dashboard/compartir"
 import { PROCESO_LABEL, SENTENCIA_LABEL, EXCEPCIONES_LABEL } from "@/components/dashboard/format"
+import { SinIA } from "@/components/dashboard/primitives"
 import { AppTopbar } from "./app-topbar"
 
 const ease = [0.22, 1, 0.36, 1] as const
@@ -110,6 +111,10 @@ export function DashboardView({ wizard, onBack, onRestart, onShowMinimos }: Dash
             Cálculo de honorarios · Ley 27.423{caso ? ' · ' + caso : ''}
           </p>
         </div>
+
+        {/* Arriba del numero y no al pie: la pregunta por la IA aparece
+            mirando el resultado, no al entrar. */}
+        <SinIA className="mb-5" />
 
         {resultado && datos ? (
           <Dashboard

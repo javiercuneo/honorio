@@ -20,6 +20,7 @@
 // ---------------------------------------------------------------
 
 import { useState, type ReactNode } from "react"
+import { Calculator } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { usePrefs } from "@/components/prefs"
 import { pesos, splitPesos, umaNum } from "./format"
@@ -456,6 +457,43 @@ export function PlegadoEnCelular({
         {children}
       </div>
     </>
+  )
+}
+
+/**
+ * «Los cálculos no usan IA», arriba de toda pantalla que devuelve un
+ * número.
+ *
+ * Estaba solo en la portada, y ahí llega tarde: quien pregunta si esto
+ * lo hizo una inteligencia artificial no pregunta al entrar, pregunta
+ * **cuando ve el número**. Ya paso —le plantearon la objecion mirando
+ * un resultado— y se desactivo en el acto, que es exactamente lo que
+ * esta linea tiene que hacer sola.
+ *
+ * Es informacion de mas en una app cuya regla es no agregar ruido, y
+ * entra igual: la objecion bloquea el uso entero de la herramienta, no
+ * una parte. El precio de una linea es menor que el de una persona que
+ * no la puede usar delante de su jefa.
+ *
+ * No se imprime. En un expediente el papel tiene que decir de que se
+ * calculo y con que version —eso lo hace la Firma—; de que no se
+ * calculo no le importa a nadie.
+ */
+export function SinIA({ className }: { className?: string }) {
+  return (
+    <p
+      data-imprimir="no"
+      className={cn(
+        "flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.16em] text-faint",
+        className,
+      )}
+    >
+      <Calculator className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+      <span>
+        Los cálculos no usan IA · funciones deterministas, verificadas caso por
+        caso
+      </span>
+    </p>
   )
 }
 

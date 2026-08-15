@@ -26,6 +26,7 @@ import {
   LedgerRow,
   Disclosure,
   Norma,
+  SinIA,
 } from '@/components/dashboard/primitives'
 import type { MinimoCategoria, MinimoItem } from '@/lib/legal/minimos-data'
 import {
@@ -169,6 +170,7 @@ export function MinimosView({
       </AppTopbar>
 
       <div className="mx-auto max-w-3xl px-6 pb-24 pt-8 md:px-8">
+        <SinIA className="mb-3" />
         <h1 className="font-meter text-[30px] leading-tight tracking-tight text-foreground md:text-[38px]">
           Mínimos arancelarios
         </h1>

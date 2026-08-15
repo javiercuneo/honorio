@@ -27,6 +27,26 @@ posible —cambió la UMA— que no se podía comprobar.
 
 ---
 
+## 3.1.2 — 15 de agosto de 2026
+
+PARCHE: una línea, en tres pantallas. El motor no se tocó.
+
+- **«Los cálculos no usan IA» ahora está arriba de todo resultado**: en el
+  dashboard de la entrevista, en el cálculo directo y en los mínimos. Estaba
+  solo en la portada y ahí llega tarde: **quien pregunta si esto lo hizo una
+  inteligencia artificial no pregunta al entrar, pregunta cuando ve el
+  número.** Ya pasó, y la objeción se desactivó en el acto — que es lo que la
+  línea tiene que hacer sola.
+
+  Es información de más en una app cuya regla es no agregar ruido, y entra
+  igual. La razón: esta objeción no bloquea una parte de la herramienta,
+  bloquea el uso entero. Una línea cuesta menos que una persona que no la puede
+  usar delante de su jefa.
+
+  **No se imprime.** En un expediente el papel tiene que decir de qué se
+  calculó y con qué versión —eso ya lo hace la firma—; de qué *no* se calculó
+  no le importa a nadie.
+
 ## 3.1.1 — 13 de agosto de 2026
 
 PARCHE: interfaz y redacción. El motor no se tocó.
