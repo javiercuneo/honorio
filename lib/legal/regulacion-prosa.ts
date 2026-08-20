@@ -400,7 +400,7 @@ export function generarProsa(opciones: OpcionesProsa): TextoRegulacion {
         ', que corresponde al ítem ' +
         mediacion.item.item +
         ' de la escala del art. 2° del Anexo III del Decreto 1467/2011, ' +
-        'sustituido por el Anexo I del Decreto 2536.' +
+        'sustituido por el Anexo I del Decreto 2536/2015.' +
         (mediacion.porTope
           ? ' El honorario quedó limitado por el tope de 120,00 UHOM previsto para ese ítem.'
           : ''),

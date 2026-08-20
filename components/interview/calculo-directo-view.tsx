@@ -339,7 +339,7 @@ export function CalculoDirectoView({
                       <span>
                         Honorario básico · ítem {med.item.item}{' '}
                         <span className="ml-1 text-[11px] text-faint">
-                          Decreto 2536/2011, Anexo III
+                          Decreto 2536/2015, Anexo III art. 2°
                         </span>
                       </span>
                     }

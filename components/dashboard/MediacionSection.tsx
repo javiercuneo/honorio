@@ -78,7 +78,7 @@ export function MediacionSection({ baseFinal }: MediacionSectionProps) {
           Mediador
         </h2>
         <span className="font-mono text-[10px] uppercase tracking-wider text-faint">
-          Decreto 2536/2011, Anexo III
+          Decreto 2536/2015, Anexo III art. 2°
         </span>
         <Insignia tono="bg-secondary text-foreground">
           si hubo mediación previa

@@ -3,21 +3,32 @@
 // ---------------------------------------------------------------
 // El honorario basico del mediador.
 //
-// Escala del ANEXO III del Decreto 1467/2011, sustituido por el
-// Decreto 2536/2011. El Decreto 696/2025 reemplazo el Anexo I entero
-// —el regimen de honorarios paso del art. 28 al art. 31— pero **no
-// toco el Anexo III**: lo cita seis veces como derecho vigente.
+// Escala del **art. 2° del ANEXO III del Decreto 1467/2011**, que es
+// el decreto que reglamento la Ley 26.589. Ese Anexo traia una tabla
+// de montos fijos; la tabla actual, en UHOM, entro por el **art. 5°
+// del Decreto 2536/2015 (B.O. 30/11/2015)**, que lo sustituyo entero.
+// El Decreto 696/2025 reemplazo el Anexo I —el regimen de honorarios
+// paso del art. 28 al art. 31— pero **no toco el Anexo III**: lo cita
+// seis veces como derecho vigente.
 //
 // Verificada contra dos fuentes: el texto del decreto y la tabla
 // oficial del Ministerio con los valores de junio a agosto de 2026.
 //
-// **Por que la cita no lleva numero de articulo.** Las tres fuentes no
-// coinciden: el Decreto 696/2025 y el propio Anexo III dicen
-// "articulo 2°", el art. 28 inc. b) del Decreto 2536/2011 dice
-// "articulos 4° y 5°", y la tabla oficial de 2026 dice "articulo 4°".
-// Los numeros del honorario son identicos en las tres, asi que no
-// afecta ningun calculo; afecta la cita, y una cita que no se pudo
-// resolver no se escribe. Falta el texto consolidado del Anexo III.
+// **El numero de articulo estuvo sin resolver y ya no lo esta.** Se
+// habian encontrado tres numeraciones: el Decreto 696/2025 y el propio
+// Anexo III dicen "articulo 2°", el art. 28 inc. b) del 2536 dice
+// "articulos 4° y 5°" y la tabla oficial de 2026 dice "articulo 4°".
+// Manda el Anexo, que es donde esta la escala: **articulo 2°**, con el
+// 1° para el honorario provisional. Las otras dos son remisiones que
+// el propio decreto dejo viejas al renumerar. Los numeros del
+// honorario son identicos en las tres, asi que nunca afecto un calculo.
+//
+// **El año del 2536 tambien estuvo sin resolver, y era 2015 y no
+// 2011.** Lo decide el texto consolidado del 1467/2011, que en la
+// cabeza de su Anexo III trae la nota "(Anexo sustituido por art. 5°
+// del Decreto N° 2536/2015 B.O. 30/11/2015)". El 11 venia del nombre
+// del archivo —`decreto 2536-11.md`, que es el decreto que modifica—
+// y se habia arrastrado a la pantalla.
 //
 // ---- Lo que este modulo NO hace, y por que ----
 //

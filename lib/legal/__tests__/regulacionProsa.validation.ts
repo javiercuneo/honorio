@@ -509,7 +509,7 @@ console.log('9. El lector de numeros lee lo que el generador escribe')
 
 {
   const leidos = numerosDelTexto(
-    '$1.234.567,89 y 45,50 UMA y 17,00 % y el art. 21 del Decreto 2536/2011',
+    '$1.234.567,89 y 45,50 UMA y 17,00 % y el art. 21 del Decreto 2536/2015',
   )
   ok('lee el importe con separadores', leidos.includes(1_234_567.89), leidos.join(', '))
   ok('lee la cifra en UMA', leidos.includes(45.5))

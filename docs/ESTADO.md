@@ -181,18 +181,37 @@ muestra el valor del UHOM con su procedencia al lado. Sin errores de consola.
 es el mismo con ella y sin ella. El desborde que sí hay en móvil es de la barra
 de acciones del resultado y es anterior a esto.
 
-### La escala, y por qué la cita no lleva número de artículo
+### La escala, y la cita que quedó completa el 18/8
 
-Sale del **ANEXO III del Decreto 1467/2011, sustituido por el Decreto
-2536/2011**. El Decreto 696/2025 reemplazó el Anexo I entero —el régimen pasó
-del art. 28 al art. 31— pero no tocó el Anexo III: lo cita seis veces como
-derecho vigente.
+Sale del **art. 2° del ANEXO III del Decreto 1467/2011** —el que reglamentó la
+Ley 26.589—. Ese Anexo traía una tabla de montos fijos; la que está vigente, en
+UHOM, entró por el **art. 5° del Decreto 2536/2015 (B.O. 30/11/2015)**, que lo
+sustituyó entero. El Decreto 696/2025 reemplazó el Anexo I —el régimen pasó del
+art. 28 al art. 31— pero no tocó el Anexo III: lo cita seis veces como derecho
+vigente.
 
-**Las tres fuentes no coinciden en la numeración del artículo** —«2°» según el
-696/2025 y el propio Anexo, «4° y 5°» según el art. 28 inc. b) del 2536/2011,
-«4°» según la tabla oficial de 2026—. Los números del honorario son idénticos
-en las tres, así que no afecta ningún cálculo: afecta la cita, y una cita que
-no se pudo resolver no se escribe. Falta el texto consolidado del Anexo III.
+**La cita tenía dos cosas sin resolver y el 18/8 se cerraron las dos.**
+
+- **El número de artículo.** Había tres numeraciones —«2°» según el 696/2025 y
+  el propio Anexo, «4° y 5°» según el art. 28 inc. b) del 2536, «4°» según la
+  tabla oficial de 2026—. Manda el Anexo, que es donde está la escala:
+  **artículo 2°**, con el 1° para el honorario provisional. Las otras dos son
+  remisiones que el propio decreto dejó viejas al renumerar.
+- **El año del 2536, que era 2015 y no 2011.** Lo decide el texto consolidado
+  del 1467/2011 que ya estaba en `docs/mediacion/`: en la cabeza de su Anexo III
+  trae la nota «(Anexo sustituido por art. 5° del Decreto N° 2536/2015 B.O.
+  30/11/2015)». **El 11 salió del nombre del archivo** —`decreto 2536-11.md`, que
+  se llama así por el decreto que modifica— y de ahí se arrastró a dos pantallas,
+  a los comentarios del módulo, a una validación y a cuatro documentos del
+  repositorio de herramientas.
+
+Ningún número del honorario se movió con esto: las tres numeraciones daban la
+misma escala, y el año nunca entró en una cuenta. Lo que estaba mal era lo que
+el usuario leía al lado de la cifra.
+
+**La trampa que lo produjo, para la próxima:** el nombre de un archivo de
+`docs/` no es una fuente. `decreto 2536-11.md` describe qué decreto modifica, no
+de cuándo es.
 
 ### La decisión que gobierna el módulo
 
