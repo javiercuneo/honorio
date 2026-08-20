@@ -10,12 +10,21 @@
 # El push a main dispara Deploy Pages, asi que el sitio queda con los
 # valores nuevos sin que nadie toque nada.
 #
-# El cron corre los dias 1 y 15 porque la Corte publica la UMA durante
-# el mes y no siempre el mismo dia; dos pasadas alcanzan para que nunca
-# pase mas de dos semanas desactualizada. Al UHOM le viene bien la
-# misma cadencia por otro motivo: cambia todos los meses y rige desde
-# el dia 1, asi que la pasada del 1 lo toma el mismo dia. Igual queda
-# el disparo manual.
+# El cron corre todos los dias. Corria los dias 1 y 15, con el
+# razonamiento de que dos pasadas alcanzaban para que nunca pasara mas
+# de dos semanas desactualizada. Dos semanas resultaron ser mucho: el
+# 20/8/26 la Res. SGA n° 1930/26 entro en la planilla, la pasada del 15
+# ya habia pasado y la siguiente caia el 1 de septiembre. Doce dias de
+# sitio calculando con la UMA vieja, en una app cuyos numeros pueden
+# terminar fundando una regulacion judicial. Una pasada diaria cuesta
+# un minuto de runner y acota ese error a un dia.
+#
+# Al UHOM la cadencia le sirve igual: cambia todos los meses y rige
+# desde el dia 1, asi que la pasada del 1 lo toma el mismo dia.
+#
+# El disparo manual queda, y es el camino cuando hay apuro: Actions ->
+# "UMA y UHOM" -> "Run workflow". Va de la planilla al sitio publicado
+# sin esperar al cron.
 #
 # Si la planilla no responde, o trae algo que no pasa los controles,
 # el script falla y no toca ningun archivo. Publicar con el valor de
@@ -25,7 +34,7 @@ name: UMA y UHOM
 
 on:
   schedule:
-    - cron: '0 11 1,15 * *' # 08:00 en Buenos Aires
+    - cron: '0 11 * * *' # 08:00 en Buenos Aires
   workflow_dispatch:
 
 permissions:
