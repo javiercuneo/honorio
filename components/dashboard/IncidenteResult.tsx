@@ -1,7 +1,7 @@
 import { pesos, umaNum, pct } from "./format"
 import type { CalculoResultado } from "@/lib/legal/types"
 import { INCIDENTE_ESCALA } from "@/lib/legal/jurisprudencia"
-import { Card, CardHeader, Cifra, Disclosure, Etiqueta } from "./primitives"
+import { Card, CardHeader, Cifra, Disclosure, Etiqueta, Fundamento } from "./primitives"
 
 interface IncidenteResultProps {
   resultado: CalculoResultado
@@ -91,32 +91,7 @@ export function IncidenteResult({ resultado }: IncidenteResultProps) {
               Ley 21.839, el régimen anterior. Es un criterio, no una
               transcripción, y esto es lo que lo sostiene:
             </p>
-            <p className="mt-2 font-law text-[15px] leading-relaxed text-foreground/80">
-              &ldquo;{INCIDENTE_ESCALA.sostiene}&rdquo;
-            </p>
-            <ul className="mt-3 space-y-2 border-l-2 border-hair pl-4">
-              {INCIDENTE_ESCALA.fallos.map((f) => (
-                <li key={f.expediente} className="text-[13px] leading-relaxed">
-                  {f.tribunal ? <span>{f.tribunal}, </span> : null}
-                  <span className="font-mono text-[11px]">{f.expediente}</span>,{" "}
-                  <span className="italic">&ldquo;{f.caratula}&rdquo;</span>,{" "}
-                  {f.fecha}
-                  {f.url ? (
-                    <>
-                      {" · "}
-                      <a
-                        href={f.url}
-                        target="_blank"
-                        rel="noopener"
-                        className="text-accent-foreground underline underline-offset-2 hover:text-foreground"
-                      >
-                        ver la sentencia
-                      </a>
-                    </>
-                  ) : null}
-                </li>
-              ))}
-            </ul>
+            <Fundamento criterio={INCIDENTE_ESCALA} className="mt-2" />
           </Disclosure>
 
           <Disclosure

@@ -1,3 +1,5 @@
+import { CADUCIDAD_ART22, type Criterio } from "@/lib/legal/jurisprudencia"
+
 export function pesos(value: number, centavos = true): string {
   if (!isFinite(value)) return 'N/A'
   const d = centavos ? 2 : 0
@@ -140,7 +142,23 @@ export const POSESORIAS_TIPO_LABEL: Record<string, string> = {
  * y aca se traduce a algo legible sin tocar el calculo. Si un id no
  * figura, se muestra el `concepto` del motor tal cual.
  */
-export const REGLA_LABEL: Record<string, { titulo: string; motivo: string }> = {
+/**
+ * El motivo de cada regla del motor, y —cuando la regla es una
+ * interpretacion y no una transcripcion— lo que la sostiene.
+ *
+ * **`criterio` solo va donde el id identifica al caso sin ambiguedad.**
+ * `escala-art25` no lo lleva y no es un olvido: ese id lo emite el
+ * motor tanto para los modos anormales del art. 25 —donde la norma se
+ * aplica directo y no hay nada que interpretar— como para la caducidad
+ * tratada por analogia. Colgarle los fallos de la caducidad haria que
+ * un desistimiento apareciera fundado en jurisprudencia que no habla de
+ * el. Los dos criterios de la caducidad se muestran donde se eligen,
+ * que es el paso de la entrevista.
+ */
+export const REGLA_LABEL: Record<
+  string,
+  { titulo: string; motivo: string; criterio?: Criterio }
+> = {
   "base-desalojo-vivienda": {
     titulo: "Inmueble destinado a vivienda",
     motivo:
@@ -154,7 +172,8 @@ export const REGLA_LABEL: Record<string, { titulo: string; motivo: string }> = {
   "base-caducidad-art22": {
     titulo: "Caducidad tratada como demanda desestimada",
     motivo:
-      "La ley no previó la caducidad de instancia. Este cálculo adopta el criterio de asimilarla a una demanda desestimada (art. 22).",
+      "La ley no previó la caducidad de instancia. Este cálculo adopta el criterio de asimilarla a una demanda desestimada (art. 22), que es una de las dos lecturas que conviven en la Cámara Civil. Esto es lo que la sostiene:",
+    criterio: CADUCIDAD_ART22,
   },
   "escala-unico-letrado": {
     titulo: "Único letrado en la sucesión",

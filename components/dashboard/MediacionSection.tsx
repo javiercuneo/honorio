@@ -41,7 +41,7 @@ import { calcularMediacion } from "@/lib/legal/mediacion"
 import { UHOM_VIGENTE } from "@/lib/legal/uhom"
 import { MEDIACION_BASE_UNICA } from "@/lib/legal/jurisprudencia"
 import { pesos, umaNum } from "./format"
-import { Cifra, Disclosure, Insignia, Tile } from "./primitives"
+import { Cifra, Disclosure, Fundamento, Insignia, Tile } from "./primitives"
 
 /**
  * El equivalente de `EnUMA`, en la otra unidad. Es un componente
@@ -151,19 +151,7 @@ export function MediacionSection({ baseFinal }: MediacionSectionProps) {
             cada una apelable por separado. <strong>Es una interpretación</strong>,
             y esto es lo que la sostiene:
           </p>
-          <p className="mt-2 font-law text-[15px] leading-relaxed text-foreground/80">
-            &ldquo;{MEDIACION_BASE_UNICA.sostiene}&rdquo;
-          </p>
-          <ul className="mt-3 space-y-2 border-l-2 border-hair pl-4">
-            {MEDIACION_BASE_UNICA.fallos.map((f) => (
-              <li key={f.expediente} className="text-[13px] leading-relaxed">
-                {f.tribunal ? <span>{f.tribunal}, </span> : null}
-                <span className="font-mono text-[11px]">{f.expediente}</span>,{" "}
-                <span className="italic">&ldquo;{f.caratula}&rdquo;</span>,{" "}
-                {f.fecha}
-              </li>
-            ))}
-          </ul>
+          <Fundamento criterio={MEDIACION_BASE_UNICA} className="mt-2" />
           <p className="mt-3">
             En el primero el apelante era un perito que planteó que la reducción
             del 30 % del art. 22 no lo alcanzaba por ser auxiliar de la Justicia

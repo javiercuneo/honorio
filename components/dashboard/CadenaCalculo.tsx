@@ -26,6 +26,7 @@ import {
   Cifra,
   Disclosure,
   EnUMA,
+  Fundamento,
   LedgerRow,
   Insignia,
   ROL_TINT,
@@ -156,6 +157,9 @@ function Regla({
       }
     >
       <p>{info?.motivo ?? tx.concepto}</p>
+      {info?.criterio ? (
+        <Fundamento criterio={info.criterio} className="mt-2" />
+      ) : null}
     </Disclosure>
   )
 }

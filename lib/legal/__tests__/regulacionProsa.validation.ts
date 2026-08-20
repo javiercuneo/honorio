@@ -343,7 +343,7 @@ En función del monto del asunto referenciado, la complejidad del procedimiento,
 - Dra. Prueba, letrado/a patrocinante (art. 21): 96,77 UMA, equivalente al día de la fecha a $9.878.026,00.
 
 d) IVA y plazo (art. 54):
-La regulación de honorarios no contiene la alícuota que establece ese impuesto. En consecuencia el beneficiario que se encuentre inscripto deberá acreditar su condición y el obligado al pago adicionarle el monto correspondiente (conf. CSJN, 16/06/1993, “Cía. General de Combustibles SA”).
+La regulación de honorarios no contiene la alícuota que establece ese impuesto. En consecuencia el beneficiario que se encuentre inscripto deberá acreditar su condición y el obligado al pago adicionarle el monto correspondiente (conf. CSJN, 16/06/1993, “Recurso de hecho deducido por Arístides Horacio M. Corti en la causa Compañía General de Combustibles S.A. s/ recurso de apelación”, Fallos 316:1533).
 Los honorarios deberán ser abonados en el plazo de 10 días (art. 54 de la ley 27.423).
 Notifíquese.
 `

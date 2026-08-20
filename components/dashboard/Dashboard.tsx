@@ -148,6 +148,7 @@ function DashboardGeneral({
         valorUMA={resultado.valorUMA}
         alicuota={alicuota}
         ingenuo={ingenuo}
+        tipoProceso={resultado.tipoProceso}
       >
         {selectorRol}
       </HonorariosBand>

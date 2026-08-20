@@ -63,6 +63,7 @@
 import type { CalculoResultado, Rango, Transformacion } from './types'
 import { TOPE_ITEM_G_UHOM } from './mediacion'
 import type { ResultadoMediacion } from './mediacion'
+import { IVA_NO_INCLUIDO, type Fallo } from './jurisprudencia'
 
 // ---- Lo que se puede regular ----
 
@@ -420,17 +421,36 @@ export function generarProsa(opciones: OpcionesProsa): TextoRegulacion {
   }
 
   // ---- IVA y plazo ----
+  //
+  // La cita sale de `jurisprudencia.ts` y ya no esta escrita a mano
+  // aca: era la unica del generador que no salia del archivo que existe
+  // para tenerlas, y estaba ademas abreviada y sin el tomo de Fallos.
   encabezado('IVA y plazo', ['art. 54'])
   p.push(
     'La regulación de honorarios no contiene la alícuota que establece ese ' +
       'impuesto. En consecuencia el beneficiario que se encuentre inscripto ' +
       'deberá acreditar su condición y el obligado al pago adicionarle el monto ' +
-      'correspondiente (conf. CSJN, 16/06/1993, “Cía. General de Combustibles SA”).',
+      'correspondiente (conf. ' +
+      citaDe(IVA_NO_INCLUIDO.fallos[0]) +
+      ').',
   )
   p.push('Los honorarios deberán ser abonados en el plazo de 10 días (art. 54 de la ley 27.423).')
   p.push('Notifíquese.')
 
   return { texto: p.join('\n').trimEnd() + '\n', huecos, errores }
+}
+
+/**
+ * Un fallo, escrito como se cita adentro de una resolucion.
+ *
+ * **No lleva la caratula entera ni el enlace**, a diferencia de como se
+ * ve en pantalla: en el cuerpo de una resolucion la cita va corta y
+ * entre parentesis. Es el mismo dato con dos formas, y por eso las dos
+ * salen del mismo lugar.
+ */
+function citaDe(f: Fallo): string {
+  const partes = [f.tribunal, f.fecha, '“' + f.caratula + '”', f.expediente]
+  return partes.filter(Boolean).join(', ')
 }
 
 /** Las transformaciones visibles de una etapa, en el orden del motor. */

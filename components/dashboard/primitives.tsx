@@ -23,6 +23,7 @@ import { useState, type ReactNode } from "react"
 import { Calculator } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { usePrefs } from "@/components/prefs"
+import type { Criterio } from "@/lib/legal/jurisprudencia"
 import { pesos, splitPesos, umaNum } from "./format"
 
 export type Axis = "base" | "escala" | "honorarios"
@@ -545,6 +546,101 @@ export function Tile({
       <div className="mt-2.5">{valor}</div>
       {sub ? (
         <div className="mt-1.5 font-mono text-[11px] text-faint">{sub}</div>
+      ) : null}
+    </div>
+  )
+}
+
+/**
+ * Lo que sostiene un criterio: la frase, los fallos y la doctrina.
+ *
+ * Existe porque el mismo bloque estaba escrito dos veces —en
+ * `IncidenteResult` y en `MediacionSection`— y ya habian empezado a
+ * divergir: uno mostraba el enlace a la sentencia y el otro no, sin
+ * ningun motivo. Con seis criterios mas, la copia numero tres era la
+ * que iba a quedar sin enlaces para siempre.
+ *
+ * **Los fallos y la doctrina no se mezclan.** Van en dos listas, con su
+ * rotulo, porque un fallo dice lo que un tribunal resolvio y un autor
+ * dice lo que le parece. Y cuando no hay ningun fallo **se dice**, en
+ * vez de dejar que la lista de doctrina ocupe ese lugar en silencio:
+ * que un criterio se apoye solo en doctrina es informacion para quien
+ * lo va a usar, no un detalle de armado.
+ */
+export function Fundamento({
+  criterio,
+  className,
+}: {
+  criterio: Criterio
+  className?: string
+}) {
+  const { fallos, doctrina } = criterio
+  const hayDoctrina = !!doctrina?.length
+
+  return (
+    <div className={className}>
+      <p className="font-law text-[15px] leading-relaxed text-foreground/80">
+        &ldquo;{criterio.sostiene}&rdquo;
+      </p>
+
+      {fallos.length ? (
+        <ul className="mt-3 space-y-2 border-l-2 border-hair pl-4">
+          {fallos.map((f) => (
+            <li key={f.expediente + f.fecha} className="text-[13px] leading-relaxed">
+              {f.tribunal ? <span>{f.tribunal}, </span> : null}
+              <span className="font-mono text-[11px]">{f.expediente}</span>,{" "}
+              <span className="italic">&ldquo;{f.caratula}&rdquo;</span>,{" "}
+              {f.fecha}
+              {f.publicacion ? (
+                <span className="text-faint"> · {f.publicacion}</span>
+              ) : null}
+              {f.url ? (
+                <>
+                  {" · "}
+                  <a
+                    href={f.url}
+                    target="_blank"
+                    rel="noopener"
+                    className="text-accent-foreground underline underline-offset-2 hover:text-foreground"
+                  >
+                    ver la sentencia
+                  </a>
+                </>
+              ) : null}
+              {f.transcripcion ? (
+                <p className="mt-1.5 font-law text-[14px] leading-relaxed text-foreground/70">
+                  &ldquo;{f.transcripcion}&rdquo;
+                </p>
+              ) : null}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="mt-3 text-[13px] leading-relaxed text-faint">
+          Sin jurisprudencia cargada: lo que sigue es doctrina, y por eso
+          está dicho aparte.
+        </p>
+      )}
+
+      {hayDoctrina ? (
+        <div className="mt-3">
+          <Etiqueta>Doctrina</Etiqueta>
+          <ul className="mt-1.5 space-y-1.5 border-l-2 border-hair pl-4">
+            {doctrina.map((d) => (
+              <li key={d.obra + d.anio} className="text-[13px] leading-relaxed">
+                {d.autor}, <span className="italic">{d.obra}</span>,{" "}
+                {d.ciudad ? `${d.ciudad}, ` : ""}
+                {d.editorial}, {d.anio}
+                {d.pagina ? `, ${d.pagina}` : ""}
+                {d.transcripcion ? (
+                  <p className="mt-1.5 font-law text-[14px] leading-relaxed text-foreground/70">
+                    &ldquo;{d.transcripcion}&rdquo;
+                  </p>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+        </div>
       ) : null}
     </div>
   )

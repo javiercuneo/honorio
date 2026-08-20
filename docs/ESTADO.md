@@ -3,7 +3,7 @@
 Documento de continuidad entre sesiones. **Leer antes de empezar a trabajar.**
 Se actualiza en el mismo commit que el trabajo, para que nunca mienta.
 
-Última actualización: 2026-08-12
+Última actualización: 2026-08-19
 
 > Honorio salió de
 > [herramientas-judiciales](https://github.com/javiercuneo/herramientas-judiciales),
@@ -20,6 +20,12 @@ Versión **3.1.0**. El rediseño visual está cerrado y el bug del flujo hacia
 atrás de la entrevista —que arrastraba respuestas de un proceso a otro— quedó
 resuelto. Las 17 validaciones de `lib/legal/__tests__` están en verde y corren
 solas en CI.
+
+**El 19/8 se hizo el barrido de huecos de criterio**: `jurisprudencia.ts` pasó
+de 2 criterios a 8, y la regla de «una interpretación se funda en un fallo o no
+se afirma» dejó de anunciarse sin cumplirse. Ver
+[Los huecos de criterio](#los-huecos-de-criterio-contados-y-fundados--el-198).
+Quedan dos cosas esperando confirmación con otro libro, anotadas ahí.
 
 **El 12/8 arrancó el trabajo de adopción y la app dejó de ser solo una
 pantalla:** un cálculo se puede compartir por enlace, citar y reportar como
@@ -741,6 +747,153 @@ decir.
 
 ---
 
+## Los huecos de criterio, contados y fundados — el 19/8
+
+Salió del barrido que `IDEAS.md` proponía en el repositorio de herramientas y
+que nunca se había hecho: **listar cada punto donde Honorio decide algo que la
+ley no resuelve sola, y anotar con qué está fundado**. La regla de `AGENTS.md`
+—una interpretación se funda en un fallo o no se afirma— se anunciaba desde el
+8/8 y se cumplía en dos lugares de doce.
+
+`jurisprudencia.ts` pasó de **2 criterios a 8**.
+
+| Criterio | Con qué quedó fundado |
+|---|---|
+| Caducidad, art. 22 | `MONOPOLI` (CNCiv., Sala I, 14/08/2026) y el plenario `Multiflex` |
+| Caducidad, art. 25 | `SOLIS` (Sala A, 14/08/2026), `FUNES` (Sala I, 2019) y Pesaresi |
+| Factor de correlación del art. 21 | `RINDEL` (CFed. Resistencia, 14/11/2024) y Díaz & Musich |
+| Mínimos del art. 58, proceso completo | `BURGUEÑO` (Sala H, 07/09/2021) y Pesaresi |
+| | *(es de abogados, no de auxiliares — ver abajo)* |
+| Primera etapa del sucesorio | Solo doctrina: Pesaresi |
+| IVA | CSJN, Fallos 316:1533 |
+
+### El tipo creció en tres direcciones, y ninguna es cosmética
+
+- **`Doctrina` es un tipo aparte de `Fallo`, y la pantalla los separa.** Un
+  fallo dice lo que un tribunal resolvió; un autor dice lo que le parece.
+  Mostrarlos juntos haría pasar una opinión por una decisión.
+- **`fallos: []` es un estado válido y se declara.** La primera etapa del
+  sucesorio no tiene ninguno, y donde se muestra dice «Sin jurisprudencia
+  cargada: lo que sigue es doctrina». Que un criterio se apoye solo en doctrina
+  es información para quien lo va a usar, no un detalle de armado.
+- **`publicacion` y `transcripcion` en `Fallo`**, los dos por `Multiflex`: no
+  tiene sentencia en línea —el único enlace disponible abre el índice entero de
+  plenarios— y se cita por la doctrina que fija, no por lo que decidió.
+
+### La caducidad es el único paso donde la app no decide, y ahora se ve
+
+Son **dos `Criterio` y no uno con una alternativa adentro**, y se muestran
+**debajo de las dos tarjetas del paso**, que es donde se elige. La entrevista
+pregunta porque las dos lecturas conviven, y hasta ahora las ofrecía sin decir
+quién sostiene cada una.
+
+**Lo que decidió no cargar la lista de salas del modelo del juzgado:** la Sala I
+aplicó el art. 25 en 2019 (`FUNES`) y el art. 22 en 2026 (`MONOPOLI`). El mismo
+tribunal fue para los dos lados en siete años. Una lista de salas envejece sola
+y da la impresión de un reparto estable que no existe; dos fallos por corriente
+dicen lo mismo y no caducan.
+
+**`escala-art25` no lleva criterio, y no es un olvido.** El motor emite ese id
+tanto para los modos anormales del art. 25 —donde la norma se aplica directo y
+no hay nada que interpretar— como para la caducidad por analogía. Colgarle los
+fallos de la caducidad haría que un desistimiento apareciera fundado en
+jurisprudencia que no habla de él. Está escrito arriba de `REGLA_LABEL`.
+
+### El error de ubicación que corrigió Javier, y por qué vale escribirlo
+
+**Los mínimos del art. 58 se habían puesto en la sección de auxiliares, y son
+un criterio de abogados.** El razonamiento equivocado era plausible: la sección
+de auxiliares es la que compara un honorario contra un piso, así que ahí parecía
+ir el dato de contra qué se compara.
+
+**Lo que faltaba es de derecho y no se ve leyendo el código: el perito no divide
+su labor en etapas.** O la completa —la pericia y lo que el juez le pida sobre
+ella— o su honorario sale por otra puerta: la «regulación compensatoria
+adecuada» del art. 25, segundo párrafo, inc. b), o el ¼ de UMA del art. 61 bis.
+**No existe un «2/3 de perito» contra el cual comparar un piso.** El único que
+puede partir su actuación es el letrado, que puede no haber alegado.
+
+Así que va pegado a las fracciones del art. 29, que es donde la app parte la
+labor del abogado.
+
+**Y el fallo explica de dónde salió la confusión**, que es lo que lo hace útil
+tener anotado: en `BURGUEÑO` el beneficiario era **un letrado** —el Dr.
+Krischkautzky— en una **ejecución de honorarios**, o sea un trámite divisible en
+etapas. La Sala le elevó el honorario a **6 UMA**, el mínimo entero del art. 58
+inc. b), aplicado por analogía porque el artículo no contempla la ejecución.
+
+Es la cuarta vez que un error de esta clase lo agarra Javier leyendo la pantalla
+y no una validación: **ninguna de las 17 mira dónde está puesto un párrafo.**
+
+### Lo que se descartó, con el motivo
+
+- **`Samudio`** (intereses a tasa activa): la jurisprudencia se está moviendo
+  después de `Barrientos` (CSJN, 15/10/2024). Los dos fallos nuevos de caducidad
+  lo muestran en vivo —la Sala I calcula al 8 % anual por `Barrientos`, la Sala A
+  directamente no incluye intereses sin condena—.
+- **El desalojo sin relación locativa** y **la moneda extranjera**: son cómo se
+  llega a la base, que la ingresa el usuario. Criterio de Javier.
+- **La nota de NotebookLM sobre el art. 41**: sirvió para llegar al libro y no
+  se cita. Repite un «40 %» y en el mismo párrafo se contradice —su propia
+  cuenta de 50 + 40 = 90 exige que la primera etapa sea 50—. Es el ejemplo de
+  por qué la regla pide la fuente y no el resumen.
+
+### Una discrepancia con la doctrina que queda anotada y sin tocar
+
+El libro comentado de Rodríguez Saiach, Kunzmann y Nigro dice que sin
+excepciones la escala del art. 41 queda en **«sólo el 40 %»** —50 menos 10
+puntos—. **Honorio hace 45 %**: `factorEscala 0,5 × factorFinal 0,9`.
+
+No se cambió, y la lectura de la app parece la correcta: el art. 41 manda
+reducir un 10 % *«del que correspondiere regular»*, y lo que correspondería
+regular ya es la mitad de la escala. El art. 34 tiene la fórmula idéntica y se
+trata igual. **Queda esperando la confirmación con otro libro.** Si resultara al
+revés, es una línea, y mueve un número: va al `CHANGELOG` con el caso.
+
+### Lo que sigue declarado abierto
+
+El art. 41 —el 40 % sobre la escala entera y el −10 % que no alcanza a las
+actuaciones posteriores— quedó respaldado por el libro comentado, pendiente de
+esa confirmación. Siguen sin nada detrás, y por eso se dicen como lo que son:
+las dos lecturas de los arts. 60 y 61, el «completo» cuando el proceso terminó
+antes de la apertura a prueba, y el art. 61 bis contra el 5 %-10 % del art. 21
+—este último ya estaba bien declarado y sirvió de modelo para los demás—.
+
+### La primitiva, y por qué había que hacerla antes del tercer criterio
+
+`Fundamento`, en `primitives.tsx`. El bloque estaba escrito dos veces —en
+`IncidenteResult` y en `MediacionSection`— y **ya habían divergido**: uno
+mostraba el enlace a la sentencia y el otro no, sin ningún motivo. Con seis
+criterios más, la copia número tres era la que iba a quedar sin enlaces para
+siempre.
+
+### La cita del IVA se mudó, y el control congelado la cazó
+
+Estaba escrita a mano adentro de una cadena de `regulacion-prosa.ts`,
+abreviada y sin el tomo de Fallos: **era la única cita del generador que no
+salía del archivo que existe para tenerlas**. Ahora sale de `IVA_NO_INCLUIDO`, y
+la prosa la escribe con `citaDe()` —corta y entre paréntesis, como va en el
+cuerpo de una resolución— mientras la pantalla usa la carátula entera. El mismo
+dato con dos formas, de un solo lugar.
+
+**El control 2 falló, que es exactamente lo que tenía que pasar.** Se leyó el
+diff antes de tocar la constante: cambió solo esa cita.
+
+### Verificación
+
+`npm run check` limpio, **las 17 validaciones en verde**, `npm run build` sin
+errores. **Ningún número se movió**: todo lo que entró es texto y citas.
+
+En el navegador se comprobaron las cinco ubicaciones nuevas con una página
+`app/verificar/` temporal —el paso del wizard no llega a montarse con el panel
+del navegador abierto, que es la trampa de `AnimatePresence` anotada más
+abajo—: las dos tarjetas de caducidad con sus fallos, la transcripción de
+`Multiflex` en caja normal, el enlace del CIJ en `FUNES`, el «por qué» del
+art. 21 bajo la barra del excedente, los mínimos en auxiliares y la primera
+etapa **solo** en el dashboard de sucesión. Sin errores de consola. **La página
+se borró después**, que es lo que la hace útil.
+---
+
 ## Lo del 7/8, segunda tanda: los tres que mueven números
 
 ### Art. 41, última oración — actuaciones posteriores a la ejecución
@@ -984,10 +1137,17 @@ interpretación declarada con jurisprudencia se puede discutir; una sin nada
 detrás solo se puede creer o no.**
 
 El primero es el del 2 %-20 %: tres fallos de la CNCiv., dos con enlace a la
-sentencia en el CIJ. **La sala del tercero no está en la fuente y no se
-completó por analogía con el anterior**, aunque el orden de la cita lo sugiera:
-una cita a medias es corregible, una inventada no se distingue de una cierta.
-Está anotado en el propio archivo.
+sentencia en el CIJ.
+
+> **Corregido el 19/8.** Este párrafo decía que la sala del tercero —`FUNES`—
+> «no está en la fuente y no se completó por analogía». **Las dos mitades eran
+> falsas.** El archivo lo traía con `CNCiv., Sala I` desde el commit que lo
+> creó, y no había ninguna nota adentro. Se resolvió del único modo que
+> corresponde: **abriendo la sentencia**. El encabezado del PDF del CIJ dice
+> «CAMARA CIVIL - SALA I», así que la cita siempre estuvo bien y lo que mentía
+> era este documento. Queda escrito porque el modo de fallar es el peligroso:
+> un documento que declara una cautela que el código no tomó deja de servir
+> para auditar el código, y encima tranquiliza.
 
 ### Verificación
 
@@ -1133,8 +1293,23 @@ se leyó lo pegado**.
 
 La planilla la lee el build, no el visitante. `scripts/actualizar-uma.mjs` la
 baja, la compara con `data/uma.json` y agrega una entrada si cambió; un cron
-mensual (`.github/workflows/uma.yml`) lo corre solo y el push dispara el
+**diario** (`.github/workflows/uma.yml`) lo corre solo y el push dispara el
 deploy.
+
+> **El cron era de los días 1 y 15 y eso costó doce días de número
+> equivocado.** El 20/8 la Res. SGA n° 1930/26 ($104.220) entró en la
+> planilla; la pasada del 15 ya había ocurrido y la siguiente caía el 1 de
+> septiembre. El sitio siguió calculando con $102.076 y nada lo avisaba: el
+> legacy —que conserva su `cargarUMA()` y lee la planilla en vivo— mostraba
+> el valor nuevo, así que los dos no coincidían y el que estaba bien era el
+> viejo. Se pasó a diario. **La lección no es la frecuencia sino que nadie
+> se entera:** no hay ningún control que compare `data/uma.json` contra la
+> planilla y avise si divergen. Mientras no lo haya, la ventana de error es
+> igual a la del cron.
+
+**Para forzar la actualización sin esperar al cron**: Actions → «UMA y UHOM» →
+«Run workflow». Está ahí desde el principio (`workflow_dispatch`) y es el
+camino cuando la UMA se movió y hay que publicar hoy.
 
 **La planilla sigue siendo la superficie de edición** y eso era el requisito:
 Javier la actualiza todos los días para su trabajo, y cualquier alternativa
