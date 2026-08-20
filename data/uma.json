@@ -1,11 +1,17 @@
 {
-  "actualizado": "2026-08-05",
+  "actualizado": "2026-08-20",
   "historia": [
     {
       "valor": 102076,
       "fuente": "Res. SGA n° 1785/26",
       "url": "https://www.csjn.gov.ar/documentos/descargar?ID=160573",
       "capturado": "2026-08-05"
+    },
+    {
+      "valor": 104220,
+      "fuente": "Res. SGA n° 1930/26",
+      "url": "https://www.csjn.gov.ar/documentos/descargar?ID=160993",
+      "capturado": "2026-08-20"
     }
   ]
 }
