@@ -23,7 +23,7 @@ import { useState, type ReactNode } from "react"
 import { Calculator } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { usePrefs } from "@/components/prefs"
-import type { Criterio } from "@/lib/legal/jurisprudencia"
+import type { Criterio, Doctrina, Fallo } from "@/lib/legal/jurisprudencia"
 import { pesos, splitPesos, umaNum } from "./format"
 
 export type Axis = "base" | "escala" | "honorarios"
@@ -574,47 +574,18 @@ export function Fundamento({
   criterio: Criterio
   className?: string
 }) {
-  const { fallos, doctrina } = criterio
-  const hayDoctrina = !!doctrina?.length
+  const { fallos, doctrina, contraria } = criterio
 
   return (
     <div className={className}>
-      <p className="font-law text-[15px] leading-relaxed text-foreground/80">
-        &ldquo;{criterio.sostiene}&rdquo;
-      </p>
+      {criterio.sostiene ? (
+        <p className="font-law text-[15px] leading-relaxed text-foreground/80">
+          &ldquo;{criterio.sostiene}&rdquo;
+        </p>
+      ) : null}
 
       {fallos.length ? (
-        <ul className="mt-3 space-y-2 border-l-2 border-hair pl-4">
-          {fallos.map((f) => (
-            <li key={f.expediente + f.fecha} className="text-[13px] leading-relaxed">
-              {f.tribunal ? <span>{f.tribunal}, </span> : null}
-              <span className="font-mono text-[11px]">{f.expediente}</span>,{" "}
-              <span className="italic">&ldquo;{f.caratula}&rdquo;</span>,{" "}
-              {f.fecha}
-              {f.publicacion ? (
-                <span className="text-faint"> · {f.publicacion}</span>
-              ) : null}
-              {f.url ? (
-                <>
-                  {" · "}
-                  <a
-                    href={f.url}
-                    target="_blank"
-                    rel="noopener"
-                    className="text-accent-foreground underline underline-offset-2 hover:text-foreground"
-                  >
-                    ver la sentencia
-                  </a>
-                </>
-              ) : null}
-              {f.transcripcion ? (
-                <p className="mt-1.5 font-law text-[14px] leading-relaxed text-foreground/70">
-                  &ldquo;{f.transcripcion}&rdquo;
-                </p>
-              ) : null}
-            </li>
-          ))}
-        </ul>
+        <ListaFallos fallos={fallos} />
       ) : (
         <p className="mt-3 text-[13px] leading-relaxed text-faint">
           Sin jurisprudencia cargada: lo que sigue es doctrina, y por eso
@@ -622,26 +593,92 @@ export function Fundamento({
         </p>
       )}
 
-      {hayDoctrina ? (
-        <div className="mt-3">
-          <Etiqueta>Doctrina</Etiqueta>
-          <ul className="mt-1.5 space-y-1.5 border-l-2 border-hair pl-4">
-            {doctrina.map((d) => (
-              <li key={d.obra + d.anio} className="text-[13px] leading-relaxed">
-                {d.autor}, <span className="italic">{d.obra}</span>,{" "}
-                {d.ciudad ? `${d.ciudad}, ` : ""}
-                {d.editorial}, {d.anio}
-                {d.pagina ? `, ${d.pagina}` : ""}
-                {d.transcripcion ? (
-                  <p className="mt-1.5 font-law text-[14px] leading-relaxed text-foreground/70">
-                    &ldquo;{d.transcripcion}&rdquo;
-                  </p>
-                ) : null}
-              </li>
-            ))}
-          </ul>
+      {doctrina?.length ? <ListaDoctrina doctrina={doctrina} /> : null}
+
+      {/*
+        La otra lectura del mismo texto. Va **abajo y con su rótulo**, no
+        mezclada: lo que la app hace y lo que la app descarta no se leen
+        igual. Y cuando no trae fuentes se dice, porque una alternativa
+        que nadie escribió pesa distinto de una que sostiene un autor.
+      */}
+      {contraria ? (
+        <div className="mt-4 border-t border-hair pt-3">
+          <Etiqueta>La lectura contraria, que esta app no sigue</Etiqueta>
+          <p className="mt-1.5 font-law text-[15px] leading-relaxed text-foreground/70">
+            &ldquo;{contraria.sostiene}&rdquo;
+          </p>
+          {contraria.fallos?.length ? (
+            <ListaFallos fallos={contraria.fallos} />
+          ) : null}
+          {contraria.doctrina?.length ? (
+            <ListaDoctrina doctrina={contraria.doctrina} />
+          ) : null}
+          {!contraria.fallos?.length && !contraria.doctrina?.length ? (
+            <p className="mt-2 text-[13px] leading-relaxed text-faint">
+              No se encontró quién la sostenga por escrito: ni fallo ni
+              doctrina. Queda dicha igual, porque el texto la admite.
+            </p>
+          ) : null}
         </div>
       ) : null}
+    </div>
+  )
+}
+
+function ListaFallos({ fallos }: { fallos: Fallo[] }) {
+  return (
+    <ul className="mt-3 space-y-2 border-l-2 border-hair pl-4">
+      {fallos.map((f) => (
+        <li key={f.expediente + f.fecha} className="text-[13px] leading-relaxed">
+          {f.tribunal ? <span>{f.tribunal}, </span> : null}
+          <span className="font-mono text-[11px]">{f.expediente}</span>,{" "}
+          <span className="italic">&ldquo;{f.caratula}&rdquo;</span>, {f.fecha}
+          {f.publicacion ? (
+            <span className="text-faint"> · {f.publicacion}</span>
+          ) : null}
+          {f.url ? (
+            <>
+              {" · "}
+              <a
+                href={f.url}
+                target="_blank"
+                rel="noopener"
+                className="text-accent-foreground underline underline-offset-2 hover:text-foreground"
+              >
+                ver la sentencia
+              </a>
+            </>
+          ) : null}
+          {f.transcripcion ? (
+            <p className="mt-1.5 font-law text-[14px] leading-relaxed text-foreground/70">
+              &ldquo;{f.transcripcion}&rdquo;
+            </p>
+          ) : null}
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+function ListaDoctrina({ doctrina }: { doctrina: Doctrina[] }) {
+  return (
+    <div className="mt-3">
+      <Etiqueta>Doctrina</Etiqueta>
+      <ul className="mt-1.5 space-y-1.5 border-l-2 border-hair pl-4">
+        {doctrina.map((d) => (
+          <li key={d.obra + d.anio} className="text-[13px] leading-relaxed">
+            {d.autor}, <span className="italic">{d.obra}</span>,{" "}
+            {d.ciudad ? `${d.ciudad}, ` : ""}
+            {d.editorial}, {d.anio}
+            {d.pagina ? `, ${d.pagina}` : ""}
+            {d.transcripcion ? (
+              <p className="mt-1.5 font-law text-[14px] leading-relaxed text-foreground/70">
+                &ldquo;{d.transcripcion}&rdquo;
+              </p>
+            ) : null}
+          </li>
+        ))}
+      </ul>
     </div>
   )
 }

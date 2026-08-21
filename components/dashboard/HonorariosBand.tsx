@@ -332,14 +332,6 @@ export function HonorariosBand({
                 de arriba, y esto es lo que la sostiene:
               </p>
               <Fundamento criterio={ESCALA_CORRELACION} className="mt-2" />
-              <p className="mt-3">
-                <strong>Hay una lectura alternativa</strong>, que acumula todos
-                los máximos previos en vez del inmediato anterior —para la 3ª
-                escala daría 12,75 UMA en lugar de 11,70—. Esta app no la sigue,
-                por contraria al texto expreso, y no se le encontró respaldo ni
-                en la doctrina ni en los fallos consultados. Queda dicho para
-                que se pueda discutir.
-              </p>
             </Disclosure>
           ) : null}
         </div>

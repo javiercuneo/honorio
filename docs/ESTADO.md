@@ -52,15 +52,35 @@ porque nombra personas. La **Fase 0 quedó cerrada el 13/8**.
 
 ## Lo que está abierto
 
-### Esperando confirmación con otro libro
+### El art. 41, donde los libros se contradicen entre sí
 
-**El art. 41 sin excepciones: ¿45 % o 40 %?** El libro comentado de Rodríguez
-Saiach, Kunzmann y Nigro dice «sólo el 40 %» —50 menos 10 puntos—; Honorio hace
-**45 %** (`factorEscala 0,5 × factorFinal 0,9`), porque el artículo manda
-reducir un 10 % *«del que correspondiere regular»* y lo que correspondería
-regular ya es la mitad de la escala. El art. 34 tiene la fórmula idéntica y se
-trata igual. **No se tocó.** Si resultara al revés es una línea, mueve un número
-y va al [`CHANGELOG`](../CHANGELOG.md) con el caso.
+Se consultaron cuatro obras. **Dos no lo tratan** —Pesaresi y Díaz & Musich— y
+las otras dos dicen cosas distintas: cada una le da la razón a Honorio en un
+punto y se la quita en el otro.
+
+| | 40 % sobre la escala entera | −10 % deja 45 % |
+|---|---|---|
+| Rodríguez Saiach, Kunzmann y Nigro | coincide | contradice: dice 40 % |
+| Beade | contradice: «sobre lo anterior» | coincide |
+
+**Ningún número se tocó**, y los dos motivos son de texto:
+
+- **El 40 % va sobre la escala del art. 21**, porque el artículo dice «de la
+  escala del citado artículo» y el citado es el 21. La cuenta cierra sola:
+  50 % + 40 % = 90 %, o sea el 100 % menos el 10 % del propio artículo.
+- **Sin excepciones queda 45 %** (`factorEscala 0,5 × factorFinal 0,9`), porque
+  el artículo manda reducir un 10 % *«del que correspondiere regular»* y lo que
+  correspondía ya era la mitad. El art. 34 tiene la fórmula idéntica.
+
+**El primero se declara abierto en pantalla**, con las dos lecturas y sus
+libros, en `ART41_POSTERIORES`. **El segundo no**: ahí la única voz en contra es
+Rodríguez Saiach, Beade coincide con la app, y la pantalla ya dice cuánto
+reduce y por qué. Si aparece un fallo o un tercer libro, entra al criterio.
+
+**Un dato para pesar a Beade en este punto**, y no es un ataque al autor: en el
+mismo ejemplo calcula el máximo como el 15 % del total de la base e ignora el
+factor de correlación del art. 21 —el criterio que la propia app funda con
+`RINDEL` y con Díaz & Musich—. Su punto de partida arranca corrido un 5,4 %.
 
 ### Lo que la app declara abierto porque no hay nada detrás
 
@@ -272,6 +292,10 @@ está la regla y su razón, que es lo que hay que saber antes de tocar el archiv
   pantalla. Ninguna cita se escribe a mano en otro archivo.
 - **El bloque de fundamento es la primitiva `Fundamento`**, en
   `primitives.tsx`. Estuvo escrito dos veces y ya habían divergido.
+- **`Criterio.contraria` muestra la lectura que la app descarta**, con sus
+  fuentes o con la falta de ellas. Un criterio mostrado solo se lee como si
+  fuera el único posible. La del art. 21 va sin ninguna, y la pantalla dice que
+  no se encontró quién la sostenga por escrito.
 
 ### Los pisos de los auxiliares
 

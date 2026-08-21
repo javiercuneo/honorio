@@ -63,6 +63,23 @@ export interface Doctrina {
   transcripcion?: string
 }
 
+/**
+ * La lectura contraria de un mismo texto legal.
+ *
+ * **Existe para que la app pueda decir que eligio.** Un criterio
+ * mostrado solo se lee como si fuera el unico posible; mostrado al lado
+ * del que descarta, se lee como lo que es.
+ *
+ * `fallos` y `doctrina` son opcionales **y su ausencia dice algo**: hay
+ * lecturas alternativas que se discuten y no tienen a nadie escrito
+ * detras. La presentacion lo declara en vez de disimularlo.
+ */
+export interface Contraria {
+  sostiene: string
+  fallos?: Fallo[]
+  doctrina?: Doctrina[]
+}
+
 export interface Criterio {
   /** Que sostiene, en una frase. */
   sostiene: string
@@ -73,6 +90,8 @@ export interface Criterio {
    */
   fallos: Fallo[]
   doctrina?: Doctrina[]
+  /** La otra lectura del mismo texto, cuando la hay. */
+  contraria?: Contraria
 }
 
 /**
@@ -303,6 +322,12 @@ export const ESCALA_CORRELACION: Criterio = {
       anio: 2026,
     },
   ],
+  // Sin fallos ni doctrina, y eso es el dato: la alternativa se discute
+  // y no se le encontro respaldo escrito.
+  contraria: {
+    sostiene:
+      'El piso de cada escala sería la acumulación de todos los máximos previos, y no el del grado inmediato anterior: para la 3ª escala, 12,75 UMA en lugar de 11,70.',
+  },
 }
 
 /**
@@ -413,4 +438,76 @@ export const IVA_NO_INCLUIDO: Criterio = {
       url: 'https://sjconsulta.csjn.gov.ar/sjconsulta/documentos/verDocumentoSumario.html?idDocumentoSumario=4059',
     },
   ],
+}
+
+/**
+ * El 40 % de las actuaciones posteriores a la ejecucion propiamente
+ * dicha (art. 41, ultima oracion): sobre que se calcula.
+ *
+ * **Este criterio se declara abierto a proposito.** No hay ninguno
+ * asentado: se consultaron cuatro obras y el resultado fue que dos
+ * callan y las otras dos se contradicen entre si, y cada una le da la
+ * razon a esta app en un punto y se la quita en el otro.
+ *
+ *   Rodriguez Saiach, Kunzmann y Nigro   40 % sobre la escala: coincide
+ *   Beade                                40 % sobre lo anterior: no
+ *   Pesaresi                             no lo trata
+ *   Diaz y Musich                        no lo trata
+ *
+ * **Por que la app sigue esta lectura y no la otra**, aunque el punto
+ * este abierto: el art. 41 dice "en un cuarenta por ciento (40%) **de
+ * la escala del citado articulo**", y el citado es el 21. "De lo
+ * anterior" es otra cosa que el texto no dice. Y la cuenta cierra: la
+ * mitad de la primera etapa mas el 40 % de la segunda dan el 90 %, que
+ * es el 100 % menos el 10 % del propio articulo.
+ *
+ * **Un dato para pesar a Beade, y no es un ataque al autor:** en el
+ * mismo ejemplo calcula el maximo de la escala como el 15 % del total
+ * de la base —$150.000 sobre $1.000.000— e ignora el factor de
+ * correlacion del art. 21, que es el criterio que ESCALA_CORRELACION
+ * funda mas arriba con RINDEL y con Diaz & Musich. Por esa regla el
+ * maximo es 292,78 UMA y no 277,78: su punto de partida ya esta corrido
+ * un 5,4 % antes de llegar a la discusion del 40 %.
+ *
+ * **Y un punto donde pasa lo contrario, que conviene tener escrito.**
+ * Sobre el -10 % por no haber excepciones, Beade **coincide** con esta
+ * app y Rodriguez Saiach **no**: Beade lo calcula sobre la mitad
+ * ($75.000 a $67.500, o sea 0,5 x 0,9 = 45 % de la escala, que es lo
+ * que hace `aplicarReduccionesFinales()`), mientras que Rodriguez
+ * Saiach dice que la escala queda en "solo el 40 %", restando puntos
+ * porcentuales. La app se queda en el 45 % porque el art. 41 manda
+ * reducir un 10 % "del que correspondiere regular", y lo que
+ * correspondia regular ya era la mitad. El art. 34 tiene la formula
+ * identica y se trata igual.
+ */
+export const ART41_POSTERIORES: Criterio = {
+  sostiene:
+    'Las actuaciones posteriores a la ejecución propiamente dicha se regulan en el cuarenta por ciento de la escala del art. 21, y no sobre el honorario ya reducido de la ejecución: la mitad de la primera etapa más el cuarenta por ciento de la segunda dan el noventa por ciento de la escala, que es el ciento por ciento menos el diez por ciento del propio artículo.',
+  fallos: [],
+  doctrina: [
+    {
+      autor: 'Rodríguez Saiach, Luis A. y Kunzmann, Walter L., con contribuciones de Nigro, Marcela',
+      obra: 'Ley de honorarios profesionales de abogados, procuradores y auxiliares de la Justicia nacional y federal comentada: Ley 27.423',
+      editorial: 'Albremática',
+      ciudad: 'Ciudad Autónoma de Buenos Aires',
+      anio: 2023,
+      pagina: 'p. 347',
+      transcripcion:
+        '50 % hasta la sentencia de venta + 40 % posterior es un 90 % que equivale a 100 % − 10 % = 90 %.',
+    },
+  ],
+  contraria: {
+    sostiene:
+      'Los trámites posteriores se regularían en un cuarenta por ciento sobre lo anterior, es decir, sobre el honorario de la ejecución ya reducido a la mitad y con el diez por ciento descontado.',
+    doctrina: [
+      {
+        autor: 'Beade, Jorge Enrique',
+        obra: 'Honorarios profesionales de abogados, procuradores y auxiliares de la Justicia nacional y federal. Ley 27.423 comentada',
+        editorial: 'Rubinzal-Culzoni',
+        anio: 2018,
+        transcripcion:
+          'Los trámites posteriores a la notificación de la resolución dictada conforme artículo 508 del Código Procesal, se regularán en un 40 % sobre lo anterior.',
+      },
+    ],
+  },
 }

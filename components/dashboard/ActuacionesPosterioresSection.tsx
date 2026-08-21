@@ -15,7 +15,8 @@
 
 import type { ReactNode } from "react"
 import type { Rango } from "@/lib/legal/types"
-import { Cifra, Disclosure, EnUMA, Tile } from "./primitives"
+import { Cifra, Disclosure, EnUMA, Fundamento, Tile } from "./primitives"
+import { ART41_POSTERIORES } from "@/lib/legal/jurisprudencia"
 
 interface ActuacionesPosterioresSectionProps {
   rango: Rango
@@ -97,6 +98,19 @@ export function ActuacionesPosterioresSection({
             oración regula un tramo aparte remitiendo a la escala sin
             descuentos.
           </p>
+          {/*
+            El punto se declara abierto y no resuelto. Se consultaron cuatro
+            obras: dos callan y las otras dos se contradicen entre si. El
+            detalle esta en el comentario de ART41_POSTERIORES.
+          */}
+          <p className="mt-3">
+            <strong>Sobre este punto no hay criterio asentado</strong>, y
+            conviene saberlo antes de firmar: de cuatro obras consultadas, dos
+            no lo tratan y las otras dos dicen cosas distintas. La app sigue la
+            que se ajusta al texto —«de la escala del citado artículo»— y deja
+            la otra a la vista.
+          </p>
+          <Fundamento criterio={ART41_POSTERIORES} className="mt-2" />
         </Disclosure>
       </div>
     </section>
