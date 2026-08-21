@@ -167,3 +167,28 @@ compartido, se arregla allá —que es la fuente— y se propaga a propósito.
 Están todas en la sección final de [`docs/ESTADO.md`](docs/ESTADO.md), con el
 detalle de qué pasa y por qué. No se duplican acá para que no se desincronicen.
 Si te chocaste con una nueva, agregala ahí.
+
+---
+
+## Datos: qué no entra a este repositorio
+
+Este repositorio es **público**. Todo lo que entra —código, comentarios, docs y
+**los mensajes de commit**— lo lee cualquiera, y no se saca después: un commit que
+borra algo lo deja igual de accesible y encima señala dónde estaba.
+
+`pre-commit` corre el verificador de datos y bloquea lo de abajo. Está para atajar
+el olvido, no para reemplazar el criterio.
+
+- **No entran** nombres de personas, domicilios, teléfonos, correos ajenos, DNI,
+  CUIT/CUIL, CBU ni matrículas. Ni en archivos, ni en comentarios, ni en commits.
+- **No entran** carátulas ni números de expediente de causas propias. Las citas de
+  jurisprudencia publicada sí, pero **sin anotar la relación de la causa con esta
+  oficina**: esa anotación no funda nada y ubica todo.
+- **No entran binarios ofimáticos** (`.docx`, `.pdf`, `.xlsx`): viajan con metadatos,
+  encabezados e identificadores del documento de origen que no se ven al abrirlos.
+- **Los datos de prueba son inventados**: la forma del caso, el contenido de nadie.
+- **Se describe la forma, no el caso.** «Un documento largo» en vez de la cantidad de
+  fojas. Ni la palabra «real», ni fechas de actuaciones.
+- **El material de trabajo vive fuera del árbol**, no ignorado adentro: un
+  `.gitignore` no saca lo que ya entró.
+- **Si falta una referencia que parece que debería estar, falta a propósito.**
