@@ -12,24 +12,11 @@ Cómo usarlo:
 - Lo que se descarta **no se borra**: baja a *Descartado*, con el motivo. Un
   descarte sin motivo se vuelve a proponer solo.
 - Cuando algo se hace, se va al [CHANGELOG](../CHANGELOG.md) y desaparece de
-  acá.
+  acá. Cómo quedó y por qué, a [`HISTORIA.md`](HISTORIA.md).
 
 ---
 
 ## En estudio
-
-### Honorarios de mediación
-
-Hoy viven aparte, en `calculadoras/honorarios-mediacion.html` (Ley 26.589),
-como calculadora HTML suelta. La regulación de honorarios de un expediente
-que pasó por mediación los necesita en la misma pantalla.
-
-Lo que hay que decidir antes de tocar código: si el mediador es **un rol más**
-dentro del cálculo actual —como el procurador o el perito— o **un cálculo
-paralelo** que comparte solo la UMA y la base. Son dos arquitecturas
-distintas y la respuesta es jurídica, no técnica: el honorario del mediador
-no sale de la escala del art. 21 sino de una tabla propia, lo que empuja
-hacia el cálculo paralelo con presentación unificada.
 
 ### Consumo del motor desde afuera
 
@@ -70,33 +57,10 @@ lector, en ese uso el efecto principal de la AGPL es el copyleft sobre la
 distribución. Donde muerde de verdad es exactamente acá: el día que el motor
 esté detrás de una API.
 
-### Regulación completa redactada
-
-Que además del número devuelva el párrafo: la regulación escrita, con los
-artículos citados y las reducciones fundadas, listo para pegar en la
-resolución.
-
-Es lo que más ahorra y también lo más delicado: el texto lo firma un juez.
-Dos condiciones antes de empezar:
-
-1. El texto sale **del `CalculoResultado`**, no de un modelo de lenguaje. Las
-   transformaciones ya traen artículo, factor y valores; el párrafo es una
-   plantilla sobre eso. Determinista y verificable línea por línea.
-2. Se entrega como **borrador editable**, nunca como texto final.
-
-### Informe imprimible
-
-Ver la conversación del 31/7: PDF del cálculo con un interruptor para incluir
-o no las explicaciones. Requiere mostrar la versión del motor en el informe,
-para que el papel diga con qué criterios se calculó.
-
 ---
 
 ## Anotado, sin estudiar
 
-- **Caducidad.** La ley no la previó y la app adopta un criterio. Está
-  declarado en `REGLA_LABEL` (`base-caducidad-art22`) pero merece tratamiento
-  visible en el ledger, como el resto de los criterios adoptados.
 - **Briefs reales en el schema.** Varios pasos traen `brief: 'Ver más'`, que
   era el rótulo de un botón viejo. Hoy se reemplaza en presentación; el
   schema debería traer el resumen de verdad.

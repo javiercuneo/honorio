@@ -8,7 +8,13 @@ no repite nada.
 el código no puede llevar: en qué punto está el trabajo, qué decisiones de
 diseño e interpretación ya se tomaron y por qué, qué se sabe roto y qué trampas
 ya costaron tiempo. Se actualiza en el mismo commit que el trabajo que
-describe. Si vas a cerrar una sesión, actualizalo.
+describe.
+
+**Al cerrar una sesión, `ESTADO.md` se actualiza y se limpia**: lo que quedó
+terminado baja a [`docs/HISTORIA.md`](docs/HISTORIA.md) con su fecha y en
+`ESTADO.md` queda el invariante, si dejó alguno. `HISTORIA.md` no se lee al
+arrancar: se abre cuando aparece la pregunta «¿por qué esto quedó así?». Un
+`ESTADO.md` que acumula todo lo hecho deja de ser lo primero que se lee.
 
 ---
 
@@ -40,7 +46,7 @@ Lo que se sigue de eso:
 - **No elimines validaciones** porque parezcan defensivas de más.
 - **El motor clásico no es un oráculo.** Es la referencia histórica de la que
   salió esta app, no la verdad. Ya se encontró al menos un caso donde ambos
-  compartían el mismo agujero (ver `ESTADO.md`, flujo hacia atrás). Que dos
+  compartían el mismo agujero (ver `HISTORIA.md`, flujo hacia atrás). Que dos
   implementaciones coincidan prueba que son consistentes, no que están bien.
 
 **Lo que sí podés hacer sin preguntar:** cambios de interfaz, texto, estilos,
@@ -59,7 +65,7 @@ Orden de prioridades cuando entran en conflicto:
 Un solo comando, y es el mismo que corre CI:
 
 ```bash
-npm run check      # tipos + las 15 validaciones
+npm run check      # tipos + las 17 validaciones
 ```
 
 Por separado, si necesitás aislar:
