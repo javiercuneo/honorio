@@ -97,10 +97,6 @@ son unas horas y no importa.
 
 ### Deudas anotadas a propósito
 
-- **Nada compara `data/uma.json` contra la planilla y avisa si divergen.**
-  Mientras no lo haya, la ventana de error es igual a la del cron —hoy diario—.
-  El 20/8 esa ventana costó doce días de número equivocado con el cron
-  quincenal, y nadie se enteró. Es la deuda más cara de la lista.
 - **El UHOM entra sin procedencia.** La planilla trae el número pero no su
   norma —la fila `Acordada` describe la UMA—. Mientras no existan las filas
   `UHOM_FUENTE` y `UHOM_URL`, cada valor nuevo entra sin cita y el script avisa;
@@ -338,6 +334,33 @@ está la regla y su razón, que es lo que hay que saber antes de tocar el archiv
   el push dispara el deploy.
 - **Para forzarlo sin esperar al cron:** Actions → «UMA y UHOM» →
   *Run workflow*. Es el camino cuando la UMA se movió y hay que publicar hoy.
+- **Un control diario comprueba que el sitio calcule con el valor de la
+  planilla** (`scripts/verificar-publicado.mjs`,
+  `.github/workflows/verificar-uma.yml`, `npm run verificar`). Corre a las 11,
+  tres horas después de la sincronización, y **si no coinciden falla**: el mail
+  de workflow fallido de GitHub es el aviso.
+  - **Mira lo servido, no el repositorio.** Comparar `data/uma.json` contra la
+    planilla sería preguntarle a la sincronización si sincronizó: lo escribe el
+    mismo script leyendo la misma planilla, así que coinciden por construcción,
+    y si no corrió tampoco corre el control. De punta a punta caza los cuatro
+    casos con una comparación —el cron no corrió, se plantó en un control, el
+    deploy falló, o lo servido quedó viejo—.
+  - **Por eso el sitio publica `honorio.ar/uma.json`** y `uhom.json`: copias que
+    genera `prebuild` desde `data/`, gitignoreadas. Sin eso el único lugar donde
+    vive el número publicado es adentro de un chunk con nombre con hash, y
+    pescarlo con un grep es una heurística que un día empieza a decir «todo
+    bien» sin haber mirado nada.
+  - **La cita no lo pone en rojo, sólo el número.** Un valor equivocado le
+    arruina la regulación a alguien; una fuente vieja se corrige en la corrida
+    siguiente. Si el rojo significara las dos cosas dejaría de significar la
+    primera.
+  - **No arregla nada, avisa.** Si la sincronización no corrió hay una razón, y
+    volver a dispararla a ciegas es como se pierde el próximo caso de «el
+    script se plantó porque el número venía mal».
+- **El lector de la planilla es `scripts/planilla.mjs`,** compartido por el que
+  sincroniza y el que controla. **El control no puede tener su propio lector:**
+  si los dos interpretaran el CSV distinto, se equivocarían juntos y el control
+  daría verde justo cuando no. Era la tercera copia de `parseImporte`.
 - **La planilla es la superficie de edición y eso era el requisito.** Javier la
   actualiza todos los días para su trabajo; cualquier alternativa que le pidiera
   un segundo acto de actualización se iba a pudrir.
@@ -664,6 +687,7 @@ Consecuencias que hay que sostener:
 npm run check    # tipos + las 17 validaciones. Es lo que corre CI.
 npm run build    # el export estatico, que es lo que se publica
 npm run uma      # trae el valor de la UMA de la planilla, si cambio
+npm run verificar # controla que honorio.ar calcule con el valor de la planilla
 ```
 
 Qué son las validaciones y qué pasa si una falla está en

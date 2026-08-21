@@ -1,0 +1,55 @@
+# ------------------------------------------------------------------
+# Controla que honorio.ar este calculando con el valor que dice la
+# planilla, y avisa si no.
+#
+# El porque de mirar el sitio y no el repositorio esta en
+# scripts/verificar-publicado.mjs. En una linea: comparar el repo
+# contra la planilla es preguntarle a la sincronizacion si sincronizo.
+#
+# **Corre a las 11 de Buenos Aires, tres horas despues del cron que
+# sincroniza.** No es un numero al azar: entre que `UMA y UHOM`
+# commitea y que Pages sirve el archivo nuevo pasa un deploy, y un
+# control que corre pegado al otro se pondria rojo por estar mirando
+# demasiado temprano. Tres horas es holgura de sobra para un deploy de
+# un minuto, y sigue avisando el mismo dia.
+#
+# **Como avisa: fallando.** GitHub manda un mail al dueño del
+# repositorio cuando un workflow programado falla, y ese mail es el
+# aviso — no hay que configurar nada ni mirar ningun tablero. El log
+# trae los dos valores y el paso a seguir.
+#
+# Este workflow no arregla nada a proposito. Si la sincronizacion no
+# corrio hay una razon, y volver a dispararla a ciegas es como se
+# pierde el proximo caso de "el script se planto porque el numero
+# venia mal".
+# ------------------------------------------------------------------
+name: Control de la UMA publicada
+
+on:
+  schedule:
+    - cron: '0 14 * * *' # 11:00 en Buenos Aires
+  workflow_dispatch:
+
+# Solo lee: la planilla y el sitio publicado. No toca el repositorio.
+permissions:
+  contents: read
+
+concurrency:
+  group: verificar-uma
+  cancel-in-progress: false
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      # Sin `npm ci`: el script usa fetch y modulos de node, nada mas.
+      # Instalar dependencias aca solo agregaria formas de que el
+      # control falle por motivos que no son el que vino a mirar.
+      - name: Comparar lo publicado contra la planilla
+        run: node scripts/verificar-publicado.mjs

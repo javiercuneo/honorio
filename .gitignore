@@ -23,3 +23,9 @@ tsconfig.tsbuildinfo
 # dejaba el arbol sucio despues de cualquier sesion. Se regenera en cada
 # `dev`/`build`, y `tsc --noEmit` pasa igual sin el: verificado.
 next-env.d.ts
+
+# Copias que genera `prebuild` desde data/ para que el sitio sirva el
+# valor con el que calcula (honorio.ar/uma.json). La fuente es data/;
+# versionar la copia seria tener dos numeros que un dia discrepan.
+public/uma.json
+public/uhom.json

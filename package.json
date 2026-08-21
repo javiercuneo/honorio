@@ -7,12 +7,14 @@
   "author": "L. Javier Cúneo Libarona",
   "scripts": {
     "dev": "next dev",
+    "prebuild": "node scripts/publicar-valores.mjs",
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "validate": "node scripts/validate.mjs",
     "check": "npm run typecheck && npm run validate",
-    "uma": "node scripts/actualizar-uma.mjs"
+    "uma": "node scripts/actualizar-uma.mjs",
+    "verificar": "node scripts/verificar-publicado.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",
