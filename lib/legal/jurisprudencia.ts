@@ -532,7 +532,7 @@ export const ART41_POSTERIORES: Criterio = {
  *     regulatoria de los honorarios por ante el juez oficiado, se
  *     debera acompanar copia de la demanda, y de la reconvencion".
  *
- * **Por que no es una base de verdad:** el principal sigue en tramite
+ * **Por que no es una base en sentido tecnico:** el principal sigue en tramite
  * y se desconoce el resultado. De ahi las dos consecuencias que la
  * app tiene que decir y no decia: el numero es *a cuenta* del que en
  * definitiva se determine, y el monto entra como indicio y no como
