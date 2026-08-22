@@ -764,11 +764,156 @@ export const STEP_POSESORIAS_TIPO: CardsStepDef = {
     },
 }
 
+// ---- Los sub-pasos del exhorto ----
+// El art. 50 tiene tres incisos con tres reglas distintas, y hasta el
+// 21/8/2026 la app los mostraba los tres a la vez sin preguntar cual
+// regia. Eso es una tabla, no una respuesta: la prosa redactaba dos
+// parrafos para un mismo exhorto y el inciso a) no se podia redactar.
+
+export const EXHORTO_INCISO: CardOption[] = [
+  {
+    id: 'a',
+    label: 'Notificaciones o actos semejantes',
+    description: 'Cédulas, traslados y diligencias equivalentes. Desde 3 UMA, sin máximo',
+    hint: 'Art. 50, a)',
+  },
+  {
+    id: 'b',
+    label: 'Inscripciones y actos registrales',
+    description:
+      'Dominios, hijuelas, testamentos, gravámenes, secuestros, embargos, inhibiciones, inventarios, remates, desalojos. De 10 a 20 UMA',
+    hint: 'Art. 50, b)',
+  },
+  {
+    id: 'c',
+    label: 'Diligencias de prueba',
+    description: 'Pericias y medidas de prueba producidas o controladas acá. De 7 a 30 UMA',
+    hint: 'Art. 50, c)',
+  },
+]
+
+export const EXHORTO_MONTO_TIPO: CardOption[] = [
+  {
+    id: 'consta',
+    label: 'Sí, consta el monto',
+    description: 'Lo trae el oficio, o surge de la demanda acompañada',
+    hint: 'Ley 22.172',
+  },
+  {
+    id: 'sin_monto',
+    label: 'No susceptible de apreciación pecuniaria',
+    description: 'El asunto no tiene monto, así que no consta en ningún lado',
+  },
+]
+
+export const STEP_EXHORTO_INCISO: CardsStepDef = {
+  id: 'exhortoInciso',
+  kind: 'cards',
+  select: 'single',
+  eyebrow: 'Exhorto',
+  pregunta: '¿Qué se encomienda en el exhorto?',
+  ayuda: 'Los tres incisos del art. 50 no comparten regla: uno fija un piso sin techo y los otros dos una escala cerrada',
+  resumenLabel: 'Inciso del art. 50',
+  options: EXHORTO_INCISO,
+  dependsOn: ['tipoProceso'],
+  condition: (answers) => answers.tipoProceso === 'exhorto',
+  explicacion: {
+    brief: 'Por qué hay que elegir uno, y qué cambia',
+    expanded:
+      'El inciso a) dice que los honorarios «no podrán ser inferiores a 3 UMA» y no fija ningún máximo: es un piso con el techo abierto. Los incisos b) y c), en cambio, mandan regular «en una escala entre» dos valores, con los dos extremos escritos. Por eso el resultado no puede ser el mismo en los tres.',
+    full: [
+      'ARTÍCULO 50.- Los honorarios por diligenciamiento de exhortos u oficios contemplados en la ley 22.172 serán regulados de conformidad a las siguientes pautas: a) Si se tratare de notificaciones o actos semejantes, los honorarios no podrán ser inferiores a tres (3) UMA; b) Si se solicitaren inscripciones de dominios, hijuelas, testamentos, gravámenes, secuestros, embargos, inhibiciones, inventarios, remates, desalojos, o cualquier otro acto registral, los honorarios se regularán en una escala entre diez (10) y veinte (20) UMA. En los casos de designaciones de auxiliares de la Justicia ante rogatorias u oficios provenientes de otra jurisdicción y a los efectos de poder establecer la base regulatoria de los honorarios por ante el juez oficiado, se deberá acompañar copia de la demanda, y de la reconvención, si la hubiera; c) Si se tratare de diligencias de prueba y se hubiera intervenido en su producción o contralor, el juez exhortado regulará los honorarios proporcionalmente a la labor desarrollada, en una escala entre siete (7) y treinta (30) UMA.',
+    ],
+  },
+}
+
+export const STEP_EXHORTO_ACTOS: NumericStepDef = {
+  id: 'exhortoActos',
+  kind: 'numeric',
+  eyebrow: 'Volumen',
+  pregunta: '¿Cuántos actos comprende el exhorto?',
+  ayuda: 'Opcional. No multiplica el piso: queda escrito en la resolución como el hecho que justifica apartarse de las 3 UMA',
+  resumenLabel: 'Cantidad de actos',
+  unidad: 'actos',
+  min: 0,
+  max: 10000,
+  step: 1,
+  default: 0,
+  format: (v) => (v > 0 ? String(v) : 'sin declarar'),
+  dependsOn: ['exhortoInciso'],
+  condition: (answers) => answers.exhortoInciso === 'a',
+  explicacion: {
+    brief: 'Por qué se pregunta y por qué no se multiplica',
+    expanded:
+      'El inciso a) fija 3 UMA como piso y no dice si son por exhorto o por acto. Pesaresi plantea la duda, y la lectura por acto tiene un problema propio: con tres cédulas se superarían las 10 UMA que el art. 58 inc. a) fija como mínimo de un proceso de conocimiento entero. Pero el piso único también ignora algo real, porque un exhorto con doscientas notificaciones es trabajo. Honorio no resuelve la duda: registra cuántos actos son, para que la resolución pueda decir por qué el número está donde está.',
+    full: [
+      'ARTÍCULO 58.- El mínimo establecido para regular honorarios de juicios susceptibles de apreciación pecuniaria que no estuviesen previstos en otros artículos será el siguiente: a) En los procesos de conocimiento, de diez (10) UMA;',
+    ],
+  },
+}
+
+export const STEP_EXHORTO_MONTO_TIPO: CardsStepDef = {
+  id: 'exhortoMontoTipo',
+  kind: 'cards',
+  select: 'single',
+  eyebrow: 'Juicio exhortante',
+  pregunta: '¿Existe constancia del monto del juicio de origen?',
+  ayuda: 'Puede venir en el oficio, que debe consignarlo, o surgir de la demanda: el art. 50 manda acompañarla y ahí el monto es infalible',
+  resumenLabel: 'Monto del exhortante',
+  options: EXHORTO_MONTO_TIPO,
+  // Depende del tipo de proceso y no del inciso: el monto se pregunta
+  // en los tres. Que venga despues del inciso es el orden de
+  // ALL_STEPS, no una condicion.
+  dependsOn: ['tipoProceso'],
+  condition: (answers) => answers.tipoProceso === 'exhorto',
+  explicacion: {
+    brief: 'De dónde sale que el monto importe',
+    expanded:
+      'De tres textos, dos de ellos anteriores a la ley de honorarios. El art. 3° inc. 2 de la ley 22.172 pone «el valor pecuniario, si existiera» entre los recaudos que el oficio debe contener. El art. 12 de la misma ley manda que el tribunal oficiado regule «teniendo en cuenta el monto del juicio si constare, la importancia de la medida a realizar y demás circunstancias del caso». Y el art. 50 inc. b) de la ley 27.423 exige acompañar copia de la demanda y de la reconvención «a los efectos de poder establecer la base regulatoria de los honorarios por ante el juez oficiado».',
+    full: [
+      'Ley 22.172, ARTÍCULO 3°.- El oficio no requiere legalización y debe contener: 1. Designación y número del tribunal y secretaría y nombre del juez y del secretario. 2. Nombre de las partes, objeto o naturaleza del juicio y el valor pecuniario, si existiera.',
+      'Ley 22.172, ARTÍCULO 12.- La regulación de honorarios corresponderá al tribunal oficiado, quien la practicará de acuerdo a la ley arancelaria vigente en su jurisdicción, teniendo en cuenta el monto del juicio si constare, la importancia de la medida a realizar y demás circunstancias del caso.',
+    ],
+    enlace: { texto: 'Ley 22.172 en InfoLEG', href: 'https://servicios.infoleg.gob.ar/infolegInternet/anexos/45000-49999/46036/norma.htm' },
+  },
+}
+
+export const STEP_EXHORTO_MONTO: NumericStepDef = {
+  id: 'exhortoMonto',
+  kind: 'numeric',
+  eyebrow: 'Juicio exhortante',
+  // **No dice "base regulatoria" y es a proposito.** El proceso
+  // principal sigue en tramite: este monto es una pauta indiciaria y
+  // el honorario que salga es a cuenta del definitivo. Llamarlo base
+  // importaria toda la maquinaria del art. 21, que es justo lo que la
+  // Sala J declara inaplicable. Ver EXHORTO_MONTO_PAUTA.
+  pregunta: 'Monto reclamado en el juicio exhortante',
+  ayuda: 'Es el que consigna el oficio. No se usa para multiplicar nada: orienta dónde ubicarse dentro de la escala del inciso',
+  resumenLabel: 'Monto del exhortante',
+  unidad: 'pesos',
+  prefix: '$',
+  min: 0,
+  max: 999999999999,
+  step: 1,
+  default: 0,
+  format: pesos,
+  dependsOn: ['exhortoMontoTipo'],
+  condition: (answers) => answers.exhortoMontoTipo === 'consta',
+  explicacion: {
+    brief: 'Por qué es una pauta y no una base',
+    expanded:
+      'Porque el juicio de origen todavía no terminó. La Sala J lo dijo con todas las letras: aun cuando el art. 50 parezca asimilar el monto reclamado a la base regulatoria, «ello no resulta exacto», porque al momento de regular «se desconoce el resultado final del litigio». La Sala C llega a lo mismo llamándolo «pauta indiciaria» y agrega la consecuencia: los honorarios del exhorto son «a cuenta de los que en definitiva se determinen». Honorio no lo multiplica por ninguna escala para producir el resultado: lo muestra al lado de la banda del inciso para que se vea la magnitud del pleito.',
+    full: [
+      'Ley 22.172, ARTÍCULO 12.- La regulación de honorarios corresponderá al tribunal oficiado, quien la practicará de acuerdo a la ley arancelaria vigente en su jurisdicción, teniendo en cuenta el monto del juicio si constare, la importancia de la medida a realizar y demás circunstancias del caso.',
+    ],
+  },
+}
+
 // ---- Mapa de pasos por tipo de proceso ----
 // Declara explicitamente que pasos necesita cada proceso.
 // Reemplaza gradualmente las conditions en cada step.
 export const PROCESS_STEP_MAP: Record<string, string[]> = {
-  exhorto: ['umaInicio', 'tipoProceso'],
+  exhorto: ['umaInicio', 'tipoProceso', 'exhortoInciso', 'exhortoActos', 'exhortoMontoTipo', 'exhortoMonto'],
   incidente: ['umaInicio', 'tipoProceso', 'base'],
   // desalojoVivienda, posesoriasTipo y alimentosTipo son sub-pasos
   // mutuamente excluyentes de 'objeto': los tres se declaran aca y su
@@ -794,6 +939,14 @@ export const ALL_STEPS: WizardStepDef[] = [
   STEP_SUCESION_LETRADO,
   STEP_CAUTELAR_OPOSICION,
   STEP_HOMOLOGACION_VIVIENDA,
+  // Los cuatro del exhorto van juntos y en este orden: el inciso
+  // primero, porque de el depende que se pregunte por los actos, y el
+  // monto ultimo, porque es lo que orienta la eleccion dentro de la
+  // banda que el inciso ya fijo.
+  STEP_EXHORTO_INCISO,
+  STEP_EXHORTO_ACTOS,
+  STEP_EXHORTO_MONTO_TIPO,
+  STEP_EXHORTO_MONTO,
   LEGAL_STEPS[2], // objeto
   STEP_DESALOJO_TIPO,
   STEP_POSESORIAS_TIPO,

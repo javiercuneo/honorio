@@ -21,13 +21,26 @@ pregunta «¿por qué esto quedó así?».
 
 ## Dónde estamos
 
-Versión **3.2.0**, publicada en `honorio.ar`. Las **17 validaciones** de
-`lib/legal/__tests__` están en verde y corren solas en CI. **No hay nada
-urgente ni bloqueante.**
+Versión **3.4.0**, publicada en `honorio.ar`. Las **17 validaciones** de
+`lib/legal/__tests__` están en verde y corren solas en CI. **No hay nada urgente
+ni bloqueante.**
 
-**Lo del 19/8 —los huecos de criterio— todavía no tiene entrada en el
-[`CHANGELOG`](../CHANGELOG.md)**, que cierra en 3.2.0 del 15/8. No movió ningún
-número, así que no fuerza una versión, pero la entrada falta.
+Va marcada `MUEVE UN NÚMERO` porque el exhorto da otro resultado: el inciso a)
+dejó de mostrarse como un honorario de 3 UMA y pasó a ser el piso que la ley dice
+que es, y el auxiliar del inciso c) tiene banda propia, que antes salía en cero.
+Ningún otro tipo de proceso cambia.
+
+**La regla de versionado cambió el 21/8 y está explicada en el
+[`CHANGELOG`](../CHANGELOG.md).** Antes, cualquier cambio de criterio que moviera
+una cifra era MAYOR; aplicada literalmente dejaba a Honorio en la versión 10 antes
+de fin de año, porque completar la ley es casi siempre arreglar el número de algún
+proceso. Ahora eso es MENOR con la marca `MUEVE UN NÚMERO`, y **la marca es la que
+garantiza la reproducibilidad, no el dígito**: obliga a decir qué caso da distinto.
+MAYOR queda para un cambio de régimen.
+
+El trabajo del 20/8 —los huecos de criterio, el art. 41, el control diario de la
+UMA y el verificador de datos— **ya tiene su entrada**, la 3.3.0, escrita el 21/8
+con el trabajo hecho. El CHANGELOG queda sin deuda.
 
 Todo lo que estaba planeado está hecho. Cada uno, con sus decisiones y su
 motivo, está contado en [`HISTORIA.md`](HISTORIA.md):
@@ -44,6 +57,8 @@ motivo, está contado en [`HISTORIA.md`](HISTORIA.md):
 | Compartir por enlace, citar y reportar; pasada de celular | 12-13/8 | `lib/compartir.ts` |
 | Ley 27.802 y los pisos de los auxiliares | 15/8 | `MINIMOS_AUXILIARES_JUSTICIA` |
 | Los huecos de criterio: de 2 criterios a 8 | 19/8 | `lib/legal/jurisprudencia.ts` |
+| El art. 41 abierto, con las dos lecturas | 20/8 | `ART41_POSTERIORES` |
+| El exhorto: un inciso por vez, con su jurisprudencia | 21/8 | `buildExhorto()`, `ExhortoResult.tsx` |
 
 El plan de adopción está **fuera del repositorio**, en `C:\IA\notas\adopcion.md`,
 porque nombra personas. La **Fase 0 quedó cerrada el 13/8**.
@@ -130,6 +145,46 @@ son unas horas y no importa.
   no está en su planilla y levantarlo le agrega fricción diaria. El informe cita
   la norma, no su vigencia. Es el dato que faltaría para calcular con la UMA
   vigente a una fecha anterior.
+
+### La devolución de SG, 21/8/2026: el dashboard genérico cuesta de leer
+
+La primera devolución honesta de alguien de afuera, sobre el dashboard **genérico**
+—no el exhorto, que no está publicado—. La conversación está fuera del
+repositorio, en `C:\IA\input generico para todo\honest review.md`, porque nombra
+personas.
+
+Lo que dijo, en sus términos:
+
+> «al ser tan completo el resultado que arroja, lo que correspondería en 1° y 2°
+> instancia como que me costó leer los datos»
+
+y la sugerencia concreta:
+
+> «desglosar en dos páginas la regulación que quedaría en primera instancia y en
+> segunda»
+
+**Lo que hay que retener, y lo que no.** Los «por qué» los elogió expresamente
+—*«lo hace súper didáctico»*—, así que el problema **no** es que haya
+explicaciones plegadas: es la **densidad de cifras sin jerarquía** cuando primera
+y segunda instancia llegan juntas. Ella misma lo matizó como posible defecto de
+lectura rápida, y aun así es el dato: alguien que probó varios procesos y lo
+entendió igual necesitó dos pasadas.
+
+**Todavía no se decidió qué hacer.** Las opciones que aparecen, sin elegir
+ninguna:
+
+1. Separar primera y segunda instancia en dos vistas o dos pestañas, que es lo
+   que ella propuso.
+2. Dejar la segunda instancia plegada por defecto: hoy es una banda más, con el
+   mismo peso visual que la que casi siempre se busca.
+3. Jerarquizar dentro de una sola vista, sin partirla.
+
+**El precedente que hay:** la tarjeta del exhorto tenía el mismo problema en
+chico —seis párrafos de prosa intercalados entre las cifras— y se resolvió el
+21/8 aplicando la regla del repositorio sin inventar nada: **los números no se
+ocultan, las explicaciones sí**. Ahí alcanzó con mover prosa a los `Disclosure`.
+En el genérico el problema es distinto —no sobra prosa, sobran cifras del mismo
+rango— así que la solución probablemente también lo sea.
 
 ### Pendiente de diseño y contenido
 
@@ -309,11 +364,19 @@ está la regla y su razón, que es lo que hay que saber antes de tocar el archiv
   | Con monto | art. 61 — 2 UMA | normas específicas; a falta de ellas, art. 58 — 4 UMA |
 
   El 61 **no** desplaza al 58: no hablan del mismo sujeto.
-- **Los pisos se muestran, no se aplican.** El art. 21 extiende sus normas a los
-  peritos *salvo lo dispuesto en el art. 478 CPCCN*, que manda adecuarlos
-  *«por debajo de sus topes mínimos inclusive»*. Automatizar el piso sería
-  decidir por el juez. Se muestran los dos números, con una insignia cuando el
+- **Un piso se aplica, salvo que una norma autorice perforarlo.** Ésta es la
+  regla, y hasta el 21/8/2026 estaba escrita como *«los pisos se muestran, no se
+  aplican»*, que se leía como una prohibición general y no lo es. **La excepción
+  es la de los auxiliares y tiene su cita**: el art. 21 extiende sus normas a los
+  peritos *salvo lo dispuesto en el art. 478 CPCCN*, que manda adecuarlos *«por
+  debajo de sus topes mínimos inclusive»*. Ahí automatizar el piso sería decidir
+  por el juez, así que se muestran los dos números, con una insignia cuando el
   5 % queda por debajo.
+- **Donde no hay art. 478, el piso es piso.** Las 3 UMA del art. 50 inc. a) —«no
+  podrán ser inferiores a»— no tienen norma que autorice perforarlas, y el motor
+  las aplica como mínimo duro: la prosa rechaza un punto por debajo. No es una
+  excepción a la regla de arriba, es la misma regla sobre otros hechos. La regla
+  nunca fue «no topear»: fue **no decidir lo que la ley le deja al juez**.
 - **El ¼ de UMA del art. 61 bis no es un piso.** El tercer párrafo dice *«se le
   regulará»*. Vive en `SIN_PERICIA_ART61BIS`, fuera de
   `PISOS_AUXILIARES_CON_BASE`, y hay una validación que falla si vuelve a
@@ -326,6 +389,88 @@ está la regla y su razón, que es lo que hay que saber antes de tocar el archiv
 - **La banda del 5 %-10 % del art. 21 alcanza a todos los auxiliares.** La
   distinción por sujeto es sólo de los pisos: la banda produce el número, el
   piso es un mínimo absoluto debajo de él. No confundir los dos planos.
+
+### El exhorto del art. 50
+
+- **La entrevista pregunta el inciso, y el motor devuelve uno solo.** Antes
+  devolvía los tres a la vez, que es una tabla y no una respuesta: `bandasDe()`
+  emitía dos bandas —el b) y el c)— para un mismo exhorto, así que el texto
+  regulaba el mismo acto dos veces por dos incisos distintos, y el a), que no
+  tiene banda cerrada, no se podía redactar nunca.
+- **El inciso a) es un piso con el techo abierto, y los otros dos son bandas
+  cerradas.** Por eso `ExhortoResultado` trae `piso` **o** `banda` y nunca los
+  dos: el a) no es un `Rango` con el máximo en infinito. `BandaRegulable.techoAbierto`
+  existe para eso y **es el único caso hasta hoy**.
+- **Al inciso a) la app no le pone techo.** Muestra el que el sistema sugiere
+  —10-20 del b), 7-30 del c), 10 UMA del art. 58 inc. a) por un conocimiento
+  entero— como `EXHORTO_INCISO_A_TECHO`, una pauta de lectura que el motor no
+  aplica. La contraria es la de Pesaresi (3 UMA por cada acto) y **le falta la
+  página de la cita**.
+- **El art. 50 no tiene base regulatoria.** El monto del juicio exhortante entra
+  como `exhortoMonto`, no como `baseValor`, y eso no es un capricho de nombres:
+  por `baseValor` cualquier regla que mire la base lo tomaría por lo que no es.
+  `baseOriginal` y `baseFinal` quedan en cero **a propósito**.
+- **El monto es pauta indiciaria y el honorario es a cuenta.** Las dos salas que
+  trataron el punto coinciden en eso aunque se separen en todo lo demás; está en
+  `EXHORTO_MONTO_PAUTA` con los tres textos que lo sostienen —ley 22.172 arts. 3°
+  inc. 2 y 12, y art. 50 inc. b) in fine—.
+- **Abogados y auxiliares no se rigen por lo mismo, y es una decisión declarada.**
+  El art. 50 fija cantidades en UMA para abogados y procuradores; al auxiliar
+  sólo lo nombra para mandar establecer su base regulatoria. Por eso la banda del
+  inciso **no lo topea**: Sala C reguló 53,10 UMA en un inciso c) cuyo techo es
+  30, fundando en los arts. 16, 21 y 61 y sin citar el art. 50. La lectura
+  contraria de Sala J va entera dentro de `EXHORTO_AUXILIARES`, con sus cuatro
+  sentencias.
+- **La oración sobre auxiliares está escrita en el inciso b) y rige los tres.** Es
+  una incoherencia del texto: en los actos del b) no interviene ningún perito
+  —hay oficial de justicia, escribano o martillero con comisión—, y el auxiliar
+  aparece en el c). `EXHORTO_INCISOS.admiteAuxiliares` sale de leer los actos uno
+  por uno, y la pantalla lo explica en vez de dejarlo raro.
+- **Hasta el 21/8/2026 la app transcribía un art. 50 incompleto.** Faltaba
+  justamente esa oración, en `ExhortoResult.tsx` y en `render-legacy.ts`, y no
+  estaba en ningún archivo del repositorio. Los dos únicos textos que nombran a
+  los auxiliares en el exhorto son ése y el último párrafo del art. 10.
+- **La cantidad de actos del inciso a) no multiplica nada.** Se pregunta, viaja en
+  `cantidadActos` y sale en la prosa como hecho declarado, para que la resolución
+  pueda decir por qué el número está arriba del piso.
+- **El «a cuenta» no se escribe en la resolución.** Sala C dice que los honorarios
+  del exhorto son *«a cuenta de los que en definitiva se determinen»*, y es una
+  lectura razonable **de su caso**: hay exhortos que se agotan en sí mismos.
+  Ponerla en cada texto sería forzar esa interpretación en boca de quien regula.
+  Vive en el «por qué», con el fallo que la sostiene.
+- **La pantalla del exhorto no lleva prosa entre las cifras.** Llegó a tener seis
+  párrafos explicativos intercalados y había que leer para encontrar los números.
+  La regla es la del repositorio —**los números no se ocultan y las explicaciones
+  sí**—, y el único modo de esconder que la app tiene es el `Disclosure`.
+- **Abierto: no se buscó un fallo donde el honorario de un abogado exceda la banda
+  del inciso.** Que las escalas de los incisos b) y c) obliguen en los dos
+  extremos es lo que dice el texto, pero para los auxiliares ya se encontró una
+  sentencia que la supera —Sala C, 53,10 UMA sobre un techo de 30—. Si aparece
+  una equivalente para abogados, la banda cerrada deja de ser una lectura pacífica
+  y `EXHORTO_INCISOS` pasa a necesitar su propio criterio.
+
+### La referencia, que es la tercera clase de número
+
+- **La app tiene tres clases de número y sólo dos tenían nombre.** Lo que el
+  motor calcula; la banda dentro de la cual se elige; y **un número de otro
+  cálculo, mostrado para orientar y que no se regula**. Los pisos de los
+  auxiliares ya eran eso, y el tope de la mediación también.
+- **La distinción se marca con una etiqueta, no con un recuadro.** El 21/8 se
+  probó una primitiva `Referencia` —caja punteada, rótulo «no se regula», línea
+  de origen obligatoria— y **se quitó el mismo día**: en una tarjeta que ya tenía
+  seis párrafos de prosa, agregaba ruido en lugar de quitarlo. Lo que quedó es el
+  `articulo` del `LedgerRow` diciendo «pauta, no base». Si algún día hay tres o
+  cuatro usos, la primitiva vuelve a tener sentido; con uno solo no lo tenía.
+- **Una referencia nunca se topea.** Recortar la escala del art. 21 a la banda
+  del inciso borraría lo único que informa, que es el tamaño del pleito: 10 UMA y
+  20.000 UMA se verían iguales. Lo que sí se topea es **la elección**, y sólo
+  donde la ley puso un techo.
+- **La escala del art. 21 va plegada, con el fallo en contra.** Sala J la declara
+  inaplicable al exhorto y lo reitera en cuatro sentencias; Sala C la aplica. La
+  app no elige en silencio: muestra las dos.
+- **Las pautas del art. 16 no entran a ningún cálculo.** Son subjetivas y Honorio
+  responde en matemática. El uso que sí califica es citarlas en la prosa, nunca
+  computarlas.
 
 ### Las dos reglas de escala que no son la del art. 21
 

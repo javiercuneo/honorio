@@ -78,6 +78,17 @@ export interface BandaRegulable {
   etiqueta: string
   articulo: string
   rango: Rango
+  /**
+   * La banda no tiene maximo legal.
+   *
+   * Existe por el inciso a) del art. 50, que dice "no podran ser
+   * inferiores a tres (3) UMA" y calla el techo. **Es el unico caso
+   * hasta hoy**, y hace falta declararlo porque la validacion de
+   * `generarProsa()` rechaza todo punto fuera de banda: sin esta
+   * marca, un exhorto de notificaciones no podria regularse en mas
+   * que su piso.
+   */
+  techoAbierto?: boolean
 }
 
 /** El punto que el usuario eligio dentro de una banda. */
@@ -169,27 +180,57 @@ const tieneAlgo = (r: Rango) => Number.isFinite(r.maxUMA) && r.maxUMA > 0
 export function bandasDe(resultado: CalculoResultado): BandaRegulable[] {
   const bandas: BandaRegulable[] = []
 
-  // El exhorto tiene sus propios incisos y sus tres roles son el mismo
-  // rango repetido: ofrecerlos daria tres filas identicas que no
-  // significan tres profesionales.
+  // El exhorto ya viene resuelto a un inciso: la entrevista pregunta
+  // cual rige. **Antes salian dos bandas —el b) y el c)— para un mismo
+  // exhorto**, y quien copiaba el texto se llevaba una resolucion que
+  // regulaba el mismo acto dos veces por dos incisos distintos; el a),
+  // que no tiene banda cerrada, no se podia redactar nunca.
+  //
+  // Los tres roles de abogado son la misma cifra repetida: el art. 50
+  // fija una cantidad por inciso y no corre el 1,4 ni el 40 % del
+  // art. 20. Por eso va una sola banda y no tres.
   if (resultado.exhorto) {
     const e = resultado.exhorto
-    if (tieneAlgo(e.incisoB)) {
+    const art = 'art. 50 inc. ' + e.inciso
+
+    if (e.piso) {
+      // Inciso a): piso duro y techo abierto. `maxUMA` queda en el
+      // piso solo para que el tipo cierre; `techoAbierto` es lo que
+      // manda y la validacion no mira el maximo.
       bandas.push({
-        clave: 'exhorto-b',
-        etiqueta: 'profesional interviniente, inscripciones y actos registrales',
-        articulo: 'art. 50 inc. b)',
-        rango: e.incisoB,
+        clave: 'exhorto-' + e.inciso,
+        etiqueta: 'profesional interviniente, ' + e.etiqueta.toLowerCase(),
+        articulo: art,
+        rango: {
+          minUMA: e.piso.uma,
+          maxUMA: e.piso.uma,
+          minPesos: e.piso.pesos,
+          maxPesos: e.piso.pesos,
+        },
+        techoAbierto: true,
+      })
+    } else if (e.banda) {
+      bandas.push({
+        clave: 'exhorto-' + e.inciso,
+        etiqueta: 'profesional interviniente, ' + e.etiqueta.toLowerCase(),
+        articulo: art,
+        rango: e.banda,
       })
     }
-    if (tieneAlgo(e.incisoC)) {
+
+    // El auxiliar del inciso c). **No lleva el articulo del inciso**:
+    // su honorario no sale de la escala en UMA del art. 50 sino de las
+    // reglas generales, y citar el inciso lo haria parecer topeado por
+    // una banda que no lo alcanza. Ver EXHORTO_AUXILIARES.
+    if (tieneAlgo(resultado.auxiliares)) {
       bandas.push({
-        clave: 'exhorto-c',
-        etiqueta: 'profesional interviniente, diligencias de prueba',
-        articulo: 'art. 50 inc. c)',
-        rango: e.incisoC,
+        clave: 'auxiliares',
+        etiqueta: 'perito/a o auxiliar de la Justicia',
+        articulo: 'arts. 21, último párrafo, y 61',
+        rango: resultado.auxiliares,
       })
     }
+
     return bandas
   }
 
@@ -286,14 +327,24 @@ export function generarProsa(opciones: OpcionesProsa): TextoRegulacion {
       errores.push(banda.etiqueta + ': el punto no es un número.')
       continue
     }
-    if (punto.uma < banda.rango.minUMA - EPS || punto.uma > banda.rango.maxUMA + EPS) {
+    if (punto.uma < banda.rango.minUMA - EPS) {
       errores.push(
         banda.etiqueta +
           ': ' +
           fmtUMA(punto.uma) +
-          ' UMA cae fuera de la banda de ' +
+          ' UMA perfora el mínimo de ' +
           fmtUMA(banda.rango.minUMA) +
-          ' a ' +
+          ' UMA.',
+      )
+      continue
+    }
+    // El techo solo acota donde la ley puso uno. Ver `techoAbierto`.
+    if (!banda.techoAbierto && punto.uma > banda.rango.maxUMA + EPS) {
+      errores.push(
+        banda.etiqueta +
+          ': ' +
+          fmtUMA(punto.uma) +
+          ' UMA excede el máximo de ' +
           fmtUMA(banda.rango.maxUMA) +
           ' UMA.',
       )
@@ -310,10 +361,23 @@ export function generarProsa(opciones: OpcionesProsa): TextoRegulacion {
   }
 
   // ---- Base ----
-  const trBase = visibles(resultado, 'base')
-  encabezado('Base regulatoria', articulosDe(trBase))
-  p.push(seccionBase(resultado, trBase))
-  p.push('')
+  //
+  // **El exhorto no tiene base regulatoria y hasta el 21/8/2026 el
+  // texto abria diciendo "Tomo como base regulatoria la suma de
+  // $0,00".** El monto del juicio exhortante es una pauta indiciaria,
+  // el proceso principal sigue en tramite y el honorario es a cuenta
+  // del definitivo: son tres cosas que la resolucion tiene que decir y
+  // que ninguna seccion generica sabe decir. Ver EXHORTO_MONTO_PAUTA.
+  if (resultado.exhorto) {
+    encabezado('Exhorto ley 22.172', ['art. 50 inc. ' + resultado.exhorto.inciso])
+    p.push(seccionExhorto(resultado.exhorto))
+    p.push('')
+  } else {
+    const trBase = visibles(resultado, 'base')
+    encabezado('Base regulatoria', articulosDe(trBase))
+    p.push(seccionBase(resultado, trBase))
+    p.push('')
+  }
 
   // ---- Escala ----
   //
@@ -322,7 +386,10 @@ export function generarProsa(opciones: OpcionesProsa): TextoRegulacion {
   // transformaciones de etapa `honorarios`. **Escribirlas como
   // "reducciones del honorario" seria mentir sobre lo que son**: no
   // reducen nada, son la forma de calcular la banda.
-  if (resultado.incidente) {
+  if (resultado.exhorto) {
+    // Nada: la seccion anterior ya dijo de donde sale la cantidad, y
+    // el art. 21 no produce el honorario del abogado en un exhorto.
+  } else if (resultado.incidente) {
     encabezado('Escala aplicable', [ART_INCIDENTE])
     p.push(
       'La ley 27.423 no contiene una pauta para la fijación de honorarios por ' +
@@ -352,7 +419,14 @@ export function generarProsa(opciones: OpcionesProsa): TextoRegulacion {
   // 10/8 no se escribia. El resultado era que el -10 % del art. 41
   // aparecia solo como una alicuota efectiva mas baja, sin decir por
   // que: el texto mostraba la consecuencia y se guardaba la causa.
-  const trHon = resultado.incidente ? [] : visibles(resultado, 'honorarios')
+  // **Ni el incidente ni el exhorto entran aca.** Los dos emiten
+  // transformaciones de etapa `honorarios` que no reducen nada: son la
+  // forma en que el motor deja asentado de donde sale la banda. El
+  // exhorto llegaba a escribir "Aplico Inciso a) notificaciones -
+  // piso, sin techo", que es el nombre interno de una transformacion
+  // puesto en una resolucion.
+  const trHon =
+    resultado.incidente || resultado.exhorto ? [] : visibles(resultado, 'honorarios')
   if (trHon.length > 0) {
     encabezado('Reducciones del honorario', articulosDe(trHon))
     for (const t of trHon) p.push(cadenaTransformacion(t))
@@ -479,6 +553,89 @@ function articulosDe(trs: Transformacion[], extra?: string | null): string[] {
   agregar(extra)
   for (const t of trs) agregar(t.articulo)
   return vistos
+}
+
+/**
+ * La seccion que reemplaza a "Base regulatoria" en el exhorto.
+ *
+ * Dice cuatro cosas y ninguna de mas:
+ *   1. Que inciso rige y cual es su cantidad —piso o escala—.
+ *   2. Cuantos actos comprende, si el usuario lo declaro. **No los
+ *      multiplica**: es un hecho del caso que sostiene apartarse del
+ *      piso, no un factor.
+ *   3. El monto del principal, dicho como lo que es —pauta indiciaria,
+ *      no base— o su ausencia cuando el asunto no es susceptible de
+ *      apreciacion pecuniaria.
+ *   4. Que la regulacion es a cuenta de la definitiva.
+ *
+ * Los puntos 3 y 4 salen de EXHORTO_MONTO_PAUTA, donde estan los dos
+ * fallos y el texto de la ley 22.172 que los sostienen. **La escala
+ * del art. 21 no se escribe aca aunque el resultado la traiga**: es
+ * una referencia de pantalla para orientar la eleccion, y meterla en
+ * la resolucion la haria pasar por fundamento de la cantidad.
+ */
+function seccionExhorto(e: NonNullable<CalculoResultado['exhorto']>): string {
+  const lineas: string[] = []
+
+  lineas.push(
+    'Se trata del diligenciamiento de un exhorto u oficio de los contemplados ' +
+      'en la ley 22.172, en el supuesto del inc. ' +
+      e.inciso +
+      ') del art. 50 de la ley 27.423: ' +
+      e.etiqueta.toLowerCase() +
+      '.',
+  )
+
+  if (e.piso) {
+    lineas.push(
+      'La norma establece que los honorarios no podrán ser inferiores a ' +
+        fmtUMA(e.piso.uma) +
+        ' UMA, sin fijar un máximo.',
+    )
+  } else if (e.banda) {
+    lineas.push(
+      'La norma manda regular en una escala entre ' +
+        fmtUMA(e.banda.minUMA) +
+        ' y ' +
+        fmtUMA(e.banda.maxUMA) +
+        ' UMA.',
+    )
+  }
+
+  if (e.cantidadActos && e.cantidadActos > 0) {
+    lineas.push(
+      'El exhorto comprendió ' +
+        e.cantidadActos +
+        (e.cantidadActos === 1 ? ' acto.' : ' actos.'),
+    )
+  }
+
+  if (e.referencia) {
+    lineas.push(
+      'Consta como monto reclamado en el juicio exhortante la suma de ' +
+        fmtPesos(e.referencia.montoPesos) +
+        ', equivalente a ' +
+        fmtUMA(e.referencia.montoUMA) +
+        ' UMA al día de la fecha. Pondero ese monto como pauta indiciaria y no ' +
+        'como base regulatoria, pues el proceso principal se encuentra en trámite ' +
+        'y se desconoce su resultado (arts. 3° inc. 2 y 12 de la ley 22.172).',
+    )
+  } else {
+    lineas.push(
+      'No consta monto: el asunto no es susceptible de apreciación pecuniaria ' +
+        '(art. 3° inc. 2 de la ley 22.172, «el valor pecuniario, si existiera»).',
+    )
+  }
+
+  // **El "a cuenta" no se escribe, y es una decision.** Sala C lo dijo
+  // para su caso —"seran a cuenta de los que en definitiva se
+  // determinen"— y es una lectura razonable, pero no es de todos los
+  // casos: hay exhortos que se agotan en si mismos. Ponerlo en cada
+  // resolucion seria forzar esa interpretacion en la boca del juez. La
+  // frase esta en la pantalla, dentro del «por qué», con el fallo que
+  // la sostiene: ahi es informacion y aca seria una afirmacion.
+
+  return lineas.join(' ')
 }
 
 function seccionBase(r: CalculoResultado, reducciones: Transformacion[]): string {
@@ -656,6 +813,28 @@ export function numerosDelResultado(opciones: OpcionesProsa): Set<number> {
       agregar(r.escala.escalera.maximoEscalaAnterior)
       agregar(r.escala.escalera.limiteAnterior)
       agregar(r.escala.escalera.excedente)
+    }
+  }
+
+  // El exhorto. **La referencia hay que declararla aunque no la
+  // produzca ninguna banda**: el texto nombra el monto del juicio
+  // exhortante y su equivalente en UMA, y el control los leeria como
+  // inventados. Es el mismo caso que el tope del item G de mediacion,
+  // mas abajo.
+  if (r.exhorto) {
+    const e = r.exhorto
+    if (e.piso) {
+      agregar(e.piso.uma)
+      agregar(e.piso.pesos)
+    }
+    agregar(e.cantidadActos)
+    if (e.referencia) {
+      agregar(e.referencia.montoPesos)
+      agregar(e.referencia.montoUMA)
+      if (e.referencia.art21) {
+        agregarRango(e.referencia.art21.patrocinante)
+        agregarRango(e.referencia.art21.auxiliares)
+      }
     }
   }
 

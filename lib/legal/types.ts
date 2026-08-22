@@ -25,6 +25,27 @@ export interface WizardState {
   posesoriasTipo: PosesoriasTipo
   alimentosTipo: AlimentosTipo
   baseValor: number
+  /** Cual de los tres incisos del art. 50 rige. Solo en el exhorto. */
+  exhortoInciso: ExhortoInciso
+  /**
+   * Si el oficio trae el valor pecuniario del principal.
+   *
+   * La ley 22.172 lo exige entre los recaudos del oficio (art. 3 inc.
+   * 2, "el valor pecuniario, si existiera"), asi que en la practica
+   * consta casi siempre. El caso que resta es el asunto no susceptible
+   * de apreciacion pecuniaria, y ahi no hay nada que preguntar.
+   */
+  exhortoMontoTipo: ExhortoMontoTipo
+  /**
+   * El monto reclamado en el juicio exhortante.
+   *
+   * **Vive aparte de `baseValor` y no es un capricho de nombres.** Si
+   * entrara por ahi, cualquier regla que mire la base lo tomaria por
+   * una base regulatoria, que es exactamente lo que no es.
+   */
+  exhortoMonto: number
+  /** Cuantos actos comprende el exhorto del inciso a). No multiplica. */
+  exhortoActos: number
   esProvisorio: boolean
   desdeMinimos: boolean
   desdeResultado: boolean
@@ -47,6 +68,8 @@ export type ProcesoTipo =
   | 'minimos_recursos_csjn'
   | 'minimos_auxiliares'
   | ''
+
+export type ExhortoMontoTipo = 'consta' | 'sin_monto' | ''
 
 export type ModoTerminacion =
   | ''
@@ -129,6 +152,69 @@ export interface ResultadoCalculo {
 // ============================================================
 
 /// Rango simple de valores minimo/maximo
+/** Cual de los tres incisos del art. 50 rige el exhorto. */
+export type ExhortoInciso = 'a' | 'b' | 'c' | ''
+
+/**
+ * El monto del juicio exhortante y lo que se deriva de el.
+ *
+ * **Se llama `referencia` y no `base` a proposito.** El proceso
+ * principal sigue en tramite: el monto es una pauta indiciaria y el
+ * honorario del exhorto es a cuenta del definitivo. Ver
+ * EXHORTO_MONTO_PAUTA en jurisprudencia.ts. Ningun campo de este
+ * objeto multiplica a la banda del inciso.
+ */
+export interface ExhortoReferencia {
+  /** El monto reclamado en el principal, tal como se ingreso. */
+  montoPesos: number
+  /** El mismo monto en UMA. Es la referencia principal y no se discute. */
+  montoUMA: number
+  /**
+   * Lo que daria la escala del art. 21 si esto fuera el juicio
+   * principal.
+   *
+   * **Es la referencia discutida**, y para los auxiliares es ademas la
+   * regla operativa segun EXHORTO_AUXILIARES. Viene ausente cuando no
+   * hay monto. **Nunca se topea**: recortarla a la banda del inciso
+   * borraria justamente lo que informa, que es la magnitud del pleito.
+   */
+  art21?: {
+    tituloEscala: string
+    /** Honorario completo del patrocinante, tres etapas. */
+    patrocinante: Rango
+    /** La banda del 5 % al 10 % del art. 21. */
+    auxiliares: Rango
+  }
+}
+
+/**
+ * El resultado de un exhorto, ya resuelto a un solo inciso.
+ *
+ * `piso` y `banda` son excluyentes y es la diferencia entre los
+ * incisos: el a) dice "no podran ser inferiores a 3 UMA" y calla el
+ * maximo, los otros dos fijan "una escala entre" con los dos extremos.
+ * Por eso el a) no es un Rango con el techo en infinito sino otra
+ * cosa, y quien lo presenta no puede confundirlos.
+ */
+export interface ExhortoResultado {
+  inciso: ExhortoInciso
+  /** Como se nombra el inciso en pantalla y en la prosa. */
+  etiqueta: string
+  /** Inciso a): piso duro, techo abierto. */
+  piso?: { uma: number; pesos: number }
+  /** Incisos b) y c): banda cerrada de abogados y procuradores. */
+  banda?: Rango
+  /**
+   * Cuantos actos comprende el exhorto, en el inciso a).
+   *
+   * **No multiplica nada.** Entra a la prosa como hecho declarado, para
+   * que la resolucion pueda decir por que el numero esta arriba del
+   * piso. Ver la contraria de EXHORTO_INCISO_A_TECHO.
+   */
+  cantidadActos?: number
+  referencia?: ExhortoReferencia
+}
+
 export interface Rango {
   minUMA: number
   maxUMA: number
@@ -233,11 +319,7 @@ export interface CalculoResultado {
   auxiliares: Rango
   actuacionesPosteriores?: ActuacionesPosteriores
   partidor?: Partidor
-  exhorto?: {
-    incisoA: number
-    incisoB: Rango
-    incisoC: Rango
-  }
+  exhorto?: ExhortoResultado
   incidente?: {
     porcentajeMin: number
     porcentajeMax: number

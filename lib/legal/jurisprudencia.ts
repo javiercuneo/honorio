@@ -511,3 +511,206 @@ export const ART41_POSTERIORES: Criterio = {
     ],
   },
 }
+
+
+/**
+ * El monto del juicio exhortante: que es, y sobre todo que no es.
+ *
+ * Las dos salas que resolvieron el punto coinciden en esto aunque
+ * despues se separen en todo lo demas, y por eso va como criterio
+ * propio y sin contraria: el monto reclamado en el principal **no es
+ * una base regulatoria**. Es una pauta.
+ *
+ * Tiene tres apoyos de texto, dos de ellos anteriores a la 27.423:
+ *   - Ley 22.172, art. 3 inc. 2: el oficio debe contener "el valor
+ *     pecuniario, si existiera". Es un recaudo, no una opcion.
+ *   - Ley 22.172, art. 12: el tribunal oficiado regula "teniendo en
+ *     cuenta el monto del juicio si constare, la importancia de la
+ *     medida a realizar y demas circunstancias del caso".
+ *   - Ley 27.423, art. 50 inc. b) in fine: para designaciones de
+ *     auxiliares "y a los efectos de poder establecer la base
+ *     regulatoria de los honorarios por ante el juez oficiado, se
+ *     debera acompanar copia de la demanda, y de la reconvencion".
+ *
+ * **Por que no es una base en sentido tecnico:** el principal sigue en tramite
+ * y se desconoce el resultado. De ahi las dos consecuencias que la
+ * app tiene que decir y no decia: el numero es *a cuenta* del que en
+ * definitiva se determine, y el monto entra como indicio y no como
+ * multiplicando.
+ */
+export const EXHORTO_MONTO_PAUTA: Criterio = {
+  sostiene:
+    'El monto reclamado en el juicio exhortante se pondera como pauta indiciaria y no como base regulatoria, porque al momento de regular el proceso principal sigue en trámite y se desconoce su resultado; los honorarios del exhorto son a cuenta de los que en definitiva se determinen.',
+  fallos: [
+    // La sentencia esta en docs/modelos/jurisprudencia/ del repositorio
+    // de herramientas: "fallo exhorto supera todos los montos.pdf".
+    {
+      tribunal: 'CNCiv., Sala C',
+      expediente: 'expte. 59652/2021',
+      caratula: 'MONTERO JUAN MANUEL c/ SANATORIO PARQUE SA Y OTROS s/ EXHORTO',
+      fecha: '18/04/2022',
+      transcripcion:
+        'de conformidad con lo establecido por el art. 12 de la ley 22.172, aplicable al presente, los honorarios deben regularse considerando como una pauta indiciaria el monto involucrado en las actuaciones principales, y ellos serán a cuenta de los que en definitiva se determinen.',
+    },
+    // "fallo exhorto base.pdf".
+    {
+      tribunal: 'CNCiv., Sala J',
+      expediente: 'expte. 42213/2025',
+      caratula: 'PEREZ, CARLOS c/ ZUÑIGA, OVIDIO OCTAVIO Y OTROS s/ EXHORTO',
+      fecha: '28/11/2025',
+      transcripcion:
+        'aun cuando el art. 50 pareciera asimilar "el monto reclamado en la demanda y reconvención" a "la base regulatoria", no debe perderse de vista que ello no resulta exacto ya que debe tenerse en cuenta que el proceso principal radicado en extraña jurisdicción se encuentra en trámite por lo que, al momento de establecerse la regulación, se desconoce el resultado final del litigio.',
+    },
+    // **Este no se leyo: se cita porque lo cita el anterior.** El de
+    // Sala J lo invoca como fuente de su parrafo sobre la base. Va
+    // identificado tal como aparece alli y sin transcripcion, que es
+    // la regla del archivo: se transcribe de la sentencia leida o no
+    // se escribe.
+    {
+      tribunal: 'CNCiv., Sala H',
+      expediente: 'expte. 59726/2019',
+      caratula: 'R. S. R. y otra c/ H. F. L. L. y otras s/ DAÑOS Y PERJUICIOS',
+      fecha: '09/06/2020',
+    },
+  ],
+}
+
+/**
+ * Como sale el honorario del auxiliar de justicia en un exhorto.
+ *
+ * **Que los auxiliares cobran en el exhorto no se discute.** Lo dicen
+ * dos textos expresos, y hasta el 21/8/2026 la app no mostraba
+ * ninguno de los dos:
+ *   - Art. 10, ultimo parrafo: los jueces "no podran devolver exhortos
+ *     u oficios entre jueces o tribunales de distinta jurisdiccion,
+ *     sin previa citacion de los mismos, si el pago de sus honorarios
+ *     no ha sido acreditado en autos".
+ *   - Art. 50 inc. b) in fine, que nombra las "designaciones de
+ *     auxiliares de la Justicia ante rogatorias u oficios".
+ *
+ * **Esa oracion esta escrita en el inciso b) y rige los tres.** Es una
+ * incoherencia del texto, no de esta lectura: en los actos del inciso
+ * b) —dominios, gravamenes, embargos, inhibiciones, desalojos— no
+ * interviene ningun perito; en remates hay martillero con comision y
+ * en inventarios, escribano. El auxiliar aparece justamente en el
+ * inciso c), en la pericia que se produce en la jurisdiccion oficiada.
+ * Sala J aplico a un caso de inciso c) una oracion escrita en el b)
+ * sin siquiera discutirlo.
+ *
+ * **Lo que si se discute es si la banda del inciso lo topea**, y ahi
+ * hay dos lecturas vivas. Pesa que Sala C haya regulado 53,10 UMA en
+ * un inciso c) cuyo techo es 30, fundando en los arts. 16, 21 y 61 y
+ * sin citar el art. 50; y que ese numero sea, con la base que la
+ * propia sentencia arma, el extremo superior del 5 %-10 % de
+ * auxiliares del art. 21.
+ *
+ * La contraria no es debil y por eso va entera: Sala J sostiene que
+ * los porcentuales del art. 21 son inaplicables y reitera cuatro
+ * sentencias propias.
+ */
+export const EXHORTO_AUXILIARES: Criterio = {
+  sostiene:
+    'El auxiliar de justicia designado en un exhorto cobra por las reglas generales —la banda del cinco al diez por ciento del art. 21 sobre el monto del principal, el piso del art. 61 y la facultad del art. 478 del Código Procesal de perforarlo—, y no queda topado por la escala en UMA del inciso, que rige para abogados y procuradores.',
+  fallos: [
+    // Regula 53,10 UMA en un exhorto por pericial contable: el techo
+    // del inciso c) es 30. Funda en los arts. 16, 21 y 61 y **no cita
+    // el art. 50**.
+    {
+      tribunal: 'CNCiv., Sala C',
+      expediente: 'expte. 59652/2021',
+      caratula: 'MONTERO JUAN MANUEL c/ SANATORIO PARQUE SA Y OTROS s/ EXHORTO',
+      fecha: '18/04/2022',
+      transcripcion:
+        'en atención al mérito, valor, extensión y complejidad de las tareas realizadas, monto en juego y lo prescripto por los arts. 16, 21, 61 y cc. de la ley 27.423, por resultar reducidos se elevan los honorarios fijados con fecha 24.2.22 a favor del perito contador Raúl Diego Reboiras a la cantidad de 53,10 UMA.',
+    },
+    // Confirma honorarios de una perita contadora en un exhorto
+    // citando el art. 21 entre los aplicables. No fija cuantia propia,
+    // asi que prueba menos que el anterior: prueba que la sala lo
+    // tiene por aplicable, no cuanto.
+    {
+      tribunal: 'CNCiv., Sala C',
+      expediente: 'expte. 93169/2022',
+      caratula: 'HERBON, KARINA ANDREA c/ SWISS MEDICAL SA. Y OTRO s/ EXHORTO',
+      fecha: '22/05/2024',
+      transcripcion:
+        'de conformidad con lo prescripto por los arts. 16, 19, 21 y concordantes de la Ley 27423 y por el art. 478 del Código Procesal, por no resultar elevados, se confirman los honorarios regulados el 5 de marzo de 2024 a favor de la perita contadora.',
+    },
+  ],
+  contraria: {
+    sostiene:
+      'Para los abogados y procuradores rige la cantidad de UMA de cada inciso, y para los auxiliares el juez exhortado establece la base regulatoria ponderando el monto reclamado con las pautas subjetivas del art. 16; los porcentuales del art. 21 son inaplicables.',
+    fallos: [
+      {
+        tribunal: 'CNCiv., Sala J',
+        expediente: 'expte. 42213/2025',
+        caratula: 'PEREZ, CARLOS c/ ZUÑIGA, OVIDIO OCTAVIO Y OTROS s/ EXHORTO',
+        fecha: '28/11/2025',
+        transcripcion:
+          'resulta inaplicable los porcentuales establecidos en el art. 21 de la ley arancelaria o intereses conforme cálculos mediante la tasa activa del B.N.A.',
+      },
+      // **Estos tres no se leyeron: los reitera el anterior como
+      // propios.** Van sin transcripcion, por la misma regla que el de
+      // Sala H de arriba. Que sean cuatro sentencias de la misma sala
+      // y no una es parte de lo que hay que poder ver.
+      {
+        tribunal: 'CNCiv., Sala J',
+        expediente: 'expte. 80624/2019',
+        caratula: 'U. c/ C. s/ EXHORTO',
+        fecha: '13/05/2021',
+      },
+      {
+        tribunal: 'CNCiv., Sala J',
+        expediente: 'expte. 29661/2019',
+        caratula: 'B. c/ B. s/ EXHORTO',
+        fecha: '23/08/2021',
+      },
+      {
+        tribunal: 'CNCiv., Sala J',
+        expediente: 'expte. 14224/2019',
+        caratula: 'S. c/ T. s/ ORDINARIO',
+        fecha: '10/02/2022',
+      },
+    ],
+  },
+}
+
+/**
+ * El inciso a) no tiene techo, y la app no le pone uno.
+ *
+ * El texto fija un piso —"no podran ser inferiores a tres (3) UMA"— y
+ * calla el maximo. Eso dejaba al usuario sin nada arriba, que fue el
+ * defecto que abrio este trabajo.
+ *
+ * **La app no inventa un techo: muestra el que el sistema sugiere.**
+ * El argumento es de coherencia interna de la ley y esta hecho de
+ * numeros que la propia ley fija:
+ *   - los actos registrales del inciso b) van de 10 a 20 UMA;
+ *   - las diligencias de prueba del inciso c), de 7 a 30;
+ *   - el art. 58 inc. a) pone en 10 UMA el minimo de un proceso de
+ *     conocimiento **entero**.
+ * Una notificacion es el menos laborioso de los tres actos que el
+ * art. 50 contempla. Un numero que la ponga por encima de esos
+ * ordenes de magnitud tiene que explicarse.
+ *
+ * **Es una pauta, no un tope, y por eso vive aca y no en el motor.**
+ * `buildExhorto()` no la aplica: el inciso a) sale con piso duro y
+ * techo abierto, que es lo que dice la ley.
+ *
+ * La contraria es la que plantea Pesaresi —que las 3 UMA sean por cada
+ * acto y no por exhorto— y su propio reductio la debilita: con tres
+ * cedulas se superarian las 10 UMA que el art. 58 fija para un
+ * conocimiento completo. Pero no es descartable de plano, porque un
+ * exhorto con doscientas notificaciones es trabajo y el piso unico lo
+ * ignora. **Falta la pagina de la cita**: hasta que este verificada
+ * contra la obra, la contraria va sin doctrina, que es lo que el
+ * archivo hace cuando no tiene con que respaldar una lectura.
+ */
+export const EXHORTO_INCISO_A_TECHO: Criterio = {
+  sostiene:
+    'El inciso a) fija un piso de 3 UMA y ningún máximo. Las escalas de los incisos b) y c) —10 a 20 y 7 a 30 UMA— y el mínimo de 10 UMA que el art. 58 inc. a) prevé para un proceso de conocimiento completo dan el orden de magnitud contra el cual una notificación tiene que medirse.',
+  fallos: [],
+  contraria: {
+    sostiene:
+      'El piso de 3 UMA correspondería a cada notificación o acto y no al exhorto considerado como una unidad, de modo que un exhorto con varios actos acumularía tantos pisos como actos comprenda.',
+  },
+}
