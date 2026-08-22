@@ -35,7 +35,8 @@ arreglo de un inciso. La precisión que se necesitaba nunca estuvo en el dígito
 —**estuvo en decir qué caso cambió**—, así que eso se volvió obligatorio y
 explícito, y el dígito volvió a significar lo que significa en cualquier lado.
 
-La regla anterior rigió hasta la 3.2.0 inclusive.
+La regla anterior rigió hasta la 3.3.0 inclusive. En esas versiones las dos
+reglas coinciden igual, porque ninguna movió una cifra.
 
 El valor de la UMA no versiona esta app: es un dato, no un criterio. Pero sí
 se versiona **él**, en `data/uma.json`, con la norma que lo fijó y la fecha
@@ -44,7 +45,7 @@ posible —cambió la UMA— que no se podía comprobar.
 
 ---
 
-## 3.3.0 — 21 de agosto de 2026
+## 3.4.0 — 21 de agosto de 2026
 
 MENOR · `MUEVE UN NÚMERO`: **el exhorto del art. 50 se regulaba mal y ahora da
 otro número.** Las 17 validaciones están en verde. Ningún otro tipo de proceso
@@ -165,6 +166,83 @@ El exhorto pasó de dos pasos a seis: se pregunta el inciso, cuántos actos
 comprende (sólo en el a, y **no multiplica nada**), si el oficio consigna el
 monto, y el monto. Vive en `exhortoMonto` y no en `baseValor`, a propósito: por
 `baseValor` cualquier regla que mire la base lo tomaría por lo que no es.
+
+---
+
+## 3.3.0 — 20 de agosto de 2026
+
+MENOR: **ningún número se movió.** Todo lo que entra es texto, citas y controles.
+Las 17 validaciones en verde. Un conocimiento, un ejecutivo, una sucesión o un
+incidente dan exactamente lo mismo que en 3.2.0.
+
+*Entrada escrita el 21/8, con el trabajo ya hecho: faltaba y quedó anotada tarde.*
+
+### Los huecos de criterio, contados
+
+`AGENTS.md` dice desde el 8/8 que una interpretación se funda en un fallo o no se
+afirma. **Se cumplía en dos lugares de doce.** Éste fue el barrido: listar cada
+punto donde la app decide algo que la ley no resuelve sola, y anotar con qué está
+fundado. `jurisprudencia.ts` pasó de 2 criterios a 8 —caducidad por el art. 22 y
+por el 25, el factor de correlación del art. 21, los mínimos del art. 58, la
+primera etapa de la sucesión, el IVA, la base única de mediación—.
+
+Tres cosas que el tipo ganó y no son cosméticas: `Doctrina` es un tipo aparte de
+`Fallo` y la pantalla los separa —un fallo dice lo que un tribunal resolvió, un
+autor dice lo que le parece—; `fallos: []` es un estado válido y **se declara**,
+porque que un criterio se apoye sólo en doctrina es información para quien lo va a
+usar; y `Fallo` ganó `publicacion` y `transcripcion`, las dos por el plenario
+Multiflex, que no tiene sentencia en línea y se cita por la doctrina que fija.
+
+La caducidad es **el único paso donde la app no decide sino que pregunta**, así
+que son dos criterios y se muestran debajo de las dos tarjetas. No se cargó una
+lista de salas por corriente: la Sala I aplicó el art. 25 en 2019 y el art. 22 en
+2026, así que una lista envejece sola y sugiere un reparto estable que no existe.
+
+La cita del IVA se mudó a `jurisprudencia.ts`. Estaba a mano dentro de una cadena
+de `regulacion-prosa.ts`, abreviada y sin el tomo de Fallos: era la única del
+generador que no salía del archivo que existe para tenerlas.
+
+### El art. 41, declarado abierto
+
+Se consultaron cuatro obras sobre si el 40 % de las actuaciones posteriores se
+toma de la escala del art. 21 o del honorario ya reducido. Dos no lo tratan y las
+otras dos se contradicen entre sí, **y cada una le da la razón a esta app en un
+punto y se la quita en el otro**. Ningún número se movió: la app sigue leyendo el
+40 % sobre la escala, porque el artículo dice «de la escala del citado artículo» y
+el citado es el 21, y porque la cuenta cierra —50 % + 40 % = 90 %, o sea el 100 %
+menos el 10 % del propio artículo—.
+
+De ahí salió `Criterio.contraria`: **la lectura que la app descarta, con sus
+fuentes o con la falta de ellas.** Un criterio mostrado solo se lee como si fuera
+el único posible. Y cuando no trae fuentes se dice: la contraria del art. 21 va
+sin ninguna y la pantalla declara que no se encontró quién la sostenga por
+escrito.
+
+### El control diario de la UMA
+
+Comparar `data/uma.json` contra la planilla no servía: lo escribe el mismo script
+leyendo la misma planilla, así que coinciden por construcción, y si el cron no
+corrió tampoco corre el control. **El 20/8 eso dejó doce días el sitio con
+$102.076**, y lo descubrió de casualidad el motor viejo.
+
+El control nuevo mira **lo servido**, y de punta a punta caza los cuatro casos: el
+cron no corrió, se plantó en un control, el deploy falló, o lo servido quedó
+viejo.
+
+### El verificador de datos personales
+
+Corre en cada commit y bloquea antes de que algo salga del repositorio: DNI, CUIT,
+CBU, matrícula, teléfono, enlaces al visor de expedientes del PJN. Las carátulas
+se pueden relajar por repositorio —en una wiki de jurisprudencia son el contenido,
+no una fuga— y en éste están en `aviso`, pero **la carátula de una causa propia no
+se relaja nunca**.
+
+### Y una cautela falsa, corregida
+
+`ESTADO.md` decía que la sala del fallo FUNES no constaba en la fuente y que no se
+había completado. **Las dos mitades eran falsas.** Se resolvió abriendo la
+sentencia: el CIJ dice «CAMARA CIVIL - SALA I». La cita siempre estuvo bien y
+mentía el documento, que es el modo peligroso de fallar porque tranquiliza.
 
 ---
 

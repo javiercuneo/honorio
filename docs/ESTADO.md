@@ -21,9 +21,9 @@ pregunta «¿por qué esto quedó así?».
 
 ## Dónde estamos
 
-Versión **3.3.0**, **todavía sin publicar** en `honorio.ar`. Las **17
-validaciones** de `lib/legal/__tests__` están en verde y corren solas en CI. **No
-hay nada urgente ni bloqueante.**
+Versión **3.4.0**, publicada en `honorio.ar`. Las **17 validaciones** de
+`lib/legal/__tests__` están en verde y corren solas en CI. **No hay nada urgente
+ni bloqueante.**
 
 Va marcada `MUEVE UN NÚMERO` porque el exhorto da otro resultado: el inciso a)
 dejó de mostrarse como un honorario de 3 UMA y pasó a ser el piso que la ley dice
@@ -38,10 +38,9 @@ proceso. Ahora eso es MENOR con la marca `MUEVE UN NÚMERO`, y **la marca es la 
 garantiza la reproducibilidad, no el dígito**: obliga a decir qué caso da distinto.
 MAYOR queda para un cambio de régimen.
 
-**Lo del 19/8 y lo del 20/8 —los huecos de criterio y el art. 41— siguen sin
-entrada en el CHANGELOG**, que salta de 3.2.0 del 15/8 a 3.3.0 del 21/8. No
-movieron ningún número, así que no forzaban una versión, pero las entradas
-faltan.
+El trabajo del 20/8 —los huecos de criterio, el art. 41, el control diario de la
+UMA y el verificador de datos— **ya tiene su entrada**, la 3.3.0, escrita el 21/8
+con el trabajo hecho. El CHANGELOG queda sin deuda.
 
 Todo lo que estaba planeado está hecho. Cada uno, con sus decisiones y su
 motivo, está contado en [`HISTORIA.md`](HISTORIA.md):
@@ -59,7 +58,7 @@ motivo, está contado en [`HISTORIA.md`](HISTORIA.md):
 | Ley 27.802 y los pisos de los auxiliares | 15/8 | `MINIMOS_AUXILIARES_JUSTICIA` |
 | Los huecos de criterio: de 2 criterios a 8 | 19/8 | `lib/legal/jurisprudencia.ts` |
 | El art. 41 abierto, con las dos lecturas | 20/8 | `ART41_POSTERIORES` |
-| El exhorto: un inciso por vez, y la primitiva `Referencia` | 21/8 | `buildExhorto()`, `ExhortoResult.tsx` |
+| El exhorto: un inciso por vez, con su jurisprudencia | 21/8 | `buildExhorto()`, `ExhortoResult.tsx` |
 
 El plan de adopción está **fuera del repositorio**, en `C:\IA\notas\adopcion.md`,
 porque nombra personas. La **Fase 0 quedó cerrada el 13/8**.
