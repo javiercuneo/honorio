@@ -74,6 +74,10 @@ const MAPPING: Record<string, keyof WizardState> = {
   posesoriasTipo: 'posesoriasTipo',
   alimentosTipo: 'alimentosTipo',
   base: 'baseValor',
+  exhortoInciso: 'exhortoInciso',
+  exhortoMontoTipo: 'exhortoMontoTipo',
+  exhortoMonto: 'exhortoMonto',
+  exhortoActos: 'exhortoActos',
 }
 
 function transformToLegacy(stepId: string, value: unknown): unknown {
@@ -81,7 +85,9 @@ function transformToLegacy(stepId: string, value: unknown): unknown {
     case 'umaInicio': return typeof value === 'number' ? value : undefined
     case 'tipoProceso':
     case 'modoTerminacion':
-    case 'objeto': return typeof value === 'string' ? value : ''
+    case 'objeto':
+    case 'exhortoInciso':
+    case 'exhortoMontoTipo': return typeof value === 'string' ? value : ''
     case 'sentenciaResultado': return typeof value === 'string' && value ? value : null
     case 'aperturaPrueba': return value === 'despues' ? true : value === 'antes' ? false : null
     case 'caducidadCriterio': return typeof value === 'string' ? value : ''
@@ -92,7 +98,9 @@ function transformToLegacy(stepId: string, value: unknown): unknown {
     case 'sucesionUnicoLetrado': return value === 'unico' ? true : value === 'varios' ? false : null
     case 'medidaOposicion': return value === 'con' ? true : value === 'sin' ? false : null
     case 'homologacionVivienda': return value === 'vivienda' ? true : value === 'otros' ? false : null
-    case 'base': return typeof value === 'number' ? value : 0
+    case 'base':
+    case 'exhortoMonto':
+    case 'exhortoActos': return typeof value === 'number' ? value : 0
     default: return value
   }
 }
@@ -103,7 +111,9 @@ function estadoDesde(answers: Answers): WizardState {
     sentenciaResultado: null, aperturaPrueba: null, caducidadCriterio: '',
     tuvoExcepciones: null, sucesionUnicoLetrado: null, medidaOposicion: null,
     homologacionVivienda: null, objetoBase: '', desalojoVivienda: null,
-    posesoriasTipo: null, alimentosTipo: null, baseValor: 0, esProvisorio: false,
+    posesoriasTipo: null, alimentosTipo: null, baseValor: 0,
+    exhortoInciso: '', exhortoMontoTipo: '', exhortoMonto: 0, exhortoActos: 0,
+    esProvisorio: false,
     desdeMinimos: false, desdeResultado: false,
   }
   for (const [stepId, value] of Object.entries(answers)) {

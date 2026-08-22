@@ -42,22 +42,40 @@ function formatPesos(num: number): string {
 }
 
 function renderExhortoHTML(result: CalculoResultado): string {
-  if (!result.exhorto) return ''
-  const { incisoA, incisoB, incisoC } = result.exhorto
+  const ex = result.exhorto
+  if (!ex) return ''
 
-  return '<div class="dashboard-card"><h3>Exhorto (art. 50)</h3>' +
+  const cifra = ex.piso
+    ? 'Piso: ' + ex.piso.uma + ' UMA ($' + formatPesos(ex.piso.pesos) + '), sin máximo legal'
+    : 'De ' + ex.banda!.minUMA + ' a ' + ex.banda!.maxUMA + ' UMA ($' +
+      formatPesos(ex.banda!.minPesos) + ' a $' + formatPesos(ex.banda!.maxPesos) + ')'
+
+  const ref = ex.referencia
+    ? '<tr><th colspan="2">Juicio exhortante (pauta indiciaria, no base regulatoria)</th></tr>' +
+      '<tr><td colspan="2">Monto reclamado: $' + formatPesos(ex.referencia.montoPesos) +
+      ' (' + formatPesos(ex.referencia.montoUMA) + ' UMA)</td></tr>'
+    : '<tr><th colspan="2">Juicio exhortante</th></tr>' +
+      '<tr><td colspan="2">Asunto no susceptible de apreciación pecuniaria</td></tr>'
+
+  const aux = result.auxiliares.maxUMA > 0
+    ? '<tr><th colspan="2">Auxiliares de la Justicia (arts. 21, 61 y 478 CPCCN)</th></tr>' +
+      '<tr><td colspan="2">De ' + formatPesos(result.auxiliares.minUMA) + ' a ' +
+      formatPesos(result.auxiliares.maxUMA) + ' UMA ($' + formatPesos(result.auxiliares.minPesos) +
+      ' a $' + formatPesos(result.auxiliares.maxPesos) + ')<br>' +
+      'No los topea la escala del inciso: el art. 50 fija cantidades en UMA para abogados y procuradores.</td></tr>'
+    : ''
+
+  return '<div class="dashboard-card"><h3>Exhorto (art. 50 inc. ' + ex.inciso + ')</h3>' +
     '<table>' +
-    '<tr><th colspan="2">Inc. a) - notificaciones</th></tr>' +
-    '<tr><td colspan="2">M\u00ednimo 3 UMA: $' + formatPesos(incisoA) + '</td></tr>' +
-    '<tr><th colspan="2">Inc. b) - inscripciones y actos registrales</th></tr>' +
-    '<tr><td colspan="2">M\u00ednimo: 10 UMA ($' + formatPesos(incisoB.minPesos) + ')<br>M\u00e1ximo: 20 UMA ($' + formatPesos(incisoB.maxPesos) + ')</td></tr>' +
-    '<tr><th colspan="2">Inc. c) - diligencias de prueba</th></tr>' +
-    '<tr><td colspan="2">M\u00ednimo: 7 UMA ($' + formatPesos(incisoC.minPesos) + ')<br>M\u00e1ximo: 30 UMA ($' + formatPesos(incisoC.maxPesos) + ')</td></tr>' +
+    '<tr><th colspan="2">' + ex.etiqueta + '</th></tr>' +
+    '<tr><td colspan="2">' + cifra + '</td></tr>' +
+    ref +
+    aux +
     '</table>' +
-    '<div class="legal-box">ARTICULO 50.- Los honorarios por diligenciamiento de exhortos u oficios contemplados en la ley 22.172 ser\u00e1n regulados de conformidad a las siguientes pautas:<br>' +
-    'a) Si se tratare de notificaciones o actos semejantes, los honorarios no podr\u00e1n ser inferiores a 3 UMA;<br>' +
-    'b) Si se solicitaren inscripciones de dominios, hijuelas, testamentos, grav\u00e1menes, secuestros, embargos, inhibiciones, inventarios, remates, desalojos, o cualquier otro acto registral, los honorarios se regular\u00e1n en una escala entre 10 y 20 UMA. (...)<br>' +
-    'c) Si se tratare de diligencias de prueba y se hubiera intervenido en su producci\u00f3n o contralor, el juez exhortado regular\u00e1 los honorarios proporcionalmente a la labor desarrollada, en una escala entre 7 y 30 UMA.</div></div>'
+    '<div class="legal-box">ARTÍCULO 50.- Los honorarios por diligenciamiento de exhortos u oficios contemplados en la ley 22.172 serán regulados de conformidad a las siguientes pautas:<br>' +
+    'a) Si se tratare de notificaciones o actos semejantes, los honorarios no podrán ser inferiores a 3 UMA;<br>' +
+    'b) Si se solicitaren inscripciones de dominios, hijuelas, testamentos, gravámenes, secuestros, embargos, inhibiciones, inventarios, remates, desalojos, o cualquier otro acto registral, los honorarios se regularán en una escala entre 10 y 20 UMA. En los casos de designaciones de auxiliares de la Justicia ante rogatorias u oficios provenientes de otra jurisdicción y a los efectos de poder establecer la base regulatoria de los honorarios por ante el juez oficiado, se deberá acompañar copia de la demanda, y de la reconvención, si la hubiera;<br>' +
+    'c) Si se tratare de diligencias de prueba y se hubiera intervenido en su producción o contralor, el juez exhortado regulará los honorarios proporcionalmente a la labor desarrollada, en una escala entre 7 y 30 UMA.</div></div>'
 }
 
 function renderIncidenteHTML(result: CalculoResultado): string {

@@ -12,7 +12,7 @@
 // Milestone 2: implementacion progresiva caso por caso.
 // ---------------------------------------------------------------
 
-import type { WizardState, CalculoResultado, EscalaResult, Transformacion, Rango, ActuacionesPosteriores, Partidor, SegundaInstancia, SegundaInstanciaRol } from './types'
+import type { WizardState, CalculoResultado, EscalaResult, Transformacion, Rango, ActuacionesPosteriores, Partidor, SegundaInstancia, SegundaInstanciaRol, ExhortoReferencia } from './types'
 
 // ---- Registry de procesos ----
 // Cada proceso registra su funcion build.
@@ -699,74 +699,172 @@ export function buildCalculationResult(state: WizardState): CalculoResultado {
 // Cada una se completara en la Fase 2 del plan de migracion.
 // Mientras tanto, buildEmpty() sirve como placeholder.
 
+/**
+ * Las constantes del art. 50, una por inciso.
+ *
+ * El inciso a) trae `piso` y ningun techo, y los otros dos una banda
+ * cerrada. **Esa asimetria es del texto, no de esta tabla**: el a) dice
+ * "no podran ser inferiores a tres (3) UMA" y calla el maximo; los
+ * otros dos dicen "se regularan en una escala entre X e Y".
+ *
+ * `admiteAuxiliares` sale de leer los actos de cada inciso. En los del
+ * b) —dominios, hijuelas, testamentos, gravamenes, secuestros,
+ * embargos, inhibiciones, inventarios, remates, desalojos— no
+ * interviene ningun perito: hay oficial de justicia, escribano o
+ * martillero con comision, o el juez de origen dispone la inscripcion
+ * sin oficiar a nadie. El auxiliar aparece en el c), en la pericia que
+ * se produce en la jurisdiccion oficiada. Ver EXHORTO_AUXILIARES.
+ */
+const EXHORTO_INCISOS = {
+  a: {
+    etiqueta: 'Notificaciones o actos semejantes',
+    pisoUMA: 3,
+    admiteAuxiliares: false,
+  },
+  b: {
+    etiqueta: 'Inscripciones y actos registrales',
+    minUMA: 10,
+    maxUMA: 20,
+    admiteAuxiliares: false,
+  },
+  c: {
+    etiqueta: 'Diligencias de prueba',
+    minUMA: 7,
+    maxUMA: 30,
+    admiteAuxiliares: true,
+  },
+} as const
+
+/**
+ * El exhorto del art. 50, resuelto a **un** inciso.
+ *
+ * Hasta el 21/8/2026 esta funcion devolvia los tres a la vez y ninguno
+ * elegido, que es una tabla y no una respuesta: la prosa redactaba dos
+ * parrafos —el b) y el c)— para un mismo exhorto, y el a) no podia
+ * redactarse nunca. Ahora la entrevista pregunta cual rige.
+ *
+ * **La referencia no entra a ninguna cuenta de este bloque.** El monto
+ * del juicio exhortante se convierte a UMA y, si hay con que, se corre
+ * la escala del art. 21 sobre el; las dos cosas viajan en `referencia`
+ * y ninguna toca la banda del inciso. Por que estan y que valen lo
+ * dicen EXHORTO_MONTO_PAUTA y EXHORTO_AUXILIARES.
+ *
+ * **La escala del art. 21 se corre con las mismas funciones puras que
+ * usa el resto del motor**, `calcularEscala()` y `calcularAuxiliares()`.
+ * No se importa `calcularDirecto()` —seria un ciclo, este modulo es el
+ * que aquel compone— y no se escribe aritmetica nueva: si el numero de
+ * la referencia difiere del que da el calculo directo para la misma
+ * base, es un bug y no una diferencia de criterio.
+ */
 function buildExhorto(state: WizardState): CalculoResultado {
   const uma = state.valorUMA
+  const inciso = state.exhortoInciso
 
-  // Constantes del art. 50
-  const incisoA_UMA = 3
-  const incisoB_minUMA = 10
-  const incisoB_maxUMA = 20
-  const incisoC_minUMA = 7
-  const incisoC_maxUMA = 30
+  // Sin inciso elegido no hay nada que responder. Pasa mientras la
+  // entrevista esta a mitad de camino.
+  if (inciso !== 'a' && inciso !== 'b' && inciso !== 'c') {
+    return buildEmpty(state)
+  }
 
-  const incisoA = incisoA_UMA * uma
-  const incisoB_min = incisoB_minUMA * uma
-  const incisoB_max = incisoB_maxUMA * uma
-  const incisoC_min = incisoC_minUMA * uma
-  const incisoC_max = incisoC_maxUMA * uma
+  const def = EXHORTO_INCISOS[inciso]
+  const rango = (minUMA: number, maxUMA: number): Rango => ({
+    minUMA,
+    maxUMA,
+    minPesos: minUMA * uma,
+    maxPesos: maxUMA * uma,
+  })
 
-  const overallMinUMA = incisoA_UMA
-  const overallMaxUMA = incisoC_maxUMA
+  // ---- La banda de abogados y procuradores ----
+  const piso =
+    'pisoUMA' in def
+      ? { uma: def.pisoUMA, pesos: def.pisoUMA * uma }
+      : undefined
+  const banda =
+    'minUMA' in def ? rango(def.minUMA, def.maxUMA) : undefined
+
+  // ---- La referencia ----
+  // Solo cuando el oficio trae el valor pecuniario. El asunto no
+  // susceptible de apreciacion pecuniaria sale sin ella, y eso no es
+  // un hueco: es el caso que la ley 22.172 preve al decir "si
+  // existiera".
+  let referencia: ExhortoReferencia | undefined
+  if (state.exhortoMontoTipo === 'consta' && state.exhortoMonto > 0) {
+    const e = calcularEscala(state.exhortoMonto, uma)
+    referencia = {
+      montoPesos: state.exhortoMonto,
+      montoUMA: state.exhortoMonto / uma,
+      art21: e
+        ? {
+            tituloEscala: e.tituloEscala,
+            patrocinante: rango(e.patrocinante.full.min, e.patrocinante.full.max),
+            auxiliares: calcularAuxiliares(e.baseEnUMA, uma),
+          }
+        : undefined,
+    }
+  }
+
+  // ---- Los auxiliares ----
+  // **No se topean con la banda del inciso**, y es una decision
+  // declarada: el art. 50 fija cantidades en UMA para abogados y
+  // procuradores, y a los auxiliares solo los nombra para mandar
+  // establecer su base regulatoria. Sala C regulo 53,10 UMA en un
+  // inciso c) cuyo techo es 30. Ver EXHORTO_AUXILIARES, que trae
+  // ademas la lectura contraria de Sala J.
+  const auxiliares: Rango =
+    def.admiteAuxiliares && referencia?.art21
+      ? referencia.art21.auxiliares
+      : { minUMA: 0, maxUMA: 0, minPesos: 0, maxPesos: 0 }
+
+  // ---- Los tres roles ----
+  // El art. 50 fija una cantidad por inciso y no distingue entre
+  // patrocinante, apoderado y procurador: no corre el 1,4 ni el 40 %
+  // del art. 20, porque no hay un honorario de patrocinio del cual
+  // sean multiplo. Es la misma cifra para el que diligencia, y por eso
+  // `bandasDe()` ofrece una sola banda y no tres.
+  const deAbogados: Rango = banda ?? rango(piso!.uma, piso!.uma)
+  const honorarios = {
+    patrocinante: { rango: deAbogados },
+    apoderado: { rango: deAbogados },
+    procurador: { rango: deAbogados },
+  }
+
+  const transformaciones: Transformacion[] = [
+    {
+      id: 'exhorto-inciso-' + inciso,
+      etapa: 'honorarios',
+      concepto:
+        inciso === 'a'
+          ? 'Inciso a) notificaciones - piso, sin techo'
+          : 'Inciso ' + inciso + ') ' + def.etiqueta.toLowerCase(),
+      articulo: 'art. 50 inc. ' + inciso,
+      visible: true,
+      valorPrevio: 0,
+      factor: piso ? piso.uma : banda!.minUMA,
+      valorPosterior: piso ? piso.pesos : banda!.maxPesos,
+    },
+  ]
 
   return {
     tipoProceso: 'exhorto',
     esProvisorio: false,
+    // **La base va en cero y no es un olvido.** El exhorto no tiene
+    // base regulatoria: el monto del principal es una pauta indiciaria
+    // y vive en `exhorto.referencia`, donde nada lo multiplica.
     baseOriginal: 0,
     baseFinal: 0,
     valorUMA: uma,
-    honorarios: {
-      patrocinante: { rango: { minUMA: overallMinUMA, maxUMA: overallMaxUMA, minPesos: overallMinUMA * uma, maxPesos: overallMaxUMA * uma } },
-      apoderado: { rango: { minUMA: overallMinUMA, maxUMA: overallMaxUMA, minPesos: overallMinUMA * uma, maxPesos: overallMaxUMA * uma } },
-      procurador: { rango: { minUMA: overallMinUMA, maxUMA: overallMaxUMA, minPesos: overallMinUMA * uma, maxPesos: overallMaxUMA * uma } },
-    },
-    auxiliares: { minUMA: 0, maxUMA: 0, minPesos: 0, maxPesos: 0 },
+    honorarios,
+    auxiliares,
     exhorto: {
-      incisoA: incisoA,
-      incisoB: { minUMA: incisoB_minUMA, maxUMA: incisoB_maxUMA, minPesos: incisoB_min, maxPesos: incisoB_max },
-      incisoC: { minUMA: incisoC_minUMA, maxUMA: incisoC_maxUMA, minPesos: incisoC_min, maxPesos: incisoC_max },
+      inciso,
+      etiqueta: def.etiqueta,
+      piso,
+      banda,
+      cantidadActos:
+        inciso === 'a' && state.exhortoActos > 0 ? state.exhortoActos : undefined,
+      referencia,
     },
-    transformaciones: [
-      {
-        id: 'exhorto-inciso-a',
-        etapa: 'honorarios',
-        concepto: 'Inciso a) notificaciones - honorario fijo',
-        articulo: 'art. 50 inc. a',
-        visible: true,
-        valorPrevio: 0,
-        factor: incisoA_UMA,
-        valorPosterior: incisoA,
-      },
-      {
-        id: 'exhorto-inciso-b',
-        etapa: 'honorarios',
-        concepto: 'Inciso b) inscripciones y actos registrales',
-        articulo: 'art. 50 inc. b',
-        visible: true,
-        valorPrevio: 0,
-        factor: incisoB_minUMA,
-        valorPosterior: incisoB_max,
-      },
-      {
-        id: 'exhorto-inciso-c',
-        etapa: 'honorarios',
-        concepto: 'Inciso c) diligencias de prueba',
-        articulo: 'art. 50 inc. c',
-        visible: true,
-        valorPrevio: 0,
-        factor: incisoC_minUMA,
-        valorPosterior: incisoC_max,
-      },
-    ],
+    transformaciones,
   }
 }
 

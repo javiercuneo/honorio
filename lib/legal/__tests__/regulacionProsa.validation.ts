@@ -74,6 +74,10 @@ function estado(parcial: Partial<WizardState>): WizardState {
     posesoriasTipo: null,
     alimentosTipo: null,
     baseValor: 50_000_000,
+    exhortoInciso: '',
+    exhortoMontoTipo: '',
+    exhortoMonto: 0,
+    exhortoActos: 0,
     esProvisorio: false,
     desdeMinimos: false,
     desdeResultado: false,
@@ -433,12 +437,112 @@ console.log('11. El exhorto y el incidente tambien redactan')
   // `buildCalculationResult` despacha por tipo de proceso, que es lo que
   // hace el dashboard. `buildGeneral` daria un resultado general sin los
   // campos propios de estos dos.
-  const ex = buildCalculationResult(estado({ tipoProceso: 'exhorto' }))
-  if (ex) {
+  //
+  // **El exhorto va inciso por inciso.** Hasta el 21/8/2026 el motor
+  // devolvia los tres a la vez y `bandasDe()` emitia dos —el b) y el
+  // c)— para un mismo exhorto: quien copiaba el texto se llevaba una
+  // resolucion que regulaba el mismo acto dos veces. El inciso a), que
+  // no tiene banda cerrada, no se podia redactar nunca.
+  for (const inc of ['a', 'b', 'c'] as const) {
+    const ex = buildCalculationResult(
+      estado({
+        tipoProceso: 'exhorto',
+        exhortoInciso: inc,
+        exhortoMontoTipo: 'consta',
+        exhortoMonto: 75_163_925.89,
+        exhortoActos: inc === 'a' ? 12 : 0,
+      }),
+    )!
     const b = bandasDe(ex)
-    ok('el exhorto ofrece bandas', b.length > 0, b.map((x) => x.clave).join(', '))
-    ok('y son sus incisos, no los tres roles', b.every((x) => x.clave.startsWith('exhorto-')))
-    ok('ninguna banda vacia', b.every((x) => x.rango.maxUMA > 0))
+    const deInciso = b.filter((x) => x.clave.startsWith('exhorto-'))
+    ok(
+      'inc. ' + inc + ': una sola banda de inciso',
+      deInciso.length === 1,
+      b.map((x) => x.clave).join(', '),
+    )
+    ok('inc. ' + inc + ': y es la del inciso elegido', deInciso[0]?.clave === 'exhorto-' + inc)
+    ok('inc. ' + inc + ': ninguna banda vacia', b.every((x) => x.rango.maxUMA > 0))
+
+    const punto = inc === 'a' ? deInciso[0].rango.minUMA : medio(ex, 'exhorto-' + inc)
+    const s3 = generarProsa({
+      resultado: ex,
+      puntos: [{ banda: 'exhorto-' + inc, uma: punto, profesional: 'Dra. Prueba' }],
+    })
+    ok(
+      'inc. ' + inc + ': redacta',
+      s3.texto.length > 200 && s3.errores.length === 0,
+      s3.errores.join(' | '),
+    )
+    // El defecto que se arreglo: el exhorto no tiene base regulatoria y
+    // el texto abria diciendo "Tomo como base regulatoria la suma de
+    // $0,00".
+    ok('inc. ' + inc + ': no habla de base regulatoria en cero', !s3.texto.includes('$0,00'))
+    // El "a cuenta" **no** va en la prosa: es una lectura de Sala C
+    // para su caso, no de todos. Vive en la pantalla, con su fallo.
+    ok('inc. ' + inc + ': no fuerza el «a cuenta»', !s3.texto.includes('a cuenta'))
+    ok('inc. ' + inc + ': cita el inciso', s3.texto.includes('inc. ' + inc + ')'))
+    // **El control tiene que reconocer la referencia.** El monto del
+    // juicio exhortante y su equivalente en UMA no salen de ninguna
+    // banda: si no se declaran en `numerosDelResultado()`, el
+    // dashboard muestra "el texto trae 2 importes que no salen del
+    // calculo. No lo uses y avisa" sobre un texto correcto.
+    const intrusos = verificarNumeros(s3.texto, {
+      resultado: ex,
+      puntos: [{ banda: 'exhorto-' + inc, uma: punto }],
+    })
+    ok(
+      'inc. ' + inc + ': ningun numero queda sin declarar',
+      intrusos.length === 0,
+      intrusos.join(', '),
+    )
+  }
+
+  // El techo abierto del inciso a): un punto muy por encima del piso se
+  // redacta, y uno por debajo no. Es lo unico que la ley acota ahi.
+  {
+    const ex = buildCalculationResult(estado({ tipoProceso: 'exhorto', exhortoInciso: 'a' }))!
+    const arriba = generarProsa({
+      resultado: ex,
+      puntos: [{ banda: 'exhorto-a', uma: 40, profesional: 'Dra. Prueba' }],
+    })
+    ok('inc. a: 40 UMA se redacta, el techo es abierto', arriba.errores.length === 0, arriba.errores.join(' | '))
+    const abajo = generarProsa({
+      resultado: ex,
+      puntos: [{ banda: 'exhorto-a', uma: 1, profesional: 'Dra. Prueba' }],
+    })
+    ok('inc. a: 1 UMA no, el piso sigue siendo piso', abajo.errores.length === 1 && abajo.texto === '')
+  }
+
+  // Los incisos b) y c) siguen cerrados en los dos extremos.
+  {
+    const ex = buildCalculationResult(estado({ tipoProceso: 'exhorto', exhortoInciso: 'c' }))!
+    const fuera = generarProsa({
+      resultado: ex,
+      puntos: [{ banda: 'exhorto-c', uma: 53.1, profesional: 'Dra. Prueba' }],
+    })
+    ok('inc. c: 53,10 UMA excede el maximo del abogado', fuera.errores.length === 1 && fuera.texto === '')
+  }
+
+  // El auxiliar del inciso c) **si** puede pasar las 30 UMA: su banda
+  // no sale del art. 50. Ver EXHORTO_AUXILIARES.
+  {
+    const ex = buildCalculationResult(
+      estado({
+        tipoProceso: 'exhorto',
+        exhortoInciso: 'c',
+        exhortoMontoTipo: 'consta',
+        exhortoMonto: 750_000_000,
+      }),
+    )!
+    const b = bandasDe(ex)
+    const aux = b.find((x) => x.clave === 'auxiliares')
+    ok('inc. c con monto: ofrece banda de auxiliares', !!aux, b.map((x) => x.clave).join(', '))
+    ok('y no la topea el inciso', (aux?.rango.maxUMA ?? 0) > 30, String(aux?.rango.maxUMA))
+    const s4 = generarProsa({
+      resultado: ex,
+      puntos: [{ banda: 'auxiliares', uma: aux!.rango.maxUMA, profesional: 'Perito Prueba' }],
+    })
+    ok('el auxiliar se redacta arriba de 30 UMA', s4.errores.length === 0, s4.errores.join(' | '))
   }
 
   const inc = buildCalculationResult(estado({ tipoProceso: 'incidente' }))

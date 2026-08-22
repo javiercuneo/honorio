@@ -282,6 +282,10 @@ function syncToLegacy(stepId: string, value: string | string[] | number | boolea
     posesoriasTipo: 'posesoriasTipo',
     alimentosTipo: 'alimentosTipo',
     base: 'baseValor',
+    exhortoInciso: 'exhortoInciso',
+    exhortoMontoTipo: 'exhortoMontoTipo',
+    exhortoMonto: 'exhortoMonto',
+    exhortoActos: 'exhortoActos',
   }
 
   const key = mapping[stepId]
@@ -304,6 +308,12 @@ function transformToLegacy(
     case 'tipoProceso':
     case 'modoTerminacion':
     case 'objeto':
+    // Los dos del exhorto guardan el id crudo: 'a' | 'b' | 'c' y
+    // 'consta' | 'sin_monto'. Sin eleccion, la cadena vacia, que es lo
+    // que `buildExhorto()` lee para devolver un resultado vacio en vez
+    // de inventar un inciso.
+    case 'exhortoInciso':
+    case 'exhortoMontoTipo':
       return typeof value === 'string' ? value : ''
 
     case 'sentenciaResultado':
@@ -339,6 +349,8 @@ function transformToLegacy(
       return value === 'vivienda' ? true : value === 'otros' ? false : null
 
     case 'base':
+    case 'exhortoMonto':
+    case 'exhortoActos':
       return typeof value === 'number' ? value : 0
 
     default:

@@ -12,18 +12,159 @@ cuándo. Por eso la regla de numeración no es «cuánto código se tocó» sino
 
 | | Cuándo |
 |---|---|
-| **MAYOR** (2.0.0) | Cambia un criterio del motor y el mismo caso da un número distinto. Reforma legal, jurisprudencia que obliga a cambiar de interpretación, o un error de cálculo corregido. |
-| **MENOR** (1.1.0) | Entra un tipo de proceso, una pantalla o un dato nuevo, pero los casos que ya andaban siguen dando lo mismo. |
-| **PARCHE** (1.0.1) | Interfaz, redacción, rendimiento. El motor no se toca. |
+| **MAYOR** (2.0.0) | Cambia el régimen entero: una reforma legal que rehace el cálculo, o un criterio que alcanza a todos los procesos a la vez. Es raro, y tiene que serlo. |
+| **MENOR** (1.1.0) | Entra un tipo de proceso, una pantalla o un dato nuevo. **También** un cambio de criterio que mueve el número de un proceso en particular: ahí la entrada va marcada `MUEVE UN NÚMERO`. |
+| **PARCHE** (1.0.1) | Interfaz, redacción, rendimiento. El motor no se toca y ninguna cifra cambia. |
 
-Un cambio MAYOR se anota siempre con **qué caso da distinto y por qué**. Es
-la entrada que alguien va a leer dentro de dos años, cuando tenga que
-explicar una diferencia entre dos regulaciones.
+**Lo que garantiza la reproducibilidad no es el dígito, es la marca.** Toda
+entrada `MUEVE UN NÚMERO` dice **qué caso da distinto y por qué**, y ésa es la
+que alguien va a leer dentro de dos años cuando tenga que explicar una
+diferencia entre dos regulaciones. El número de versión sirve para nombrar el
+cálculo; la marca, para entenderlo.
+
+### Por qué esta regla cambió el 21/8/2026
+
+Antes decía que **cualquier** cambio de criterio que moviera una cifra era
+MAYOR. Aplicada literalmente, esa regla dejaba a Honorio en la versión 10 antes
+de fin de año: la app está en su etapa de completar la ley, y completar la ley
+es, casi siempre, mover el número de algún proceso que hasta ayer estaba mal.
+
+Un número de versión que crece así deja de decir nada. Peor: para alguien de
+afuera, un salto de MAYOR anuncia un producto nuevo, y lo que hubo fue el
+arreglo de un inciso. La precisión que se necesitaba nunca estuvo en el dígito
+—**estuvo en decir qué caso cambió**—, así que eso se volvió obligatorio y
+explícito, y el dígito volvió a significar lo que significa en cualquier lado.
+
+La regla anterior rigió hasta la 3.2.0 inclusive.
 
 El valor de la UMA no versiona esta app: es un dato, no un criterio. Pero sí
 se versiona **él**, en `data/uma.json`, con la norma que lo fijó y la fecha
 en que entró. Sin eso, «el mismo caso da otro número» tenía una explicación
 posible —cambió la UMA— que no se podía comprobar.
+
+---
+
+## 3.3.0 — 21 de agosto de 2026
+
+MENOR · `MUEVE UN NÚMERO`: **el exhorto del art. 50 se regulaba mal y ahora da
+otro número.** Las 17 validaciones están en verde. Ningún otro tipo de proceso
+cambia: un conocimiento, un ejecutivo, una sucesión o un incidente dan
+exactamente lo mismo que en 3.2.0.
+
+Es la primera entrada con la regla nueva de versionado, que se explica arriba y
+rige desde acá.
+
+### El caso que da distinto
+
+**Un exhorto de notificaciones (inc. a).** Antes la app mostraba `3 UMA` con la
+misma tipografía que cualquier resultado, y el motor llamaba a esa
+transformación *«honorario fijo»*. No es fijo: el art. 50 inc. a) dice que los
+honorarios *«no podrán ser inferiores a tres (3) UMA»* y **no fija ningún
+máximo**. Quien tomaba las 3 UMA como la respuesta estaba regulando el piso.
+Ahora la app muestra un piso, dice que arriba no hay nada escrito, y la
+resolución se redacta con el número que el usuario elija por encima.
+
+**Un exhorto con perito (inc. c).** Antes la app no producía ningún número para
+el auxiliar de justicia: el exhorto salía con `auxiliares` en cero. Ahora, si el
+oficio trae el monto del juicio exhortante, sale la banda del 5 % al 10 % del
+art. 21. Con la base que arma la sentencia de Sala C —capital más intereses, con
+el 30 % del art. 22 descontado— eso da 53,10 UMA, muy por encima de las 30 del
+inciso, **y no se topea**.
+
+**Cualquier exhorto, en la prosa.** El texto abría diciendo *«Tomo como base
+regulatoria la suma de $0,00»* y después escribía *«Aplico Inciso a)
+notificaciones - honorario fijo»*, que es el nombre interno de una
+transformación puesto en una resolución. Y emitía **dos párrafos** —el inc. b) y
+el inc. c)— para un mismo exhorto: quien copiaba el texto regulaba el mismo acto
+dos veces por dos incisos distintos.
+
+### La app transcribía un art. 50 incompleto
+
+Faltaba una oración entera del inciso b), la única del artículo que nombra a los
+auxiliares de la Justicia y la única que nombra la base regulatoria:
+
+> «En los casos de designaciones de auxiliares de la Justicia ante rogatorias u
+> oficios provenientes de otra jurisdicción y a los efectos de poder establecer
+> la base regulatoria de los honorarios por ante el juez oficiado, se deberá
+> acompañar copia de la demanda, y de la reconvención, si la hubiera»
+
+No estaba en ningún archivo del repositorio: ni en el dashboard, ni en el
+renderizador legacy, ni en docs. Nada de lo que se había decidido sobre el
+exhorto la había tenido en cuenta.
+
+### Lo que se decidió, y con qué
+
+Tres criterios nuevos en `lib/legal/jurisprudencia.ts`, dos de ellos con su
+lectura contraria:
+
+- **`EXHORTO_MONTO_PAUTA`** — el monto del juicio exhortante es pauta indiciaria
+  y no base regulatoria, porque el principal sigue en trámite; el honorario es *a
+  cuenta* del definitivo. Sin contraria: las dos salas coinciden. Ley 22.172
+  arts. 3° inc. 2 y 12; art. 50 inc. b) in fine. CNCiv Sala C, «MONTERO c/
+  SANATORIO PARQUE» (18/4/2022) y Sala J, «PEREZ c/ ZUÑIGA» (28/11/2025).
+- **`EXHORTO_AUXILIARES`** — el auxiliar cobra por las reglas generales (arts. 21,
+  61 y 478 CPCCN) y **la escala en UMA del inciso no lo topea**, porque el art. 50
+  fija cantidades para abogados y procuradores y al auxiliar sólo lo nombra para
+  mandar establecer su base. Sala C reguló 53,10 UMA en un inciso c) de techo 30,
+  fundando en los arts. 16, 21 y 61 y sin citar el art. 50. **La contraria es
+  fuerte y va entera**: Sala J sostiene que los porcentuales del art. 21 son
+  inaplicables, y lo reitera en cuatro sentencias propias.
+- **`EXHORTO_INCISO_A_TECHO`** — el inciso a) no tiene techo y la app no le
+  inventa uno: muestra el orden de magnitud que la propia ley fija (10-20 del
+  inc. b, 7-30 del inc. c, 10 UMA del art. 58 inc. a por un conocimiento entero).
+  Es una pauta de lectura y el motor no la aplica. La contraria —las 3 UMA por
+  cada acto, que plantea Pesaresi— **queda sin cita de página hasta verificarla
+  contra la obra**.
+
+### Lo que cambió en la regla de los pisos
+
+`ESTADO.md` decía *«los pisos se muestran, no se aplican»*, que se leía como una
+prohibición general y no lo era: su fundamento siempre fue el art. 478 CPCCN,
+que autoriza a ir por debajo de los topes mínimos **de los auxiliares**. Ahora
+está escrita como lo que es: **un piso se aplica, salvo que una norma autorice
+perforarlo**. Las 3 UMA del art. 50 inc. a) no tienen art. 478, así que son un
+mínimo duro y la prosa rechaza un punto por debajo. La regla nunca fue «no
+topear»: fue **no decidir lo que la ley le deja al juez**.
+
+### La tercera clase de número
+
+La app tenía dos: lo que el motor calcula, y la banda dentro de la cual el
+usuario elige. Faltaba la que este trabajo obligó a nombrar: **un número de otro
+cálculo, mostrado para orientar y que no se regula**. Los pisos de los auxiliares
+ya eran eso, y el tope de la mediación también.
+
+Se probó darle forma propia —una primitiva `Referencia`, con caja punteada y
+rótulo «no se regula»— y **se quitó el mismo día**: agregaba ruido a una tarjeta
+que ya tenía de más. Quedó marcada con la etiqueta del `LedgerRow`, «pauta, no
+base». Con un solo uso, la primitiva no se justificaba.
+
+**Una referencia nunca se topea.** Recortar la escala del art. 21 a la banda del
+inciso borraría lo único que informa: el tamaño del pleito. Lo que se topea es la
+elección, y sólo donde la ley puso un techo.
+
+### Lo que la resolución no dice
+
+Sala C sostiene que los honorarios del exhorto son *«a cuenta de los que en
+definitiva se determinen»*. El generador llegó a escribirlo en cada texto y **se
+sacó**: es una lectura razonable de ese caso y no necesariamente de todos —hay
+exhortos que se agotan en sí mismos—, y ponerla en cada resolución es forzar una
+interpretación en boca de quien regula. Está en la pantalla, dentro del «por
+qué», con el fallo que la sostiene.
+
+### La pantalla, sin prosa entre las cifras
+
+La tarjeta del exhorto llegó a tener seis párrafos explicativos intercalados
+entre los números y había que leer para encontrarlos. Se aplicó la regla que el
+repositorio ya tenía escrita —**los números no se ocultan y las explicaciones
+sí**— y todo eso pasó a los «por qué». Arriba quedó lo que hace falta para leer
+una cifra: qué es, de qué artículo sale y en qué unidad está.
+
+### La entrevista
+
+El exhorto pasó de dos pasos a seis: se pregunta el inciso, cuántos actos
+comprende (sólo en el a, y **no multiplica nada**), si el oficio consigna el
+monto, y el monto. Vive en `exhortoMonto` y no en `baseValor`, a propósito: por
+`baseValor` cualquier regla que mire la base lo tomaría por lo que no es.
 
 ---
 

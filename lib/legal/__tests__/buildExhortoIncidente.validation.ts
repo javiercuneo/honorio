@@ -80,6 +80,10 @@ function makeState(overrides: Partial<WizardState>): WizardState {
     desalojoVivienda: null,
     posesoriasTipo: null,
     baseValor: 0,
+    exhortoInciso: "",
+    exhortoMontoTipo: "",
+    exhortoMonto: 0,
+    exhortoActos: 0,
     esProvisorio: false,
     desdeMinimos: false,
     desdeResultado: false,
@@ -106,34 +110,148 @@ console.log("Validacion end-to-end: buildExhorto / buildIncidente vs legacy")
 console.log("UMA = " + UMA)
 console.log("======================================================================")
 
-// ---- Exhorto: el resultado no depende de baseValor, solo de valorUMA ----
+// ---- Exhorto: cada inciso, contra las constantes del art. 50 ----
+//
+// **El caso ya no son los tres incisos a la vez.** La entrevista
+// pregunta cual rige, asi que la validacion corre uno por vez y
+// compara contra la constante que le toca. Las cifras del legacy no
+// cambiaron —3, 10-20 y 7-30 UMA siguen siendo las mismas—: lo que
+// cambio es que ahora solo sale la del inciso elegido.
 const EXHORTO_UMAS = [1, 92482, 500000]
 for (const uma of EXHORTO_UMAS) {
-  const label = "exhorto UMA=" + uma
-  const state = makeState({ tipoProceso: "exhorto", valorUMA: uma })
-  const leg = legacyExhorto(state)
-  const ts = buildCalculationResult(state)
-  const ex = ts.exhorto
+  const leg = legacyExhorto(makeState({ valorUMA: uma }))
 
-  if (!ex) {
-    console.log("  FAIL " + label.padEnd(45) + " TS no genero campo 'exhorto'")
-    failures.push(label + " / campo exhorto ausente")
-    failed++
-    continue
+  // Inciso a): piso, sin banda.
+  {
+    const label = "exhorto inc. a UMA=" + uma
+    const ts = buildCalculationResult(makeState({ valorUMA: uma, exhortoInciso: "a" }))
+    const ex = ts.exhorto
+    if (!ex || !ex.piso) {
+      console.log("  FAIL " + label.padEnd(45) + " no genero piso del inciso a")
+      failures.push(label + " / piso ausente")
+      failed++
+    } else if (ex.banda) {
+      console.log("  FAIL " + label.padEnd(45) + " el inciso a no puede traer banda cerrada")
+      failures.push(label + " / banda indebida")
+      failed++
+    } else if (check(label, leg.incisoA, ex.piso.pesos, "piso")) {
+      console.log("  OK   " + label.padEnd(45) + " piso de 3 UMA, sin techo")
+      passed++
+    } else {
+      failed++
+    }
   }
 
-  let ok = true
-  ok = check(label, leg.incisoA, ex.incisoA, "incisoA") && ok
-  ok = check(label, leg.incisoBMin, ex.incisoB.minPesos, "incisoB.min") && ok
-  ok = check(label, leg.incisoBMax, ex.incisoB.maxPesos, "incisoB.max") && ok
-  ok = check(label, leg.incisoCMin, ex.incisoC.minPesos, "incisoC.min") && ok
-  ok = check(label, leg.incisoCMax, ex.incisoC.maxPesos, "incisoC.max") && ok
+  // Incisos b) y c): banda cerrada, sin piso.
+  const cerrados: [("b" | "c"), number, number][] = [
+    ["b", leg.incisoBMin, leg.incisoBMax],
+    ["c", leg.incisoCMin, leg.incisoCMax],
+  ]
+  for (const [inc, min, max] of cerrados) {
+    const label = "exhorto inc. " + inc + " UMA=" + uma
+    const ts = buildCalculationResult(makeState({ valorUMA: uma, exhortoInciso: inc }))
+    const ex = ts.exhorto
+    if (!ex || !ex.banda) {
+      console.log("  FAIL " + label.padEnd(45) + " no genero banda")
+      failures.push(label + " / banda ausente")
+      failed++
+      continue
+    }
+    if (ex.piso) {
+      console.log("  FAIL " + label.padEnd(45) + " un inciso con escala no lleva piso aparte")
+      failures.push(label + " / piso indebido")
+      failed++
+      continue
+    }
+    let ok = true
+    ok = check(label, min, ex.banda.minPesos, "banda.min") && ok
+    ok = check(label, max, ex.banda.maxPesos, "banda.max") && ok
+    if (ok) {
+      console.log("  OK   " + label.padEnd(45) + " banda cerrada, 2 campos coinciden")
+      passed++
+    } else {
+      failed++
+    }
+  }
+}
 
-  if (ok) {
-    console.log("  OK   " + label.padEnd(45) + " 5 campos coinciden")
-    passed++
-  } else {
+// ---- Sin inciso elegido no hay respuesta ----
+// La entrevista a mitad de camino no puede producir un exhorto
+// inventado: `buildExhorto()` cae en `buildEmpty()`.
+{
+  const ts = buildCalculationResult(makeState({ exhortoInciso: "" }))
+  if (ts.exhorto) {
+    console.log("  FAIL " + "exhorto sin inciso".padEnd(45) + " genero un resultado igual")
+    failures.push("exhorto sin inciso / resultado indebido")
     failed++
+  } else {
+    console.log("  OK   " + "exhorto sin inciso".padEnd(45) + " no inventa inciso")
+    passed++
+  }
+}
+
+// ---- La referencia no toca la banda ----
+// Es la regla que gobierna todo el rediseno: el monto del juicio
+// exhortante entra como pauta y **no multiplica nada**. Si un dia
+// alguien lo conecta a la cifra del abogado, esto falla.
+{
+  const uma = 92482
+  const sinMonto = buildCalculationResult(makeState({ valorUMA: uma, exhortoInciso: "c" }))
+  const conMonto = buildCalculationResult(
+    makeState({
+      valorUMA: uma,
+      exhortoInciso: "c",
+      exhortoMontoTipo: "consta",
+      exhortoMonto: 750_000_000,
+    }),
+  )
+  const a = sinMonto.exhorto!.banda!
+  const b = conMonto.exhorto!.banda!
+  const igual = a.minPesos === b.minPesos && a.maxPesos === b.maxPesos
+  if (!igual) {
+    console.log("  FAIL " + "referencia no altera la banda".padEnd(45) + " la banda cambio con el monto")
+    failures.push("referencia / altero la banda")
+    failed++
+  } else if (!conMonto.exhorto!.referencia) {
+    console.log("  FAIL " + "referencia no altera la banda".padEnd(45) + " no se genero la referencia")
+    failures.push("referencia / ausente")
+    failed++
+  } else {
+    console.log("  OK   " + "referencia no altera la banda".padEnd(45) + " la banda es la misma con y sin monto")
+    passed++
+  }
+
+  // Y el auxiliar del inciso c) **no queda topeado en 30 UMA**: con
+  // esta base el 10 % del art. 21 la supera, que es exactamente el
+  // caso de Sala C. Ver EXHORTO_AUXILIARES.
+  const aux = conMonto.auxiliares
+  const label = "auxiliar del inc. c sin tope del inciso"
+  if (aux.maxUMA <= 30) {
+    console.log("  FAIL " + label.padEnd(45) + " maxUMA=" + aux.maxUMA + " quedo dentro del techo")
+    failures.push(label + " / topeado")
+    failed++
+  } else {
+    console.log("  OK   " + label.padEnd(45) + " maxUMA=" + aux.maxUMA.toFixed(2))
+    passed++
+  }
+
+  // El inciso b) no lleva auxiliares: en sus actos no interviene
+  // ningun perito.
+  const b2 = buildCalculationResult(
+    makeState({
+      valorUMA: uma,
+      exhortoInciso: "b",
+      exhortoMontoTipo: "consta",
+      exhortoMonto: 750_000_000,
+    }),
+  )
+  if (b2.auxiliares.maxUMA !== 0) {
+    console.log("  FAIL " + "inc. b sin auxiliares".padEnd(45) + " genero banda de auxiliares")
+    failures.push("inc. b / auxiliares indebidos")
+    failed++
+  } else {
+    console.log("  OK   " + "inc. b sin auxiliares".padEnd(45) + " ningun perito en actos registrales")
+    passed++
   }
 }
 

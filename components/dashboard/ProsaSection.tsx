@@ -239,10 +239,16 @@ export function ProsaSection({ resultado }: { resultado: CalculoResultado }) {
           {filas.map((fila) => {
             const banda = porClave.get(fila.banda)!
             const valor = fila.uma.trim() === "" ? null : Number(fila.uma.replace(",", "."))
+            // El techo solo acota donde la ley puso uno. Sin esto, el
+            // inciso a) del art. 50 —"no podran ser inferiores a 3
+            // UMA", sin maximo— marcaba en rojo todo numero por
+            // encima del piso: la pantalla decia "fuera de la banda"
+            // de un texto que el motor redacta sin problema.
             const fuera =
               valor !== null &&
               Number.isFinite(valor) &&
-              (valor < banda.rango.minUMA - 1e-6 || valor > banda.rango.maxUMA + 1e-6)
+              (valor < banda.rango.minUMA - 1e-6 ||
+                (!banda.techoAbierto && valor > banda.rango.maxUMA + 1e-6))
 
             return (
               <div
@@ -280,8 +286,16 @@ export function ProsaSection({ resultado }: { resultado: CalculoResultado }) {
                     onChange={(e) => editar(fila.id, { uma: e.target.value })}
                   />
                   <span className="font-mono text-[12px] text-muted-foreground">
-                    banda: {umaNum(banda.rango.minUMA, 2)} a{" "}
-                    {umaNum(banda.rango.maxUMA, 2)} UMA
+                    {banda.techoAbierto ? (
+                      <>
+                        desde {umaNum(banda.rango.minUMA, 2)} UMA, sin máximo
+                      </>
+                    ) : (
+                      <>
+                        banda: {umaNum(banda.rango.minUMA, 2)} a{" "}
+                        {umaNum(banda.rango.maxUMA, 2)} UMA
+                      </>
+                    )}
                   </span>
                   {valor !== null && Number.isFinite(valor) && !fuera ? (
                     <span className="font-mono text-[12px] text-muted-foreground">
@@ -292,8 +306,9 @@ export function ProsaSection({ resultado }: { resultado: CalculoResultado }) {
 
                 {fuera ? (
                   <p className="mt-2 font-mono text-[12px] text-destructive">
-                    Fuera de la banda. El texto no se redacta con un número que
-                    perfora la escala.
+                    {banda.techoAbierto
+                      ? "Por debajo del mínimo legal. El texto no se redacta con un número que perfora el piso."
+                      : "Fuera de la banda. El texto no se redacta con un número que perfora la escala."}
                   </p>
                 ) : null}
               </div>
