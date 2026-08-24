@@ -89,6 +89,12 @@ dibujadas idénticas entre sí; y la cifra de primera instancia volvía a aparec
 - **De quién es el honorario, en color.** Cobalto para el profesional que se
   consulta, grafito para los demás. No entra ningún color nuevo: cobalto ya era
   el acento de la app.
+- **La prosa queda separada de las dos zonas por una línea**, y sin marca de
+  sujeto: el texto lleva una línea por profesional, así que las redacta a las
+  dos. Los cinco encabezados de sección pasan a salir de una sola primitiva;
+  estaban escritos a mano y ya habían divergido.
+- **El mediador deja de anunciar «si hubo mediación previa».** Es obvio, y la
+  insignia envolvía a una segunda línea que lo desalineaba de los auxiliares.
 - **El cálculo directo sigue el mismo orden**, que era el único punto donde
   estaba desalineado por accidente: la segunda instancia quedaba última, después
   de auxiliares y mediador. Ahí no se plegó nada: la herramienta de etapas y
@@ -96,6 +102,15 @@ dibujadas idénticas entre sí; y la cifra de primera instancia volvía a aparec
 
 **Ninguna explicación se eliminó.** Las diez que había siguen estando, más dos
 que absorben las cifras que perdieron su recuadro.
+
+### Un defecto de maqueta que sólo se veía en pantalla ancha
+
+`Disclosure` envolvía siempre. Sin un valor a la derecha, eso hacía caer la
+etiqueta «por qué» sola a la segunda línea y alineada a la derecha, que se leía
+como una tabulación caprichosa. **Nunca se había visto porque hasta ahora ninguna
+de esas filas vivía en media pantalla**: aparece a partir de 1024 px, que es
+donde auxiliares y mediador pasan a dos columnas. Ahora envuelve sólo cuando hay
+un valor que valga la pena bajar.
 
 ### Lo que cambia en el papel
 

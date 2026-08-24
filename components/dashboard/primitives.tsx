@@ -474,10 +474,28 @@ export function Disclosure({
 }) {
   return (
     <details data-ledger-row className={cn("group", className)}>
-      {/* Envuelve por el mismo motivo que LedgerRow, y ademas tiene una
-          pieza mas que no se puede achicar: la etiqueta «por qué». */}
-      <summary className="flex cursor-pointer list-none flex-wrap items-baseline justify-end gap-x-3 gap-y-0.5 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-        <span className="flex min-w-0 items-baseline gap-2 text-[13px] text-muted-foreground">
+      {/*
+        Envuelve **solo cuando hay un valor**, por el mismo motivo que
+        LedgerRow: en pantalla angosta la cifra baja a la segunda linea
+        y se alinea a la derecha, que es mejor que partirla al medio.
+
+        Sin valor no hay nada que valga la pena bajar, y envolver hacia
+        que la etiqueta «por qué» —la unica pieza que no se puede
+        achicar— cayera sola a la segunda linea, alineada a la derecha.
+        Se leia como una tabulacion caprichosa, y se veia apenas los
+        auxiliares y el mediador pasaron a dos columnas: ahi el ancho
+        se parte al medio y los conceptos largos ya no entran.
+
+        Con `flex-nowrap` el concepto se achica —para eso tiene
+        `min-w-0`— y su texto envuelve como texto, que es lo que es.
+      */}
+      <summary
+        className={cn(
+          "flex cursor-pointer list-none items-baseline justify-end gap-x-3 gap-y-0.5 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+          valor ? "flex-wrap" : "flex-nowrap",
+        )}
+      >
+        <span className="flex min-w-0 flex-wrap items-baseline gap-x-2 text-[13px] text-muted-foreground">
           {concepto}
           {articulo ? <Articulo>{articulo}</Articulo> : null}
         </span>

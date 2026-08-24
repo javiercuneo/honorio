@@ -80,15 +80,18 @@ export function MediacionSection({ baseFinal }: MediacionSectionProps) {
 
   return (
     <section>
+      {/*
+        Sin la insignia de «si hubo mediación previa». Era una condicion
+        obvia —equivale a aclarar «si se designaron peritos» arriba de
+        los auxiliares— y encima envolvia a una segunda linea, que
+        desalineaba esta seccion de la de al lado. Decision de Javier,
+        24/8.
+      */}
       <EncabezadoSeccion
         titulo="Mediador"
         articulo="Decreto 2536/2015, Anexo III art. 2°"
         sujeto="otro"
-      >
-        <Insignia tono="bg-secondary text-foreground">
-          si hubo mediación previa
-        </Insignia>
-      </EncabezadoSeccion>
+      />
 
       {/*
         El recuadro de al lado era el monto del asunto —la base otra

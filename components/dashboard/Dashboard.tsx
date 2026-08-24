@@ -274,17 +274,35 @@ function DashboardGeneral({
 
       {/*
         La prosa es un resultado —la tercera forma de la misma salida,
-        con el numero y el informe imprimible— y no una explicacion.
-        Por eso cierra la zona de resultados en vez de irse al pie con
-        la cadena.
+        con el numero y el informe imprimible— y no una explicacion. Por
+        eso va antes del pliegue de la escala y no adentro.
+
+        Y va **despues de las dos zonas, no adentro de ninguna**: el
+        texto lleva una linea por profesional, incluidos los peritos y
+        el mediador, asi que redacta lo de arriba entero. La linea que
+        la precede cierra la zona de los otros intervinientes; sin ella
+        la seccion se leia como una mas de esa zona, que es lo que
+        Javier vio el 24/8.
       */}
-      <ProsaSection resultado={resultado} />
+      <div className="border-t border-border pt-8">
+        <ProsaSection resultado={resultado} />
+      </div>
 
       {/* ---------- 3. Como se llego a ese numero ---------- */}
 
-      <CorteDeZona>Cómo se llegó a ese número</CorteDeZona>
+      {/*
+        Sin corte de zona, y es una regla: **un corte encabeza un grupo,
+        no un solo elemento.** La zona 2 lleva el suyo porque agrupa
+        auxiliares, mediador y partidor bajo un rotulo comun. Acá hay un
+        unico pliegue que ya dice lo que contiene, y el corte repetia esa
+        misma frase una linea mas arriba.
 
-      <SeccionPlegable etiqueta="De dónde sale el número">
+        Y el pliegue **no** se llama "cómo se llegó a este número",
+        aunque sea lo que hace: `CadenaCalculo` ya se titula asi adentro,
+        y el problema era justamente la frase repetida. Se nombra por lo
+        que contiene.
+      */}
+      <SeccionPlegable etiqueta="La escala y la cadena del cálculo">
         <div className="space-y-6">
           <EscalaExplicacion
             escala={escala}

@@ -648,6 +648,30 @@ volviera a aparecer *después* de la segunda.
 - **Se quitó el realce del «Revocada · 40 %».** Con la sección ya marcada por
   sujeto, ese `destacado` competía con la marca. Dos jerarquías encimadas no son
   una jerarquía.
+- **`Disclosure` envuelve sólo cuando hay un valor.** El `flex-wrap` estaba
+  siempre, y sin valor hacía caer la etiqueta «por qué» sola a la segunda línea,
+  alineada a la derecha: se leía como una tabulación caprichosa. **Sólo se ve a
+  partir de 1024 px**, que es donde auxiliares y mediador pasan a dos columnas y
+  el ancho se parte al medio; en una sola columna nunca aparece. Sin valor va
+  `flex-nowrap` y el concepto se achica —para eso tiene `min-w-0`— y envuelve
+  como texto.
+- **Un corte de zona encabeza un grupo, no un solo elemento.** La zona 2 lleva
+  el suyo porque agrupa auxiliares, mediador y partidor. La zona 3 no lleva:
+  tiene un único pliegue que ya se nombra solo, y el corte repetía esa frase una
+  línea más arriba. Por lo mismo el pliegue **no** se llama «cómo se llegó a
+  este número»: `CadenaCalculo` ya se titula así adentro.
+- **La prosa no lleva marca de sujeto y va después de las dos zonas.** El texto
+  lleva una línea por profesional —incluidos peritos y mediador—, así que no es
+  de un sujeto: las redacta a las dos. Lleva una línea arriba que cierra la zona
+  de los otros intervinientes; sin ella se leía como una sección más de esa
+  zona.
+- **Los encabezados de sección salen todos de `EncabezadoSeccion`.** Estaban los
+  cinco escritos a mano y ya habían divergido en separaciones. `ProsaSection`
+  era el más distinto y por eso era el único sin separación visible.
+- **El mediador no anuncia «si hubo mediación previa».** Es una condición obvia
+  —equivale a aclarar «si se designaron peritos» arriba de los auxiliares— y la
+  insignia envolvía a una segunda línea, que desalineaba la sección de la de al
+  lado. Decisión de Javier del 24/8.
 - **El cálculo directo sigue el mismo orden y no pliega nada.** Su segunda
   instancia quedaba última, después de auxiliares y mediador, y eso no era una
   decisión: era el orden en que se fue escribiendo. Pero ahí la herramienta de
