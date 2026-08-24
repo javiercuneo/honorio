@@ -23,6 +23,95 @@ historia de `honorio/` viajó completa con `git subtree split`, así que
 calculadoras, el asistente clásico y la documentación de dominio.
 
 ---
+## La devolución de SG y las tres zonas del dashboard — el 24/8
+
+La primera devolución honesta de alguien de afuera. SG probó Honorio con varios
+procesos, elogió el paso a paso —«un elegí tu propia aventura procesal»— y los
+íconos del «por qué» —«lo hace súper didáctico»—, y después dijo lo único que
+servía para mejorar:
+
+> «Al ser tan completo el resultado que arroja, lo que correspondería en 1° y 2°
+> instancia como que me costó leer los datos.»
+
+Su cura era desglosar en dos páginas. **No se siguió, y el síntoma sí.** Un
+usuario es autoridad sobre lo que le pasó al leer, no sobre por qué pasó: ella
+misma lo matizó como posible defecto de lectura rápida, y lo propuso después de
+una sola pasada. La conversación está fuera del repositorio, en
+`C:\IA\input generico para todo\honest review.md`, porque nombra personas.
+
+**Lo que se midió.** Un conocimiento de 200 UMA: **28 importes en una pantalla,
+de los que cinco eran la respuesta.** Entre primera y segunda instancia había
+ocho importes de herramientas —las etapas y el reparto entre dos—; después
+venían tres secciones dibujadas idénticas entre sí, y dos de ellas eran el
+honorario de otra persona; y la cifra de primera instancia volvía a aparecer
+*después* de la segunda, en la cadena de cálculo. Recorriendo la pantalla se
+encontraba 1ª, herramientas, 2ª, 1ª otra vez.
+
+Así que no era que hubiera explicaciones —las elogió— ni que primera y segunda
+estuvieran juntas. Era **densidad sin jerarquía y sin sujeto declarado**.
+
+### Lo que se descartó, y por qué
+
+- **Dos páginas o pestañas.** Rompe el informe imprimible, que es una sola
+  maqueta, y el enlace compartido; y contradecía una decisión escrita: la
+  segunda instancia la consumen mucho quienes revisan en cámara.
+- **Un índice de resultados arriba.** Repite cifras, y ninguna cifra se repite
+  sin agregar algo. Quedó como carta si el reorden no alcanzaba.
+- **Verde para los auxiliares.** Lo propuso el agente, no Javier, y estaba
+  ocupado: el verde es el ajuste por rol del art. 20. Se descartó antes de
+  escribirlo.
+
+### La corrección de Javier sobre la regla de ocultar
+
+El agente objetó que plegar «por etapas» y «el reparto entre dos» rompía «los
+números no se ocultan nunca». Javier lo corrigió, y tenía razón:
+
+> «el número es el del patrocinante y todo lo demás si lo ocultas no ocultas el
+> número sino solo una forma de mostrarlo a través de la herramienta. no veo que
+> se rompa la regla. sino cabría lo mismo para apoderado y para procurador
+> (están literalmente ocultos) y eso no rompe la regla que de otra forma sería
+> demasiado literal y estricta.»
+
+**La regla protege el número, no cada derivación del número.** El precedente
+estaba a la vista desde siempre: el apoderado y el procurador viven detrás del
+selector de rol, y leída literalmente la regla haría ilegal ese selector.
+
+### El art. 77 CPCCN, que no se menciona en la app
+
+El agente escribió que el art. 77 hablaba de cómo cobra el mediador. Habla de
+**los peritos**: pueden reclamar de la parte no condenada en costas hasta el
+50 % de lo regulado. El argumento de Javier era otro y mejor: si el mediador
+puede valerse de un artículo escrito para peritos —y el abogado de la parte no
+puede—, esa habilitación es en sí misma la equiparación del mediador como
+auxiliar de justicia. **No va a ninguna pantalla:** sirve para saber por qué
+auxiliares y mediador se agrupan, no para explicárselo a nadie.
+
+### Cómo se decidió
+
+Con una maqueta publicada como artefacto, con las cifras reales del motor y un
+interruptor entre el orden actual y el propuesto, más un contador de importes en
+pantalla. La primera versión **se comía seis «por qué»** sin que se notara —uno
+de segunda instancia, tres de auxiliares, uno de mediación y uno de la prosa— y
+lo cazó Javier preguntando por uno de ellos. De ahí salió la regla de trabajo:
+**una maqueta que resume miente si no se la inventaría contra el código.** El
+segundo contador, el de «por qué» disponibles, se agregó para que la próxima vez
+la pérdida se vea sola.
+
+### Lo que se probó y no quedó
+
+Un tono más suave de cobalto para la segunda instancia, como «grado» del mismo
+color. Javier: «se confunde un poco con el color del fondo». Y era peor que
+invisible: un tono más débil **sugiere otro sujeto donde hay el mismo**. La
+subordinación pasó a ser geométrica —56 px de sangría y la cifra un escalón más
+chica— con el color diciendo lo contrario, que es el mismo.
+
+También se descubrió, al medir, que **el espaciado entre secciones no existía**:
+estaba puesto en el contenedor de las dos versiones de la maqueta y no entre las
+secciones. Javier lo vio como «las cards están muy pegadas verticalmente» y era
+literal.
+
+---
+
 ## Los huecos de criterio, contados y fundados — el 19/8
 
 Salió del barrido que `IDEAS.md` proponía en el repositorio de herramientas y

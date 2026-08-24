@@ -15,7 +15,14 @@
 
 import type { ReactNode } from "react"
 import type { Rango } from "@/lib/legal/types"
-import { Cifra, Disclosure, EnUMA, Fundamento, Tile } from "./primitives"
+import {
+  Cifra,
+  Disclosure,
+  EncabezadoSeccion,
+  EnUMA,
+  Fundamento,
+  Tile,
+} from "./primitives"
 import { ART41_POSTERIORES } from "@/lib/legal/jurisprudencia"
 
 interface ActuacionesPosterioresSectionProps {
@@ -28,7 +35,7 @@ interface ActuacionesPosterioresSectionProps {
 function Valor({ pesos, uma }: { pesos: number; uma: number }) {
   return (
     <>
-      <Cifra value={pesos} size="xl" className="text-foreground" />
+      <Cifra value={pesos} size="lg" className="text-foreground" />
       <div className="mt-1.5 font-mono text-[11px] text-faint">
         <EnUMA value={uma} />
       </div>
@@ -44,17 +51,13 @@ export function ActuacionesPosterioresSection({
 }: ActuacionesPosterioresSectionProps) {
   return (
     <section>
-      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 pb-3">
-        <div className="flex items-baseline gap-2.5">
-          <h2 className="font-mono text-[11px] uppercase tracking-[0.18em] text-foreground">
-            Actuaciones posteriores a la ejecución
-          </h2>
-          <span className="font-mono text-[10px] uppercase tracking-wider text-faint">
-            art. 41
-          </span>
-        </div>
+      <EncabezadoSeccion
+        titulo="Actuaciones posteriores a la ejecución"
+        articulo="art. 41"
+        sujeto="propio"
+      >
         {children}
-      </div>
+      </EncabezadoSeccion>
 
       <div className="grid gap-3 sm:grid-cols-2">
         <Tile

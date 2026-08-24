@@ -11,7 +11,7 @@
 
 import type { ReactNode } from "react"
 import type { SegundaInstanciaRol } from "@/lib/legal/types"
-import { Cifra, Disclosure, EnUMA, Tile } from "./primitives"
+import { Cifra, Disclosure, EncabezadoSeccion, EnUMA, Tile } from "./primitives"
 
 interface SegundaInstanciaBandProps {
   valores: SegundaInstanciaRol
@@ -23,7 +23,7 @@ interface SegundaInstanciaBandProps {
 function Valor({ pesos, uma }: { pesos: number; uma: number }) {
   return (
     <>
-      <Cifra value={pesos} size="xl" className="text-foreground" />
+      <Cifra value={pesos} size="lg" className="text-foreground" />
       <div className="mt-1.5 font-mono text-[11px] text-faint">
         <EnUMA value={uma} />
       </div>
@@ -39,18 +39,17 @@ export function SegundaInstanciaBand({
 }: SegundaInstanciaBandProps) {
   return (
     <section>
-      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 pb-3">
-        <div className="flex items-baseline gap-2.5">
-          <h2 className="font-mono text-[11px] uppercase tracking-[0.18em] text-foreground">
-            Segunda instancia
-          </h2>
-          <span className="font-mono text-[10px] uppercase tracking-wider text-faint">
-            art. 30
-          </span>
-        </div>
+      <EncabezadoSeccion titulo="Segunda instancia" articulo="art. 30" sujeto="propio">
         {children}
-      </div>
+      </EncabezadoSeccion>
 
+      {/*
+        Los tres recuadros van iguales. El 40 % de la revocada estuvo
+        destacado hasta el 24/8/2026, por ser el tope posible, y se
+        quito: con la seccion ya marcada como del mismo sujeto que la
+        primera instancia, ese realce competia con la marca en vez de
+        sumarle. Dos jerarquias encimadas no son una jerarquia.
+      */}
       <div className="grid gap-3 sm:grid-cols-3">
         <Tile
           etiqueta="Confirmada · 30%"
@@ -73,7 +72,6 @@ export function SegundaInstanciaBand({
               }
             />
             <Tile
-              destacado
               etiqueta="Revocada · 40%"
               valor={
                 <Valor

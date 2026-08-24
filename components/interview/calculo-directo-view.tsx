@@ -229,8 +229,8 @@ export function CalculoDirectoView({
         {!r ? null : (
           <>
             {/* ---- Los roles ---- */}
-            <Card className="mt-6">
-              <CardHeader titulo="Honorarios" />
+            <Card className="mt-6" sujeto="propio">
+              <CardHeader titulo="Honorarios" sujeto="propio" />
 
               <div className="flex flex-wrap items-center justify-between gap-3 px-6 pb-1">
                 <Etiqueta>Etapas cumplidas · art. 29</Etiqueta>
@@ -282,9 +282,43 @@ export function CalculoDirectoView({
               </div>
             </Card>
 
+            {/* ---- Segunda instancia ---- */}
+            <Card className="mt-6" sujeto="propio">
+              <CardHeader titulo="Segunda instancia" sujeto="propio" />
+              <div className="px-6 pb-2">
+                <LedgerRow
+                  concepto="Mínimo · 30 % del patrocinante"
+                  valor={<ParUMA rango={r.segundaInstancia.patrocinante.minimo} />}
+                />
+                <LedgerRow
+                  concepto="Máximo · 35 %"
+                  valor={<ParUMA rango={r.segundaInstancia.patrocinante.maximo} />}
+                />
+                <LedgerRow
+                  concepto="Revocada en todas sus partes · 40 %"
+                  valor={<ParUMA rango={r.segundaInstancia.patrocinante.revocada} />}
+                />
+              </div>
+            </Card>
+
+            {/* ---- El honorario de otro ----
+                 Auxiliares y mediador van despues de la segunda
+                 instancia, y no antes, por el mismo motivo que en el
+                 dashboard: hasta aca es el honorario del profesional
+                 que se consulta, y de aca para abajo el de otro. Hasta
+                 el 24/8/2026 la segunda instancia quedaba ultima,
+                 despues de dos sujetos ajenos, y eso no era una
+                 decision: era el orden en que se fueron escribiendo. */}
+            <div className="mt-8 flex items-center gap-3.5">
+              <span className="shrink-0 font-mono text-[10px] uppercase tracking-[0.16em] text-faint">
+                Honorarios de otros intervinientes
+              </span>
+              <span className="h-px flex-1 bg-border" aria-hidden="true" />
+            </div>
+
             {/* ---- Auxiliares ---- */}
-            <Card className="mt-6">
-              <CardHeader titulo="Auxiliares de justicia" />
+            <Card className="mt-6" sujeto="otro">
+              <CardHeader titulo="Auxiliares de justicia" sujeto="otro" />
               <div className="px-6 pb-2">
                 <LedgerRow
                   concepto={
@@ -326,8 +360,8 @@ export function CalculoDirectoView({
               pantalla —solo que la unidad de acá es el UHOM—.
             */}
             {med ? (
-              <Card className="mt-6">
-                <CardHeader titulo="Mediador">
+              <Card className="mt-6" sujeto="otro">
+                <CardHeader titulo="Mediador" sujeto="otro">
                   <span className="font-mono text-[11px] tabular-nums text-muted-foreground">
                     <span className="tracking-wider text-faint">UHOM</span>{' '}
                     {pesos(UHOM_VIGENTE.valor)}
@@ -395,25 +429,6 @@ export function CalculoDirectoView({
                 </div>
               </Card>
             ) : null}
-
-            {/* ---- Segunda instancia ---- */}
-            <Card className="mt-6">
-              <CardHeader titulo="Segunda instancia" />
-              <div className="px-6 pb-2">
-                <LedgerRow
-                  concepto="Mínimo · 30 % del patrocinante"
-                  valor={<ParUMA rango={r.segundaInstancia.patrocinante.minimo} />}
-                />
-                <LedgerRow
-                  concepto="Máximo · 35 %"
-                  valor={<ParUMA rango={r.segundaInstancia.patrocinante.maximo} />}
-                />
-                <LedgerRow
-                  concepto="Revocada en todas sus partes · 40 %"
-                  valor={<ParUMA rango={r.segundaInstancia.patrocinante.revocada} />}
-                />
-              </div>
-            </Card>
 
             {/* ---- Lo que no hace ---- */}
             <Card className="mt-6">
