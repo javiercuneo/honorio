@@ -3,7 +3,7 @@
 Documento de continuidad entre sesiones. **Leer antes de empezar a trabajar.**
 Se actualiza en el mismo commit que el trabajo, para que nunca mienta.
 
-Última actualización: 2026-08-24 · rama `rediseno-dashboard`
+Última actualización: 2026-08-24 · rama `main`
 
 Lleva **sólo lo que sigue vivo**: dónde está el trabajo, qué está abierto, qué
 se sabe roto, qué decisiones no hay que contradecir sin saberlo y qué trampas
@@ -21,9 +21,9 @@ pregunta «¿por qué esto quedó así?».
 
 ## Dónde estamos
 
-Versión **3.4.1**, en la rama `rediseno-dashboard`, **sin publicar todavía**.
-Las **17 validaciones** de `lib/legal/__tests__` están en verde y corren solas en
-CI. **No hay nada urgente ni bloqueante.**
+Versión **3.4.1**, publicada en `honorio.ar`. Las **17 validaciones** de
+`lib/legal/__tests__` están en verde y corren solas en CI. **No hay nada urgente
+ni bloqueante.**
 
 Es un PARCHE: **el motor no se tocó y ninguna cifra cambia.** Lo que cambia es el
 orden del dashboard genérico y del cálculo directo, y sale de la devolución de SG

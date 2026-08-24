@@ -121,6 +121,9 @@ Invariantes que hay que sostener:
   y no debe hacerlo.**
 - Todo componente nuevo del dashboard se compone desde
   `components/dashboard/primitives.tsx`.
+- Una sección nueva del dashboard **declara de quién es el honorario** —`propio`
+  o `otro`— y entra en una de las tres zonas. Las reglas, en
+  [`docs/ESTADO.md`](docs/ESTADO.md), «Las tres zonas del dashboard».
 - Los archivos de `lib/legal/` llevan encabezado SPDX (AGPL). Uno nuevo también.
 
 Detalle de capas y contratos: [`docs/ARQUITECTURA.md`](docs/ARQUITECTURA.md).
