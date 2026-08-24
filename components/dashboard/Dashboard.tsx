@@ -5,7 +5,11 @@ import type { CalculoResultado, Rango, SegundaInstanciaRol } from "@/lib/legal/t
 import { pct } from "./format"
 import { derivarCadena } from "./cadena"
 import { ChipsCaso, type ChipsCasoProps } from "./ChipsCaso"
-import { HonorariosBand } from "./HonorariosBand"
+import {
+  EscalaExplicacion,
+  HonorariosBand,
+  RepartoSection,
+} from "./HonorariosBand"
 import { SegundaInstanciaBand } from "./SegundaInstanciaBand"
 import { ActuacionesPosterioresSection } from "./ActuacionesPosterioresSection"
 import { CadenaCalculo } from "./CadenaCalculo"
@@ -15,7 +19,7 @@ import { ProsaSection } from "./ProsaSection"
 import { PartidorSection } from "./PartidorSection"
 import { ExhortoResult } from "./ExhortoResult"
 import { IncidenteResult } from "./IncidenteResult"
-import { Segmented } from "./primitives"
+import { CorteDeZona, SeccionPlegable, Segmented } from "./primitives"
 
 type RolKey = "patrocinante" | "apoderado" | "procurador"
 
@@ -137,82 +141,129 @@ function DashboardGeneral({
       />
     ) : null
 
+  const rolLabel = ROL_LABEL[rol]
+  const marcaRol = (
+    <span className="font-mono text-[10px] uppercase tracking-wider text-faint">
+      {rolLabel}
+    </span>
+  )
+
+  /*
+    El orden de esta pantalla es la respuesta a la devolucion de SG del
+    21/8/2026: "al ser tan completo el resultado que arroja, lo que
+    correspondería en 1° y 2° instancia como que me costó leer los
+    datos".
+
+    Lo que la causaba no era que hubiera explicaciones —las elogio— ni
+    que primera y segunda estuvieran juntas: era que **entre las dos
+    habia ocho importes de herramientas**, que despues venian tres
+    secciones dibujadas identicas entre si, y que la cifra de primera
+    instancia volvia a aparecer *despues* de la segunda, en la cadena.
+    Veintiocho importes en una pantalla, de los que cinco eran la
+    respuesta.
+
+    De ahi las tres zonas:
+
+      1. Lo que se vino a buscar: el honorario del profesional que se
+         consulta, en primera instancia y en las que se le suman.
+      2. El honorario de otro: auxiliares, mediador, partidor.
+      3. Como se llego: la escala, la cadena y el caso.
+
+    Nada se elimino. Las herramientas y el camino se pliegan, y plegar
+    una herramienta no es ocultar un numero: el numero es el mismo que
+    esta arriba, mostrado de otra manera. Es el criterio que ya regia
+    para el apoderado y el procurador, que viven detras del selector de
+    rol desde siempre.
+  */
   return (
     <div className="space-y-8">
+      {/* ---------- 1. El honorario que se vino a buscar ---------- */}
+
       <HonorariosBand
         rango={rango}
-        rolLabel={ROL_LABEL[rol]}
         esProvisorio={resultado.esProvisorio}
-        escala={escala}
         cadena={cadena}
-        valorUMA={resultado.valorUMA}
-        alicuota={alicuota}
-        ingenuo={ingenuo}
-        tipoProceso={resultado.tipoProceso}
       >
         {selectorRol}
       </HonorariosBand>
 
+      {/*
+        Subordinada y no par: entra unos centimetros y cuelga de la
+        primera. Sigue siendo una seccion propia —quien revisa en
+        camara viene a buscar estos tres numeros— pero es el mismo
+        sujeto y el mismo cobalto lo dice. Un tono mas debil se comia
+        contra el fondo y ademas mentia: sugeria otro sujeto donde hay
+        el mismo.
+      */}
       {segunda ? (
-        <SegundaInstanciaBand
-          valores={segunda}
-          rolLabel={ROL_LABEL[rol]}
-          esProvisorio={resultado.esProvisorio}
-        >
-          <span className="font-mono text-[10px] uppercase tracking-wider text-faint">
-            {ROL_LABEL[rol]}
-          </span>
-        </SegundaInstanciaBand>
+        <div className="md:ml-14">
+          <SegundaInstanciaBand
+            valores={segunda}
+            rolLabel={rolLabel}
+            esProvisorio={resultado.esProvisorio}
+          >
+            {marcaRol}
+          </SegundaInstanciaBand>
+        </div>
       ) : null}
 
       {resultado.actuacionesPosteriores ? (
-        <ActuacionesPosterioresSection
-          rango={resultado.actuacionesPosteriores[rol]}
-          rolLabel={ROL_LABEL[rol]}
-          esProvisorio={resultado.esProvisorio}
-        >
-          <span className="font-mono text-[10px] uppercase tracking-wider text-faint">
-            {ROL_LABEL[rol]}
-          </span>
-        </ActuacionesPosterioresSection>
-      ) : null}
-
-      <CadenaCalculo
-        baseOriginal={resultado.baseOriginal}
-        baseFinal={resultado.baseFinal}
-        valorUMA={resultado.valorUMA}
-        escala={escala}
-        cadena={cadena}
-        rango={rango}
-        rolLabel={ROL_LABEL[rol]}
-        notaRol={ROL_NOTA[rol]}
-        alicuota={alicuota}
-        esProvisorio={resultado.esProvisorio}
-      >
-        <ChipsCaso
-          {...caso}
-          tipoProceso={resultado.tipoProceso}
-          valorUMA={resultado.valorUMA}
-          transformaciones={resultado.transformaciones}
-        />
-      </CadenaCalculo>
-
-      {resultado.auxiliares ? (
-        <AuxiliaresSection
-          rango={resultado.auxiliares}
-          valorUMA={resultado.valorUMA}
-          esProvisorio={resultado.esProvisorio}
-          aperturaPrueba={caso.aperturaPrueba}
-        />
+        <div className="md:ml-14">
+          <ActuacionesPosterioresSection
+            rango={resultado.actuacionesPosteriores[rol]}
+            rolLabel={rolLabel}
+            esProvisorio={resultado.esProvisorio}
+          >
+            {marcaRol}
+          </ActuacionesPosterioresSection>
+        </div>
       ) : null}
 
       {/*
-        Va pegado a auxiliares porque comparten de donde salen: los dos
-        se calculan sobre la base y no sobre el honorario del abogado.
-        Se le pasa `baseFinal` —la misma cifra— y no el resultado
-        entero, porque mediacion no comparte la unidad: va en UHOM.
+        Las herramientas. No son resultados: son el mismo honorario
+        partido en fracciones del art. 29 o repartido entre dos. En
+        provisorio no hay ninguna —el art. 12 regula en el minimo, sin
+        etapas— y la banda ya lo explica.
       */}
-      <MediacionSection baseFinal={resultado.baseFinal} />
+      {!resultado.esProvisorio ? (
+        <SeccionPlegable etiqueta="Repartir el honorario">
+          <RepartoSection
+            rango={rango}
+            cadena={cadena}
+            tipoProceso={resultado.tipoProceso}
+          />
+        </SeccionPlegable>
+      ) : null}
+
+      {/* ---------- 2. El honorario de otro ---------- */}
+
+      {resultado.auxiliares || resultado.partidor ? (
+        <CorteDeZona>Honorarios de otros intervinientes</CorteDeZona>
+      ) : null}
+
+      {/*
+        Auxiliares y mediador van a la par porque comparten de donde
+        salen: los dos se calculan sobre la base y no sobre el
+        honorario del abogado. `items-start` para que abrir un "por
+        que" de uno no estire la columna del otro: son dos sujetos
+        distintos y cada uno crece solo.
+      */}
+      <div className="grid items-start gap-6 lg:grid-cols-2">
+        {resultado.auxiliares ? (
+          <AuxiliaresSection
+            rango={resultado.auxiliares}
+            valorUMA={resultado.valorUMA}
+            esProvisorio={resultado.esProvisorio}
+            aperturaPrueba={caso.aperturaPrueba}
+          />
+        ) : null}
+
+        {/*
+          Se le pasa `baseFinal` —la misma cifra— y no el resultado
+          entero, porque mediacion no comparte la unidad: va en UHOM.
+        */}
+        <MediacionSection baseFinal={resultado.baseFinal} />
+      </div>
 
       {resultado.partidor ? (
         <PartidorSection
@@ -222,11 +273,76 @@ function DashboardGeneral({
       ) : null}
 
       {/*
-        La prosa va ultima porque es la salida y no un paso del calculo:
-        se arma con los numeros que estan arriba. Es la tercera forma de
-        la misma salida —el numero, el informe imprimible y el texto—.
+        La prosa es un resultado —la tercera forma de la misma salida,
+        con el numero y el informe imprimible— y no una explicacion. Por
+        eso va antes del pliegue de la escala y no adentro.
+
+        Y va **despues de las dos zonas, no adentro de ninguna**: el
+        texto lleva una linea por profesional, incluidos los peritos y
+        el mediador, asi que redacta lo de arriba entero. La linea que
+        la precede cierra la zona de los otros intervinientes; sin ella
+        la seccion se leia como una mas de esa zona, que es lo que
+        Javier vio el 24/8.
       */}
-      <ProsaSection resultado={resultado} />
+      <div className="border-t border-border pt-8">
+        <ProsaSection resultado={resultado} />
+      </div>
+
+      {/* ---------- 3. Como se llego a ese numero ---------- */}
+
+      {/*
+        Sin corte de zona, y es una regla: **un corte encabeza un grupo,
+        no un solo elemento.** La zona 2 lleva el suyo porque agrupa
+        auxiliares, mediador y partidor bajo un rotulo comun. Acá hay un
+        unico pliegue que ya dice lo que contiene, y el corte repetia esa
+        misma frase una linea mas arriba.
+
+        Y el pliegue **no** se llama "cómo se llegó a este número",
+        aunque sea lo que hace: `CadenaCalculo` ya se titula asi adentro,
+        y el problema era justamente la frase repetida. Se nombra por lo
+        que contiene.
+      */}
+      <SeccionPlegable etiqueta="La escala y la cadena del cálculo">
+        <div className="space-y-6">
+          <EscalaExplicacion
+            escala={escala}
+            cadena={cadena}
+            valorUMA={resultado.valorUMA}
+            alicuota={alicuota}
+            ingenuo={ingenuo}
+          />
+
+          <CadenaCalculo
+            baseOriginal={resultado.baseOriginal}
+            baseFinal={resultado.baseFinal}
+            valorUMA={resultado.valorUMA}
+            escala={escala}
+            cadena={cadena}
+            rango={rango}
+            rolLabel={rolLabel}
+            notaRol={ROL_NOTA[rol]}
+            alicuota={alicuota}
+            esProvisorio={resultado.esProvisorio}
+          />
+        </div>
+      </SeccionPlegable>
+
+      {/*
+        El caso deja de colgar de la cadena y pasa al pie, siempre a la
+        vista: es **lo que contestaste**, no un fundamento. Queda donde
+        ya estaba la firma, que dice con que version se calculo; ahora
+        tambien se lee con que datos.
+      */}
+      {/* Sin borde propio: `ChipsCaso` ya trae el suyo, y dos lineas
+          seguidas se leen como un error de maqueta. */}
+      <footer>
+        <ChipsCaso
+          {...caso}
+          tipoProceso={resultado.tipoProceso}
+          valorUMA={resultado.valorUMA}
+          transformaciones={resultado.transformaciones}
+        />
+      </footer>
     </div>
   )
 }

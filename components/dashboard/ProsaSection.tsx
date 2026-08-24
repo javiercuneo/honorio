@@ -57,7 +57,13 @@ import { calcularMediacion } from "@/lib/legal/mediacion"
 import { UHOM_VIGENTE } from "@/lib/legal/uhom"
 import type { CalculoResultado } from "@/lib/legal/types"
 import { pesos, umaNum } from "./format"
-import { Disclosure, Etiqueta, PlegadoEnCelular, Prosa } from "./primitives"
+import {
+  Disclosure,
+  EncabezadoSeccion,
+  Etiqueta,
+  PlegadoEnCelular,
+  Prosa,
+} from "./primitives"
 
 /** Una fila de la lista: un profesional con su banda y su punto. */
 interface Fila {
@@ -169,14 +175,17 @@ export function ProsaSection({ resultado }: { resultado: CalculoResultado }) {
 
   return (
     <section data-imprimir="no">
-      <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1 pb-3">
-        <h2 className="font-mono text-[11px] uppercase tracking-[0.18em] text-foreground">
-          Regulación redactada
-        </h2>
-        <span className="font-mono text-[10px] uppercase tracking-wider text-faint">
-          borrador para revisar
-        </span>
-      </div>
+      {/*
+        Sin marca de sujeto, a diferencia de las demas secciones: el
+        texto lleva una linea por profesional —patrocinante, apoderado,
+        procurador, peritos, mediador—, asi que **no es de un sujeto,
+        es de todos**. Por eso tampoco va adentro de ninguna de las dos
+        zonas: las redacta a las dos.
+      */}
+      <EncabezadoSeccion
+        titulo="Regulación redactada"
+        articulo="borrador para revisar"
+      />
 
       {/* Es la seccion mas larga del informe —una pantalla y media en un
           telefono— y la que menos sentido tiene ahi: nadie carga cuatro

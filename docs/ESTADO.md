@@ -3,7 +3,7 @@
 Documento de continuidad entre sesiones. **Leer antes de empezar a trabajar.**
 Se actualiza en el mismo commit que el trabajo, para que nunca mienta.
 
-Última actualización: 2026-08-20 · rama `main`
+Última actualización: 2026-08-24 · rama `rediseno-dashboard`
 
 Lleva **sólo lo que sigue vivo**: dónde está el trabajo, qué está abierto, qué
 se sabe roto, qué decisiones no hay que contradecir sin saberlo y qué trampas
@@ -21,14 +21,19 @@ pregunta «¿por qué esto quedó así?».
 
 ## Dónde estamos
 
-Versión **3.4.0**, publicada en `honorio.ar`. Las **17 validaciones** de
-`lib/legal/__tests__` están en verde y corren solas en CI. **No hay nada urgente
-ni bloqueante.**
+Versión **3.4.1**, en la rama `rediseno-dashboard`, **sin publicar todavía**.
+Las **17 validaciones** de `lib/legal/__tests__` están en verde y corren solas en
+CI. **No hay nada urgente ni bloqueante.**
 
-Va marcada `MUEVE UN NÚMERO` porque el exhorto da otro resultado: el inciso a)
-dejó de mostrarse como un honorario de 3 UMA y pasó a ser el piso que la ley dice
-que es, y el auxiliar del inciso c) tiene banda propia, que antes salía en cero.
-Ningún otro tipo de proceso cambia.
+Es un PARCHE: **el motor no se tocó y ninguna cifra cambia.** Lo que cambia es el
+orden del dashboard genérico y del cálculo directo, y sale de la devolución de SG
+del 21/8. El detalle está en el [`CHANGELOG`](../CHANGELOG.md); lo que gobierna
+las decisiones está más abajo, en «Las tres zonas del dashboard».
+
+La 3.4.0 quedó marcada `MUEVE UN NÚMERO` porque el exhorto daba otro resultado: el
+inciso a) dejó de mostrarse como un honorario de 3 UMA y pasó a ser el piso que la
+ley dice que es, y el auxiliar del inciso c) tiene banda propia, que antes salía
+en cero. Ningún otro tipo de proceso cambió.
 
 **La regla de versionado cambió el 21/8 y está explicada en el
 [`CHANGELOG`](../CHANGELOG.md).** Antes, cualquier cambio de criterio que moviera
@@ -59,6 +64,7 @@ motivo, está contado en [`HISTORIA.md`](HISTORIA.md):
 | Los huecos de criterio: de 2 criterios a 8 | 19/8 | `lib/legal/jurisprudencia.ts` |
 | El art. 41 abierto, con las dos lecturas | 20/8 | `ART41_POSTERIORES` |
 | El exhorto: un inciso por vez, con su jurisprudencia | 21/8 | `buildExhorto()`, `ExhortoResult.tsx` |
+| Las tres zonas del dashboard, y el mismo orden en el cálculo directo | 24/8 | `Dashboard.tsx`, `HonorariosBand.tsx` |
 
 El plan de adopción está **fuera del repositorio**, en `C:\IA\notas\adopcion.md`,
 porque nombra personas. La **Fase 0 quedó cerrada el 13/8**.
@@ -145,46 +151,6 @@ son unas horas y no importa.
   no está en su planilla y levantarlo le agrega fricción diaria. El informe cita
   la norma, no su vigencia. Es el dato que faltaría para calcular con la UMA
   vigente a una fecha anterior.
-
-### La devolución de SG, 21/8/2026: el dashboard genérico cuesta de leer
-
-La primera devolución honesta de alguien de afuera, sobre el dashboard **genérico**
-—no el exhorto, que no está publicado—. La conversación está fuera del
-repositorio, en `C:\IA\input generico para todo\honest review.md`, porque nombra
-personas.
-
-Lo que dijo, en sus términos:
-
-> «al ser tan completo el resultado que arroja, lo que correspondería en 1° y 2°
-> instancia como que me costó leer los datos»
-
-y la sugerencia concreta:
-
-> «desglosar en dos páginas la regulación que quedaría en primera instancia y en
-> segunda»
-
-**Lo que hay que retener, y lo que no.** Los «por qué» los elogió expresamente
-—*«lo hace súper didáctico»*—, así que el problema **no** es que haya
-explicaciones plegadas: es la **densidad de cifras sin jerarquía** cuando primera
-y segunda instancia llegan juntas. Ella misma lo matizó como posible defecto de
-lectura rápida, y aun así es el dato: alguien que probó varios procesos y lo
-entendió igual necesitó dos pasadas.
-
-**Todavía no se decidió qué hacer.** Las opciones que aparecen, sin elegir
-ninguna:
-
-1. Separar primera y segunda instancia en dos vistas o dos pestañas, que es lo
-   que ella propuso.
-2. Dejar la segunda instancia plegada por defecto: hoy es una banda más, con el
-   mismo peso visual que la que casi siempre se busca.
-3. Jerarquizar dentro de una sola vista, sin partirla.
-
-**El precedente que hay:** la tarjeta del exhorto tenía el mismo problema en
-chico —seis párrafos de prosa intercalados entre las cifras— y se resolvió el
-21/8 aplicando la regla del repositorio sin inventar nada: **los números no se
-ocultan, las explicaciones sí**. Ahí alcanzó con mover prosa a los `Disclosure`.
-En el genérico el problema es distinto —no sobra prosa, sobran cifras del mismo
-rango— así que la solución probablemente también lo sea.
 
 ### Pendiente de diseño y contenido
 
@@ -629,6 +595,89 @@ a la vez: lo activo, lo enfocado y lo seleccionado son siempre el mismo color.
 
 **`--radius: 0.375rem`.** El `rounded-2xl` parejo era parte del look de plantilla.
 
+### Las tres zonas del dashboard
+
+Salió de la devolución de SG del 21/8/2026 —«me costó leer los datos»— y de
+medir la pantalla: **28 importes, de los que cinco eran la respuesta.** Lo que
+lo causaba no eran las explicaciones, que ella elogió, sino que primera y
+segunda instancia estuvieran separadas por ocho importes de herramientas, que
+tres secciones se dibujaran idénticas entre sí, y que la cifra de primera
+volviera a aparecer *después* de la segunda.
+
+**El orden es el invariante**, y está escrito arriba de `DashboardGeneral`:
+
+1. **Lo que se vino a buscar.** El honorario del profesional que se consulta:
+   primera instancia, segunda, actuaciones posteriores. Después, plegadas, las
+   herramientas que lo reparten.
+2. **El honorario de otro.** Auxiliares, mediador, partidor, detrás de un corte
+   con su rótulo. Auxiliares y mediador van a la par —comparten que se calculan
+   sobre la base y no sobre el honorario del abogado— con `items-start`, para
+   que abrir un «por qué» de uno no estire la columna del otro.
+3. **Cómo se llegó.** La escala, la cadena y el caso.
+
+- **Plegar una herramienta no es ocultar un número, y la regla no cambió.** La
+  regla protege **el número**, no cada forma de derivarlo: «por etapas» y «el
+  reparto entre dos» muestran el mismo honorario del patrocinante de otra
+  manera. El precedente es el apoderado y el procurador, **literalmente ocultos
+  detrás del selector de rol** desde siempre. Leída tan literal, la regla haría
+  ilegal ese selector. Es una corrección de Javier del 24/8.
+- **`SeccionPlegable` no dice «por qué», y no puede.** El «por qué» es un signo
+  único de la app y usarlo para plegar una sección entera sería inventar una
+  variante. Dice «Ver» / «Ocultar».
+- **Va en `<details>` y no en estado de React**, para que el interruptor
+  «incluir los fundamentos» del imprimible lo gobierne. Con `useState` el
+  informe saldría con lo que el lector hubiera abierto al leer, que es el bug
+  que `imprimir.tsx` existe para evitar.
+- **La tabla de tramos y la barra del excedente estaban fuera de todo
+  desplegable**, así que se imprimían siempre y el interruptor no las tocaba.
+  Al bajar a la zona 3 quedaron adentro, y ahora sí las gobierna.
+- **El sujeto del honorario es un cuarto eje de color y no se confunde con los
+  tres del cálculo.** Los tres ejes dicen *qué parte de la cuenta* toca una
+  regla; el sujeto dice *a quién* se le regula. `propio` reusa cobalto —que ya
+  era `primary`— y `otro` es grafito: **no entró ningún color nuevo**. El verde
+  sigue siendo el ajuste por rol del art. 20 y no se tocó.
+- **Los pisos de auxiliares y el ítem G del mediador viven adentro de su «por
+  qué».** Son referencias, la tercera clase de número. **La insignia de «el 5 %
+  queda por debajo» queda afuera del pliegue**: es la única razón por la que los
+  dos números conviven en pantalla, así que verla no puede depender de abrir
+  nada.
+- **El caso es pie y no parte de la cadena.** Es lo que contestaste, no un
+  fundamento, y va sin borde propio porque `ChipsCaso` ya trae el suyo.
+- **La prosa cierra la zona 1**, no la página: es un resultado —la tercera forma
+  de la misma salida— y no una explicación.
+- **Se quitó el realce del «Revocada · 40 %».** Con la sección ya marcada por
+  sujeto, ese `destacado` competía con la marca. Dos jerarquías encimadas no son
+  una jerarquía.
+- **`Disclosure` envuelve sólo cuando hay un valor.** El `flex-wrap` estaba
+  siempre, y sin valor hacía caer la etiqueta «por qué» sola a la segunda línea,
+  alineada a la derecha: se leía como una tabulación caprichosa. **Sólo se ve a
+  partir de 1024 px**, que es donde auxiliares y mediador pasan a dos columnas y
+  el ancho se parte al medio; en una sola columna nunca aparece. Sin valor va
+  `flex-nowrap` y el concepto se achica —para eso tiene `min-w-0`— y envuelve
+  como texto.
+- **Un corte de zona encabeza un grupo, no un solo elemento.** La zona 2 lleva
+  el suyo porque agrupa auxiliares, mediador y partidor. La zona 3 no lleva:
+  tiene un único pliegue que ya se nombra solo, y el corte repetía esa frase una
+  línea más arriba. Por lo mismo el pliegue **no** se llama «cómo se llegó a
+  este número»: `CadenaCalculo` ya se titula así adentro.
+- **La prosa no lleva marca de sujeto y va después de las dos zonas.** El texto
+  lleva una línea por profesional —incluidos peritos y mediador—, así que no es
+  de un sujeto: las redacta a las dos. Lleva una línea arriba que cierra la zona
+  de los otros intervinientes; sin ella se leía como una sección más de esa
+  zona.
+- **Los encabezados de sección salen todos de `EncabezadoSeccion`.** Estaban los
+  cinco escritos a mano y ya habían divergido en separaciones. `ProsaSection`
+  era el más distinto y por eso era el único sin separación visible.
+- **El mediador no anuncia «si hubo mediación previa».** Es una condición obvia
+  —equivale a aclarar «si se designaron peritos» arriba de los auxiliares— y la
+  insignia envolvía a una segunda línea, que desalineaba la sección de la de al
+  lado. Decisión de Javier del 24/8.
+- **El cálculo directo sigue el mismo orden y no pliega nada.** Su segunda
+  instancia quedaba última, después de auxiliares y mediador, y eso no era una
+  decisión: era el orden en que se fue escribiendo. Pero ahí la herramienta de
+  etapas y fracción **es** la pantalla, y su balance es otro a propósito: filas
+  en vez de recuadros, los tres roles juntos, y la UMA como unidad principal.
+
 ### Las tres reglas que gobiernan el contenido
 
 1. **Toda la información importante debe estar.** Es software didáctico y
@@ -656,8 +705,10 @@ borde derecho de la fila, en toda la app. **No inventar variantes.**
   $1.428.000"*, con la norma detrás del `por qué`. Es el momento más didáctico
   de la app. **No aparece cuando la base cae en el primer tramo**, porque ahí el
   cálculo ingenuo y el real coinciden y la frase mentiría.
-- **Segunda instancia es una sección par**, no un colapsable: la van a consumir
-  mucho quienes revisan regulaciones en cámara.
+- **Segunda instancia no es un colapsable**: la van a consumir mucho quienes
+  revisan regulaciones en cámara. Desde el 24/8 tampoco es una sección *par*:
+  es **subordinada** —entra 56 px y la cifra baja un escalón—, pero sigue
+  siempre a la vista y lleva el mismo cobalto, porque es el mismo sujeto.
 - **No numerar los ejes.** "Eje 1 / 01" es una convención nuestra, no de la ley.
 - **No hay honorario promedio.** El punto medio no lo señala nada de la 27.423,
   sería la única cifra en pantalla sin un artículo al lado y por su forma («el
@@ -737,7 +788,13 @@ para esos el mismo art. 21 manda considerar que hay una sola parte.
 
 - `components/dashboard/primitives.tsx` — `Cifra`, `LedgerRow`, `Disclosure`,
   `Segmented`, `Tile`, `Prosa`, `Insignia`, `Fundamento`, `SinIA`,
-  `PlegadoEnCelular`, y el mapa de colores por eje.
+  `PlegadoEnCelular`, `SeccionPlegable`, `CorteDeZona`, `EncabezadoSeccion`, y
+  los mapas de color: el de los tres ejes y el del sujeto.
+- `components/dashboard/HonorariosBand.tsx` exporta **tres** piezas y el orden
+  lo arma el `Dashboard`: `HonorariosBand` (la cifra, sola), `RepartoSection`
+  (las fracciones del art. 29 y el reparto entre dos) y `EscalaExplicacion` (el
+  tramo y el excedente). Estaban las tres en un solo componente y por eso el
+  orden no se podía cambiar sin partirlo.
 - `components/prefs.tsx` — tema y preferencias de lectura. Persisten en
   `localStorage`. **Solo cambian cómo se escribe la cifra, nunca el cálculo.**
 - `components/interview/app-topbar.tsx` — la única cabecera de la app.

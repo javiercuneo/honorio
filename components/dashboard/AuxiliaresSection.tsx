@@ -22,7 +22,14 @@ import {
   SIN_PERICIA_ART61BIS,
   baseDondeElPisoDejaDeMorder,
 } from "@/lib/legal/minimos-data"
-import { Cifra, Disclosure, EnUMA, Insignia, Tile } from "./primitives"
+import {
+  Cifra,
+  Disclosure,
+  EncabezadoSeccion,
+  EnUMA,
+  SeccionPlegable,
+  Tile,
+} from "./primitives"
 
 interface AuxiliaresSectionProps {
   rango: Rango
@@ -60,20 +67,17 @@ export function AuxiliaresSection({
 
   return (
     <section>
-      <div className="flex items-baseline gap-2.5 pb-3">
-        <h2 className="font-mono text-[11px] uppercase tracking-[0.18em] text-foreground">
-          Auxiliares de justicia
-        </h2>
-        <span className="font-mono text-[10px] uppercase tracking-wider text-faint">
-          art. 21
-        </span>
-      </div>
+      <EncabezadoSeccion
+        titulo="Auxiliares de justicia"
+        articulo="art. 21"
+        sujeto="otro"
+      />
 
       <div className="grid gap-3 sm:grid-cols-2">
         <Tile
           etiqueta="Mínimo · 5%"
           valor={
-            <Cifra value={rango.minPesos} size="xl" className="text-value-min" />
+            <Cifra value={rango.minPesos} size="lg" className="text-value-min" />
           }
           sub={<EnUMA value={rango.minUMA} />}
         />
@@ -81,25 +85,30 @@ export function AuxiliaresSection({
           <Tile
             etiqueta="Máximo · 10%"
             valor={
-              <Cifra value={rango.maxPesos} size="xl" className="text-value-max" />
+              <Cifra value={rango.maxPesos} size="lg" className="text-value-max" />
             }
             sub={<EnUMA value={rango.maxUMA} />}
           />
         )}
       </div>
 
-      <div className="mt-3">
-        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 pb-2">
-          <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-faint">
-            Pisos que fija la ley
-          </span>
-          {quedaCorto ? (
-            <Insignia tono="bg-secondary text-foreground">
-              el 5 % queda por debajo
-            </Insignia>
-          ) : null}
-        </div>
+      {/*
+        Los pisos van plegados desde el 24/8/2026. **No es ocultar un
+        numero:** son referencias —la tercera clase de numero de la
+        app, un valor de otro calculo que se muestra para orientar y
+        que nadie regula—, y ocupaban tres recuadros del mismo tamaño
+        que los dos de arriba, que si son lo que se regula.
 
+        La insignia queda **afuera del pliegue**, en el rotulo: si el
+        5 % cae por debajo de un piso, eso hay que verlo sin abrir
+        nada. Es la unica razon por la que los dos numeros conviven en
+        pantalla.
+      */}
+      <SeccionPlegable
+        className="mt-3"
+        etiqueta="Pisos que fija la ley"
+        articulo={quedaCorto ? "el 5 % queda por debajo" : undefined}
+      >
         <div className="grid gap-3 sm:grid-cols-2">
           {PISOS_AUXILIARES_CON_BASE.map((piso) => (
             <Tile
@@ -142,7 +151,7 @@ export function AuxiliaresSection({
             />
           ) : null}
         </div>
-      </div>
+      </SeccionPlegable>
 
       <div className="mt-1 px-1">
         <Disclosure concepto="Entre el 5% y el 10% de la base regulatoria">

@@ -46,7 +46,6 @@ interface CadenaCalculoProps {
   notaRol?: string
   alicuota: string
   esProvisorio: boolean
-  children?: ReactNode
 }
 
 function ParPesos({
@@ -175,7 +174,6 @@ export function CadenaCalculo({
   notaRol,
   alicuota,
   esProvisorio,
-  children,
 }: CadenaCalculoProps) {
   const [modalOpen, setModalOpen] = useState(false)
   const uma = useUma()
@@ -370,8 +368,6 @@ export function CadenaCalculo({
             </>
           ) : null}
         </Bloque>
-
-        {children}
       </div>
 
       {escala ? (

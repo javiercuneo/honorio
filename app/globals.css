@@ -80,6 +80,19 @@
   --color-rol-tint: var(--rol-tint);
   --color-rol-tint-foreground: var(--rol-tint-foreground);
 
+  /* ---- De quien es el honorario ----
+     Cuarto eje, y no se confunde con los tres del calculo: aquellos
+     dicen que parte de la cuenta toca una regla, este dice a quien se
+     le regula. `propio` reusa el acento —cobalto ya significa "lo
+     tuyo"—, asi que no entra ningun color nuevo al sistema. */
+  --color-sujeto-propio: var(--sujeto-propio);
+  --color-sujeto-propio-tint: var(--sujeto-propio-tint);
+  --color-sujeto-propio-borde: var(--sujeto-propio-borde);
+  --color-sujeto-propio-hilo: var(--sujeto-propio-hilo);
+  --color-sujeto-otro: var(--sujeto-otro);
+  --color-sujeto-otro-tint: var(--sujeto-otro-tint);
+  --color-sujeto-otro-borde: var(--sujeto-otro-borde);
+
   /* Neutros propios del sistema */
   --color-faint: var(--faint);
   --color-hair: var(--hair);
@@ -159,6 +172,16 @@
   --rol: #1f7a4d;
   --rol-tint: rgb(31 122 77 / 0.11);
   --rol-tint-foreground: #19613d;
+
+  /* De quien es el honorario. `propio` es el mismo cobalto de
+     --primary; se nombra aparte para que se lea de que habla. */
+  --sujeto-propio: #1e45ce;
+  --sujeto-propio-tint: rgb(30 69 206 / 0.06);
+  --sujeto-propio-borde: rgb(30 69 206 / 0.45);
+  --sujeto-propio-hilo: rgb(30 69 206 / 0.28);
+  --sujeto-otro: #5a6472;
+  --sujeto-otro-tint: rgb(90 100 114 / 0.07);
+  --sujeto-otro-borde: rgb(90 100 114 / 0.42);
 }
 
 .dark {
@@ -222,6 +245,14 @@
   --rol: #5fc08a;
   --rol-tint: rgb(95 192 138 / 0.14);
   --rol-tint-foreground: #86d3a8;
+
+  --sujeto-propio: #7a99ff;
+  --sujeto-propio-tint: rgb(122 153 255 / 0.10);
+  --sujeto-propio-borde: rgb(122 153 255 / 0.48);
+  --sujeto-propio-hilo: rgb(122 153 255 / 0.30);
+  --sujeto-otro: #99a1ae;
+  --sujeto-otro-tint: rgb(153 161 174 / 0.08);
+  --sujeto-otro-borde: rgb(153 161 174 / 0.40);
 }
 
 @layer base {

@@ -218,15 +218,50 @@ export function EnUMA({
 
 // ---- Contenedores ----
 
+/**
+ * De quien es el honorario que la seccion regula.
+ *
+ * Es un cuarto eje, y no se confunde con los tres del calculo —base,
+ * escala, honorario—: aquellos dicen **que parte de la cuenta** toca
+ * una regla, y este dice **a quien** se le regula. Por eso no toma
+ * ninguno de sus tintes.
+ *
+ * `propio` es el profesional que se consulta —primera instancia,
+ * segunda, actuaciones posteriores— y va en el acento de la app, que
+ * ya significa "lo tuyo". `otro` es el honorario de un tercero
+ * —auxiliares, mediador, partidor— y va en grafito.
+ *
+ * No entra ningun color nuevo al sistema: cobalto ya era `primary`.
+ */
+export type Sujeto = "propio" | "otro"
+
+export const SUJETO_CARD: Record<Sujeto, string> = {
+  propio: "border-sujeto-propio-borde",
+  otro: "border-sujeto-otro-borde",
+}
+
+export const SUJETO_TITULO: Record<Sujeto, string> = {
+  propio: "text-sujeto-propio",
+  otro: "text-sujeto-otro",
+}
+
 export function Card({
   children,
   className,
+  sujeto,
 }: {
   children: ReactNode
   className?: string
+  sujeto?: Sujeto
 }) {
   return (
-    <section className={cn("rounded-lg border border-border bg-card", className)}>
+    <section
+      className={cn(
+        "rounded-lg border bg-card",
+        sujeto ? SUJETO_CARD[sujeto] : "border-border",
+        className,
+      )}
+    >
       {children}
     </section>
   )
@@ -237,21 +272,69 @@ export function CardHeader({
   articulo,
   children,
   className,
+  sujeto,
 }: {
   titulo: ReactNode
   articulo?: string
   children?: ReactNode
   className?: string
+  sujeto?: Sujeto
 }) {
   return (
     <div
       className={cn(
-        "flex flex-wrap items-center justify-between gap-x-4 gap-y-3 border-b border-border px-7 py-4",
+        "flex flex-wrap items-center justify-between gap-x-4 gap-y-3 border-b px-7 py-4",
+        sujeto
+          ? sujeto === "propio"
+            ? "border-sujeto-propio-borde bg-sujeto-propio-tint"
+            : "border-sujeto-otro-borde bg-sujeto-otro-tint"
+          : "border-border",
         className,
       )}
     >
       <div className="flex items-baseline gap-2.5">
-        <h2 className="font-mono text-[11px] uppercase tracking-[0.18em] text-foreground">
+        <h2
+          className={cn(
+            "font-mono text-[11px] uppercase tracking-[0.18em]",
+            sujeto ? SUJETO_TITULO[sujeto] : "text-foreground",
+          )}
+        >
+          {titulo}
+        </h2>
+        {articulo ? <Articulo>{articulo}</Articulo> : null}
+      </div>
+      {children}
+    </div>
+  )
+}
+
+/**
+ * El encabezado de una seccion que no lleva card.
+ *
+ * Existe como primitiva y no copiado en cada seccion porque ya
+ * estaban los cuatro escritos a mano y con separaciones distintas.
+ * Es el mismo motivo por el que `Fundamento` es una primitiva.
+ */
+export function EncabezadoSeccion({
+  titulo,
+  articulo,
+  children,
+  sujeto,
+}: {
+  titulo: ReactNode
+  articulo?: string
+  children?: ReactNode
+  sujeto?: Sujeto
+}) {
+  return (
+    <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 pb-3">
+      <div className="flex items-baseline gap-2.5">
+        <h2
+          className={cn(
+            "font-mono text-[11px] uppercase tracking-[0.18em]",
+            sujeto ? SUJETO_TITULO[sujeto] : "text-foreground",
+          )}
+        >
           {titulo}
         </h2>
         {articulo ? <Articulo>{articulo}</Articulo> : null}
@@ -391,10 +474,28 @@ export function Disclosure({
 }) {
   return (
     <details data-ledger-row className={cn("group", className)}>
-      {/* Envuelve por el mismo motivo que LedgerRow, y ademas tiene una
-          pieza mas que no se puede achicar: la etiqueta «por qué». */}
-      <summary className="flex cursor-pointer list-none flex-wrap items-baseline justify-end gap-x-3 gap-y-0.5 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-        <span className="flex min-w-0 items-baseline gap-2 text-[13px] text-muted-foreground">
+      {/*
+        Envuelve **solo cuando hay un valor**, por el mismo motivo que
+        LedgerRow: en pantalla angosta la cifra baja a la segunda linea
+        y se alinea a la derecha, que es mejor que partirla al medio.
+
+        Sin valor no hay nada que valga la pena bajar, y envolver hacia
+        que la etiqueta «por qué» —la unica pieza que no se puede
+        achicar— cayera sola a la segunda linea, alineada a la derecha.
+        Se leia como una tabulacion caprichosa, y se veia apenas los
+        auxiliares y el mediador pasaron a dos columnas: ahi el ancho
+        se parte al medio y los conceptos largos ya no entran.
+
+        Con `flex-nowrap` el concepto se achica —para eso tiene
+        `min-w-0`— y su texto envuelve como texto, que es lo que es.
+      */}
+      <summary
+        className={cn(
+          "flex cursor-pointer list-none items-baseline justify-end gap-x-3 gap-y-0.5 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+          valor ? "flex-wrap" : "flex-nowrap",
+        )}
+      >
+        <span className="flex min-w-0 flex-wrap items-baseline gap-x-2 text-[13px] text-muted-foreground">
           {concepto}
           {articulo ? <Articulo>{articulo}</Articulo> : null}
         </span>
@@ -458,6 +559,73 @@ export function PlegadoEnCelular({
         {children}
       </div>
     </>
+  )
+}
+
+/**
+ * Una seccion entera plegada.
+ *
+ * **No es un `Disclosure` y no dice «por que».** El «por que» es un
+ * unico signo de la app —una explicacion al borde derecho de una
+ * fila— y esto es otra cosa: una seccion que existe y esta cerrada.
+ * Usar la misma palabra para las dos inventaria una variante del
+ * signo, que es justo lo que la regla prohibe.
+ *
+ * Lo que pliega no son numeros nuevos: son **otras formas de mostrar
+ * el mismo numero** —el honorario repartido por etapas o entre dos
+ * profesionales— y el camino por el que se llego a el. El numero
+ * sigue arriba, entero y a la vista.
+ *
+ * Va en `<details>` y no en estado de React a proposito: asi el
+ * interruptor «incluir los fundamentos» del imprimible lo gobierna,
+ * como a todo lo demas que se pliega. Con `useState` el informe
+ * saldria con lo que el lector hubiera abierto al leer.
+ */
+export function SeccionPlegable({
+  etiqueta,
+  articulo,
+  children,
+  className,
+}: {
+  /** Que se despliega, dicho en pocas palabras. */
+  etiqueta: string
+  articulo?: string
+  children: ReactNode
+  className?: string
+}) {
+  return (
+    <details className={cn('group', className)}>
+      <summary className="flex cursor-pointer list-none flex-wrap items-baseline gap-x-3 gap-y-1 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+        <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-accent-foreground">
+          {etiqueta}
+        </span>
+        {articulo ? <Articulo>{articulo}</Articulo> : null}
+        <span className={PUNTEADO} aria-hidden="true" />
+        <span className="shrink-0 font-mono text-[10px] uppercase tracking-wider text-faint">
+          <span className="group-open:hidden">Ver</span>
+          <span className="hidden group-open:inline">Ocultar</span>
+        </span>
+      </summary>
+      <div className="pt-3">{children}</div>
+    </details>
+  )
+}
+
+/**
+ * El limite entre dos sujetos del calculo.
+ *
+ * Hasta aca el honorario del profesional que se consulta; de aca para
+ * abajo, el de otro. Se dice, en vez de dejar que cuatro grillas
+ * identicas lo insinuen.
+ */
+export function CorteDeZona({ children }: { children: ReactNode }) {
+  return (
+    <div className="flex items-center gap-3.5 pt-2">
+      <span className="shrink-0 font-mono text-[10px] uppercase tracking-[0.16em] text-faint">
+        {children}
+      </span>
+      <span className="h-px flex-1 bg-border" aria-hidden="true" />
+    </div>
   )
 }
 

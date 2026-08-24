@@ -45,6 +45,88 @@ posible —cambió la UMA— que no se podía comprobar.
 
 ---
 
+## 3.4.1 — 24 de agosto de 2026
+
+PARCHE. **El motor no se tocó y ninguna cifra cambia**: las 17 validaciones
+están en verde y cualquier caso da exactamente el mismo número que en 3.4.0.
+Lo que cambia es el orden del dashboard genérico y del cálculo directo.
+
+### De dónde salió
+
+De la primera devolución honesta de alguien de afuera. SG, el 21/8:
+
+> «Al ser tan completo el resultado que arroja, lo que correspondería en 1° y 2°
+> instancia como que me costó leer los datos.»
+
+Su diagnóstico —desglosar en dos páginas— no se siguió, y su síntoma sí. Lo que
+lo causaba, medido sobre un conocimiento de 200 UMA: **28 importes en una
+pantalla, de los que cinco eran la respuesta.** Entre primera y segunda
+instancia había ocho importes de herramientas; después venían tres secciones
+dibujadas idénticas entre sí; y la cifra de primera instancia volvía a aparecer
+*después* de la segunda, en la cadena de cálculo.
+
+### Qué cambió
+
+- **Tres zonas declaradas.** Lo que se vino a buscar —el honorario del
+  profesional que se consulta, en primera y segunda instancia—; el honorario de
+  otro —auxiliares, mediador, partidor—; y cómo se llegó. Entre la primera y la
+  segunda hay un corte con su rótulo.
+- **La segunda instancia sube, pegada a la primera**, y entra unos centímetros:
+  es el mismo sujeto y lo dice el mismo color, pero está subordinada.
+- **Las herramientas se pliegan.** El reparto por etapas y el reparto entre dos
+  profesionales pasan a una sección plegable. **No se oculta ningún número:** el
+  número es el del patrocinante, que sigue arriba y entero, y lo que se pliega
+  es otra forma de mostrarlo. Es el mismo criterio que ya regía para el
+  apoderado y el procurador, que viven detrás del selector de rol desde siempre.
+- **La escala y la cadena bajan al pie**, detrás de un pliegue. Son lo que se
+  mira cuando el número no cierra, no cuando se lo busca.
+- **El caso pasa a ser pie, siempre visible.** Colgaba de la cadena de cálculo;
+  es lo que contestaste, no un fundamento.
+- **Cuatro cifras pierden su recuadro y se mudan adentro de su «por qué»:** los
+  tres pisos de auxiliares y el ítem G del mediador. Son referencias —números de
+  otro cálculo que nadie regula—. La insignia de «el 5 % queda por debajo» queda
+  **afuera** del pliegue: eso hay que verlo sin abrir nada.
+- **De quién es el honorario, en color.** Cobalto para el profesional que se
+  consulta, grafito para los demás. No entra ningún color nuevo: cobalto ya era
+  el acento de la app.
+- **La prosa queda separada de las dos zonas por una línea**, y sin marca de
+  sujeto: el texto lleva una línea por profesional, así que las redacta a las
+  dos. Los cinco encabezados de sección pasan a salir de una sola primitiva;
+  estaban escritos a mano y ya habían divergido.
+- **El mediador deja de anunciar «si hubo mediación previa».** Es obvio, y la
+  insignia envolvía a una segunda línea que lo desalineaba de los auxiliares.
+- **El cálculo directo sigue el mismo orden**, que era el único punto donde
+  estaba desalineado por accidente: la segunda instancia quedaba última, después
+  de auxiliares y mediador. Ahí no se plegó nada: la herramienta de etapas y
+  fracción *es* esa pantalla.
+
+**Ninguna explicación se eliminó.** Las diez que había siguen estando, más dos
+que absorben las cifras que perdieron su recuadro.
+
+### Un defecto de maqueta que sólo se veía en pantalla ancha
+
+`Disclosure` envolvía siempre. Sin un valor a la derecha, eso hacía caer la
+etiqueta «por qué» sola a la segunda línea y alineada a la derecha, que se leía
+como una tabulación caprichosa. **Nunca se había visto porque hasta ahora ninguna
+de esas filas vivía en media pantalla**: aparece a partir de 1024 px, que es
+donde auxiliares y mediador pasan a dos columnas. Ahora envuelve sólo cuando hay
+un valor que valga la pena bajar.
+
+### Lo que cambia en el papel
+
+El informe impreso también se reordena. Y hay un efecto que conviene saber: la
+tabla de tramos y la barra del excedente **no estaban dentro de un desplegable**,
+así que se imprimían siempre, sin importar el interruptor «incluir los
+fundamentos». Ahora sí lo están, y el interruptor las gobierna. Con los
+fundamentos activados el informe sale igual de completo que antes; sin ellos,
+más corto.
+
+**Un enlace compartido de antes de esta versión abre igual**, y en el diseño
+nuevo: el enlace lleva las respuestas de la entrevista, no los números, así que
+el motor recalcula y lo dibuja la pantalla del día. El formato sigue en `c1`.
+
+---
+
 ## 3.4.0 — 21 de agosto de 2026
 
 MENOR · `MUEVE UN NÚMERO`: **el exhorto del art. 50 se regulaba mal y ahora da

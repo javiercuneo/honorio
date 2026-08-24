@@ -41,7 +41,14 @@ import { calcularMediacion } from "@/lib/legal/mediacion"
 import { UHOM_VIGENTE } from "@/lib/legal/uhom"
 import { MEDIACION_BASE_UNICA } from "@/lib/legal/jurisprudencia"
 import { pesos, umaNum } from "./format"
-import { Cifra, Disclosure, Fundamento, Insignia, Tile } from "./primitives"
+import {
+  Cifra,
+  Disclosure,
+  EncabezadoSeccion,
+  Fundamento,
+  Insignia,
+  Tile,
+} from "./primitives"
 
 /**
  * El equivalente de `EnUMA`, en la otra unidad. Es un componente
@@ -73,51 +80,65 @@ export function MediacionSection({ baseFinal }: MediacionSectionProps) {
 
   return (
     <section>
-      <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1 pb-3">
-        <h2 className="font-mono text-[11px] uppercase tracking-[0.18em] text-foreground">
-          Mediador
-        </h2>
-        <span className="font-mono text-[10px] uppercase tracking-wider text-faint">
-          Decreto 2536/2015, Anexo III art. 2°
-        </span>
-        <Insignia tono="bg-secondary text-foreground">
-          si hubo mediación previa
-        </Insignia>
-      </div>
+      {/*
+        Sin la insignia de «si hubo mediación previa». Era una condicion
+        obvia —equivale a aclarar «si se designaron peritos» arriba de
+        los auxiliares— y encima envolvia a una segunda linea, que
+        desalineaba esta seccion de la de al lado. Decision de Javier,
+        24/8.
+      */}
+      <EncabezadoSeccion
+        titulo="Mediador"
+        articulo="Decreto 2536/2015, Anexo III art. 2°"
+        sujeto="otro"
+      />
 
+      {/*
+        El recuadro de al lado era el monto del asunto —la base otra
+        vez, en UHOM, con el item de la escala—. Es de donde sale el
+        item, no cuanto cobra el mediador: una referencia, y desde el
+        24/8/2026 vive en su "por que". En su lugar va el valor del
+        UHOM, que si hace falta para leer la cifra de al lado y antes
+        estaba en letra chica al pie.
+      */}
       <div className="grid gap-3 sm:grid-cols-2">
         <Tile
           etiqueta="Honorario básico"
           destacado
           valor={
-            <Cifra value={m.honorarioPesos} size="xl" className="text-foreground" />
+            <Cifra value={m.honorarioPesos} size="lg" className="text-foreground" />
           }
           sub={<EnUHOM value={m.honorarioUHOM} />}
         />
         <Tile
-          etiqueta={`Monto del asunto · ítem ${m.item.item}`}
-          valor={<Cifra value={baseFinal} size="lg" className="text-foreground" />}
-          sub={
-            <>
-              <EnUHOM value={m.baseEnUHOM} />
-              <span className="mx-1.5 text-faint">·</span>
-              {m.item.descripcion}
-            </>
+          etiqueta="Valor del UHOM"
+          valor={
+            <Cifra
+              value={UHOM_VIGENTE.valor}
+              size="lg"
+              className="text-foreground"
+            />
           }
+          sub={UHOM_VIGENTE.fuente ?? "tabla oficial"}
         />
       </div>
 
-      <div className="mt-2 px-1 font-mono text-[11px] tabular-nums text-faint">
-        <span className="tracking-wider">UHOM</span> {pesos(UHOM_VIGENTE.valor)}
-        {UHOM_VIGENTE.fuente ? (
-          <>
-            <span className="mx-2">·</span>
-            <span className="font-sans">{UHOM_VIGENTE.fuente}</span>
-          </>
-        ) : null}
-      </div>
-
       <div className="mt-1 px-1">
+        <Disclosure
+          concepto="De qué ítem de la escala sale"
+          valor={
+            <span className="font-mono text-[11px]">ítem {m.item.item}</span>
+          }
+        >
+          <p>
+            La escala del mediador no se aplica sobre pesos sino sobre el monto
+            del asunto medido en UHOM. Acá la base del expediente son{" "}
+            <EnUHOM value={m.baseEnUHOM} />, que cae en el ítem {m.item.item}:{" "}
+            {m.item.descripcion}. Es de dónde sale el ítem, no lo que el
+            mediador cobra: ese número es el de al lado.
+          </p>
+        </Disclosure>
+
         {/*
           Solo cuando pasa. Si el tope no mordio, decir que existe es
           describir la escala, y eso esta en la documentacion.
