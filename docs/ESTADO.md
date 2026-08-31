@@ -138,6 +138,23 @@ son unas horas y no importa.
 
 ### Deudas anotadas a propósito
 
+- **Los cuatro puntos que `PLAN_COBERTURA_LEY.md` dejó anotados sin fecha, que
+  son lo único vivo de ese plan.** El plan está hecho entero desde el 7/8 y su
+  documento vive en el repositorio `herramientas-judiciales`, porque ahí está la
+  materia prima; **el trabajo pendiente es de acá y por eso se anota acá**, que
+  es lo que faltaba hasta el 31/8. Ninguno es bloqueante y dos pueden no hacerse
+  nunca:
+  1. **Nombrar las etapas por tipo de proceso** (punto 3b).
+  2. **Calculadora del art. 42** (punto 5), si alguna vez hace falta.
+  3. **El proceso mal encarrilado**, y **sin decisión tomada**: qué debería
+     decir la app cuando se ejecuta —por la vía de la ejecución de sentencia— un
+     acuerdo de mediación cuya obligación no es de dar sumas de dinero sino, por
+     ejemplo, de escriturar. El juez debió ordinarizarlo; si no se dio cuenta y
+     siguió adelante, la entrevista devuelve un número sobre una base que no es
+     la del art. 22. Está sin resolver porque no está claro si vale una
+     advertencia o si es ruido para el 99 % de los casos.
+  4. **Si el «completo» sigue siendo el completo** cuando el proceso terminó
+     antes de la apertura a prueba.
 - **El UHOM entra sin procedencia.** La planilla trae el número pero no su
   norma —la fila `Acordada` describe la UMA—. Mientras no existan las filas
   `UHOM_FUENTE` y `UHOM_URL`, cada valor nuevo entra sin cita y el script avisa;
