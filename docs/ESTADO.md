@@ -21,14 +21,21 @@ pregunta «¿por qué esto quedó así?».
 
 ## Dónde estamos
 
-Versión **3.4.1**, publicada en `honorio.ar`. Las **17 validaciones** de
+Versión **3.4.2**, publicada en `honorio.ar`. Las **17 validaciones** de
 `lib/legal/__tests__` están en verde y corren solas en CI. **No hay nada urgente
 ni bloqueante.**
 
-Es un PARCHE: **el motor no se tocó y ninguna cifra cambia.** Lo que cambia es el
-orden del dashboard genérico y del cálculo directo, y sale de la devolución de SG
-del 21/8. El detalle está en el [`CHANGELOG`](../CHANGELOG.md); lo que gobierna
-las decisiones está más abajo, en «Las tres zonas del dashboard».
+Es un PARCHE: **el motor no se tocó y ninguna cifra cambia.** Trae dos cosas: el
+**hueco entre un grado y el siguiente del art. 21** queda declarado —la app lo
+resolvía y no lo decía—, y el **cron de la UMA vuelve a llegar al sitio**, que no
+llegaba por una trampa de GitHub Actions. Las dos están en el
+[`CHANGELOG`](../CHANGELOG.md); el criterio del hueco, más abajo en «Lo que la
+app declara abierto porque no hay nada detrás», y la trampa del deploy en «La UMA
+y el UHOM».
+
+La 3.4.1 fue el orden del dashboard genérico y del cálculo directo, de la
+devolución de SG del 21/8. Lo que gobierna esas decisiones está más abajo, en
+«Las tres zonas del dashboard».
 
 La 3.4.0 quedó marcada `MUEVE UN NÚMERO` porque el exhorto daba otro resultado: el
 inciso a) dejó de mostrarse como un honorario de 3 UMA y pasó a ser el piso que la
@@ -108,6 +115,17 @@ factor de correlación del art. 21 —el criterio que la propia app funda con
 No son deudas: son huecos de criterio dichos como lo que son, en pantalla. Si
 alguno consigue jurisprudencia, entra a `jurisprudencia.ts`.
 
+- El **hueco entre un grado y el siguiente del art. 21**. La tabla está escrita
+  con enteros —«Hasta 15 UMA», «De 16 UMA a 45 UMA»— y una base de 15,4 UMA no
+  está nombrada por ningún renglón. Pasa en los seis cortes (15, 45, 90, 150,
+  450, 750) y pasa seguido, porque la base sale de dividir pesos por la UMA.
+  **Honorio la toma en el grado de arriba y mide el excedente desde el límite
+  cerrado —15— y no desde el entero del rótulo —16—.** Lo funda el segundo
+  párrafo del artículo, que manda aplicar la alícuota *al excedente*: si hay
+  excedente sobre 15, hay grado siguiente. **No se redondea la base**, que es
+  otra cosa y está descartada desde siempre. Sin fallo ni doctrina: se buscó y
+  no se encontró. Está dicho arriba de `calcularEscala()`, en la tabla de la
+  escala y en un «por qué» que aparece sólo cuando la base cae adentro.
 - Las **dos lecturas de los arts. 60 y 61** (pisos de peritos).
 - El **«completo»** cuando el proceso terminó antes de la apertura a prueba: el
   art. 25 ya le aplicó la mitad de la escala, pero tampoco es la suma de tres
@@ -482,8 +500,16 @@ está la regla y su razón, que es lo que hay que saber antes de tocar el archiv
 
 - **La UMA sale de `data/uma.json`, que lee el build y no el visitante.**
   `scripts/actualizar-uma.mjs` la baja de la planilla, la compara y agrega una
-  entrada si cambió; un cron **diario** (`.github/workflows/uma.yml`) lo corre y
-  el push dispara el deploy.
+  entrada si cambió; un cron **diario** (`.github/workflows/uma.yml`) lo corre.
+- **El cron pide el deploy a mano, y tiene que hacerlo.** Acá decía que «el push
+  dispara el deploy» y era falso: **GitHub no dispara workflows por un push
+  hecho con el `GITHUB_TOKEN` del runner**, que es un cortafuegos contra la
+  recursión y no se puede desactivar. El síntoma no era un error sino un
+  silencio —commit en `main`, workflow en verde, sitio con el valor viejo hasta
+  que un humano empujara cualquier otra cosa—. Pasó el 15/8 y el 1/9/26; la
+  segunda vez dejó a honorio.ar calculando la mediación con el UHOM de agosto.
+  El último paso de `uma.yml` llama a `gh workflow run pages.yml`, y por eso el
+  workflow lleva `actions: write`.
 - **Para forzarlo sin esperar al cron:** Actions → «UMA y UHOM» →
   *Run workflow*. Es el camino cuando la UMA se movió y hay que publicar hoy.
 - **Un control diario comprueba que el sitio calcule con el valor de la

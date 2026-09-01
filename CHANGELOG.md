@@ -45,6 +45,67 @@ posible —cambió la UMA— que no se podía comprobar.
 
 ---
 
+## 3.4.2 — 1 de septiembre de 2026
+
+PARCHE. **El motor no se tocó y ninguna cifra cambia**: las 17 validaciones
+están en verde y cualquier caso da exactamente el mismo número que en 3.4.1.
+Lo que cambia es que la app dice algo que hacía y no decía, y que los valores
+nuevos vuelven a llegar solos al sitio.
+
+### El hueco entre un grado y el siguiente del art. 21, declarado
+
+La tabla del art. 21 está escrita con números enteros: «Hasta 15 UMA», «De 16
+UMA a 45 UMA», «De 46 UMA a 90 UMA». **Entre un renglón y el siguiente queda un
+hueco que ningún renglón nombra**: una base de 15,4 UMA no está en el primero,
+que cierra en 15, ni en el segundo, que se rotula desde 16. Pasa en los seis
+cortes —15, 45, 90, 150, 450 y 750— y pasa seguido, porque la base sale de
+dividir pesos por la UMA y casi nunca da un entero.
+
+**Honorio ya resolvía el caso, y no lo decía.** La toma en el grado de arriba
+—15,4 UMA se calcula por la 2ª escala— y mide el excedente desde el límite que
+la ley cierra, 15, y no desde el 16 del rótulo. Lo funda el segundo párrafo del
+artículo, el mismo del factor de correlación: manda aplicar la alícuota *al
+excedente* sobre el máximo del grado anterior, y con 15,4 hay excedente sobre
+15. Leerla en el grado de abajo obligaría a aplicar el 22 %-33 % sobre el total,
+que es lo que la ley reserva a las bases que no exceden el límite.
+
+**No se redondea la base, que es otra cosa.** Se evaluó tomar del ,5 para
+arriba como el entero siguiente y del ,5 para abajo como el anterior, y quedó
+descartado: redondear la base es calcular con una base que no es la base, el
+defecto que ya tenía la calculadora vieja. Acá la base entra entera; lo único
+que se decide es de qué lado del corte cae.
+
+**No se encontró fallo ni doctrina sobre el punto**, y eso también se dice.
+Entra a la lista de huecos de criterio de `ESTADO.md`, no a `jurisprudencia.ts`,
+que exige un fallo o un autor. Dónde queda dicho:
+
+- Arriba de `calcularEscala()`, que es donde vive la regla.
+- En la tabla completa de la escala, **siempre**: el hueco se ve en cada renglón,
+  así que la pregunta se la hace cualquiera que la mire.
+- En un «por qué» del dashboard que aparece **sólo cuando la base cae adentro**,
+  con el corte y el excedente de ese caso.
+- En `calculoDirecto.validation.ts`, que lo fija en números: los seis cortes por
+  cinco decimales, más que el límite exacto no se va para arriba. Es una
+  elección, y una elección se puede cambiar sin querer.
+
+### El cron traía los valores nuevos y no llegaban al sitio
+
+`uma.yml` decía que el push a `main` disparaba el deploy. **Era falso.** GitHub
+no dispara workflows por un push hecho con el `GITHUB_TOKEN` del propio runner:
+es un cortafuegos contra la recursión infinita y no se puede desactivar.
+
+El síntoma no era un error, era un silencio. El commit aparecía en `main`, el
+workflow salía en verde y el sitio seguía sirviendo el valor viejo hasta que un
+humano empujara cualquier otra cosa. Pasó el 15/8 y el 1/9/26, y la segunda vez
+dejó a honorio.ar calculando la mediación con el UHOM de agosto —$12.960— con
+el de septiembre ya en el repositorio —$13.210—.
+
+Lo cazó el control diario, que es para lo que existe: falló el 1/9 a las 11 y
+el mail dijo los dos valores. **Ahora `uma.yml` pide el deploy con
+`gh workflow run pages.yml`**, y sólo cuando algo cambió.
+
+---
+
 ## 3.4.1 — 24 de agosto de 2026
 
 PARCHE. **El motor no se tocó y ninguna cifra cambia**: las 17 validaciones
