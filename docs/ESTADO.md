@@ -190,7 +190,45 @@ son unas horas y no importa.
 - **No se guarda desde cuándo rige la UMA.** Decisión de Javier del 5/8: el dato
   no está en su planilla y levantarlo le agrega fricción diaria. El informe cita
   la norma, no su vigencia. Es el dato que faltaría para calcular con la UMA
-  vigente a una fecha anterior.
+  vigente a una fecha anterior. **Esto quedó superado y hay que releerlo con el
+  bloque de abajo**: el 24/8 se anotó del otro lado que la planilla ya tiene
+  `UMA_VIGENCIA` y `UHOM_VIGENCIA`, así que la fricción que fundaba la decisión
+  ya no existiría. Antes de tocar nada, mirar la planilla: lo de arriba es del
+  5/8 y lo de abajo, del 24/8.
+
+#### Los cuatro de `scripts/actualizar-uma.mjs`
+
+**Vinieron del `ESTADO.md` de `herramientas-judiciales`, donde estaban anotados
+desde el 24/8 bajo el título «Del lado de Honorio, anotado el 24/8 y no tocado
+desde acá».** Se mudaron el 1/9/2026: son trabajo de este repositorio y es acá
+donde se van a cerrar, que es la misma decisión del 31/8 que trajo los cuatro
+puntos del plan de cobertura. Allá quedó un puntero y nada más.
+
+**Ninguno se verificó contra la planilla al mudarlos**, así que se leen como lo
+que son: una nota del 24/8. La primera línea de trabajo es abrirla y ver si
+sigue siendo cierta.
+
+1. **Leer `UMA_VIGENCIA` y `UHOM_VIGENCIA` y escribir `vigencia` en cada entrada
+   de `historia`.** Hoy sólo hay `capturado`, que es el día en que el cron vio el
+   valor, y **no es lo mismo**: de ahí salió mostrar «rige desde el 20 de agosto»
+   un valor que rige desde el 1 de julio. Y completarla también cuando el valor
+   no cambió, como ya se hace con `fuente` y `url`.
+2. **El control de forma del UHOM —`v % 10 === 0`— tiene que pasar a aviso.**
+   Noviembre de 2022 salió en 2003, contra la regla de redondeo del decreto
+   2536/15, y la tabla oficial lo declara así y construye toda su escala sobre
+   él. O sea que ese control **abortaría la sincronización por un valor
+   oficial**.
+3. **Los dos umbrales de salto están mal calibrados**, y desde que existe la
+   serie completa hay con qué calibrarlos. `SALTO_MAXIMO_UHOM = 0.15` es **más
+   chico que saltos que ya ocurrieron** —enero 2024 +16 %, junio 2022 +24 %,
+   enero 2019 +20 %—, así que frena valores buenos; `SALTO_MAXIMO_UMA = 0.6` es
+   al revés, tan flojo que deja pasar un valor leído a la mitad cuando el salto
+   más grande de la serie es +20 %.
+
+**Dónde está la serie con la que calibrar:** `data/serie-uma.json` y
+`data/serie-uhom.json` de `herramientas-judiciales`, reconstruidas de los actos
+—67 valores cada una, con la norma al lado— y verificadas por su
+`npm run verificar-series`.
 
 ### Pendiente de diseño y contenido
 
