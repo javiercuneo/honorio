@@ -42,6 +42,42 @@ export const PROCESS_REGISTRY: Record<string, ProcessBuilder> = {
  * Implementa las 7 escalas progresivas con acumulacion de maximos
  * del grado inmediato anterior (interpretacion literal del art. 21).
  *
+ * ---- El hueco entre un grado y el siguiente ----
+ *
+ * La tabla del art. 21 esta escrita con enteros: "Hasta 15 UMA", "De
+ * 16 UMA a 45 UMA", "De 46 UMA a 90 UMA"... Entre un renglon y el
+ * otro queda un hueco que ningun renglon nombra: 15,4 UMA no esta en
+ * el primero, que cierra en 15, ni en el segundo, que se rotula desde
+ * 16. Pasa en los seis cortes —15, 45, 90, 150, 450 y 750— y **pasa
+ * seguido**: la base sale de dividir pesos por la UMA y casi nunca da
+ * un entero.
+ *
+ * **Los cortes de abajo son `<=`, asi que el hueco cae en el grado de
+ * arriba**: 15,4 UMA se calcula por la 2ª escala. Y el excedente se
+ * mide **desde el limite cerrado y no desde el entero del rotulo**:
+ * `(baseEnUMA - 15)`, nunca `(baseEnUMA - 16)`.
+ *
+ * Lo funda el segundo parrafo del articulo, el mismo del factor de
+ * correlacion: manda aplicar la alicuota "al excedente" sobre el
+ * maximo del grado anterior. Con 15,4 hay excedente sobre 15, asi que
+ * hay grado siguiente. Leerla en el grado de abajo obligaria a aplicar
+ * el 22 %-33 % sobre el total, que es lo que la ley reserva a las
+ * bases que no exceden el limite.
+ *
+ * **La base no se redondea, y eso es distinto de esto.** Se evaluo
+ * tomar del ,5 para arriba como el entero siguiente y del ,5 para
+ * abajo como el anterior, y se descarto: redondear la base es calcular
+ * con una base que no es la base, que es el defecto que ya tenia
+ * `calculadoras/honorarios.html`. Aca la base entra entera; lo unico
+ * que se decide es de que lado del corte cae.
+ *
+ * **No se encontro fallo ni doctrina sobre el punto.** Es un hueco de
+ * criterio declarado, no un criterio fundado: por eso no vive en
+ * `jurisprudencia.ts` —que exige un fallo o un autor— sino dicho en
+ * pantalla, en `ScaleBreakdownModal` y en el "por que" que
+ * `HonorariosBand` muestra cuando le toca a la base de alguien.
+ * `calculoDirecto.validation.ts` lo fija en numeros.
+ *
  * @param basePesos - Base regulatoria en pesos
  * @param valorUMA  - Valor de la UMA vigente
  * @returns EscalaResult con los mismos campos que calcularEscalaBase()

@@ -52,7 +52,7 @@ import {
   Tile,
   useUma,
 } from "./primitives"
-import { BarraExcedente, ReglaArt21 } from "./ReglaArt21"
+import { BarraExcedente, ReglaArt21, huecoDe } from "./ReglaArt21"
 
 type EtapaKey = "full" | "dos" | "una"
 
@@ -444,6 +444,8 @@ export function EscalaExplicacion({
 
   if (!escala) return null
 
+  const hueco = huecoDe(escala.baseEnUMA)
+
   /*
     Cuando corre la escala de los incidentes -art. 39 segundo parrafo-
     la tabla de tramos y la barra del excedente no significan nada: el
@@ -502,6 +504,55 @@ export function EscalaExplicacion({
       ) : null}
 
       <ReglaArt21 baseEnUMA={escala.baseEnUMA} />
+
+      {/*
+        La base cayo entre dos renglones de la tabla. Se dice **cuando
+        pasa y no siempre**: es un fundamento del numero que se esta
+        mirando, y adelantarlo en los casos donde no juega lo convierte
+        en ruido. Que aparezca solo aca es el aviso.
+      */}
+      {hueco !== null ? (
+        <Disclosure
+          concepto="Esta base cae entre dos renglones de la tabla"
+          articulo="art. 21"
+        >
+          <p>
+            La escala está escrita con números enteros: el renglón anterior
+            cierra en {hueco} UMA y el siguiente se rotula desde {hueco + 1}.
+            Una base de {uma(escala.baseEnUMA)} UMA no está nombrada por
+            ninguno de los dos, y como la base sale de dividir pesos por la
+            UMA, caer en uno de esos seis huecos no es raro.
+          </p>
+          <p className="mt-2">
+            <strong>Honorio la calcula en el grado de arriba y no redondea
+            la base.</strong> Los {uma(escala.baseEnUMA)} UMA entran enteros
+            a la cuenta, y el excedente se mide desde {hueco} UMA —donde la
+            ley cierra el grado anterior— y no desde el {hueco + 1} del
+            rótulo.
+          </p>
+          <p className="mt-2">
+            El fundamento es el segundo párrafo del artículo, el mismo que
+            explica el piso: manda aplicar la alícuota <em>al excedente</em>{" "}
+            sobre el máximo del grado anterior. Con esta base hay excedente,
+            así que hay grado siguiente. Leerla en el grado de abajo
+            obligaría a aplicar la alícuota sobre el total, que es lo que la
+            ley reserva a las bases que no exceden ese límite.
+          </p>
+          <p className="mt-2">
+            <strong>No es un empate cosmético: los dos lados del hueco dan
+            números distintos.</strong> Justo después de cada corte el piso
+            del grado nuevo domina el resultado y la banda se angosta, así
+            que caer de un lado o del otro se nota. Es el efecto que muestra
+            la barra de acá abajo.
+          </p>
+          <p className="mt-2">
+            <strong>No se encontró fallo ni doctrina sobre el punto.</strong>{" "}
+            Queda dicho como lo que es: acá la app eligió, y la elección se
+            puede discutir.
+          </p>
+        </Disclosure>
+      ) : null}
+
       {escala.escalera && cadena.pisoUMA !== null && cadena.aporteExcedenteUMA ? (
         <BarraExcedente
           pisoUMA={cadena.pisoUMA}

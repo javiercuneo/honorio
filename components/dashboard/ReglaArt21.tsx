@@ -43,6 +43,40 @@ export function tramoDe(baseEnUMA: number): TramoArt21 {
   )
 }
 
+/**
+ * Donde la escala cambia de grado. Son los seis limites que el art. 21
+ * cierra: 15, 45, 90, 150, 450 y 750 UMA.
+ *
+ * **Entre un renglon de la tabla y el siguiente queda un hueco.** La
+ * ley los rotula con enteros —"Hasta 15 UMA", "De 16 UMA a 45 UMA"— y
+ * entonces una base de 15,4 UMA no esta nombrada por ninguno de los
+ * dos. Lo mismo entre 45 y 46, 90 y 91, 150 y 151, 450 y 451, 750 y
+ * 751. No es un caso de laboratorio: la base sale de dividir pesos por
+ * la UMA, asi que casi nunca da un entero.
+ *
+ * Se derivan de `ESCALAS_ART21` y no se escriben otra vez: dos listas
+ * de los mismos seis numeros es la forma exacta de que un dia digan
+ * cosas distintas.
+ */
+export const CORTES_ART21: number[] = ESCALAS_ART21.filter((t) =>
+  isFinite(t.hasta),
+).map((t) => t.hasta)
+
+/**
+ * El corte cuyo hueco contiene esta base, o `null` si la base no cae en
+ * ninguno.
+ *
+ * Solo sirve para decirlo en pantalla. **El calculo no lo consulta**:
+ * `calcularEscala()` no tiene un caso especial para el hueco, porque
+ * para el motor no hay hueco —sus cortes son `<= 15`, `<= 45`...— y el
+ * excedente se mide desde el limite cerrado. Esto existe para que la
+ * app declare esa lectura cuando le toca a la base de alguien, no para
+ * cambiarla.
+ */
+export function huecoDe(baseEnUMA: number): number | null {
+  return CORTES_ART21.find((c) => baseEnUMA > c && baseEnUMA < c + 1) ?? null
+}
+
 export function ReglaArt21({ baseEnUMA }: { baseEnUMA: number }) {
   const activo = tramoDe(baseEnUMA)
   const span = isFinite(activo.hasta) ? activo.hasta - activo.desde : 750

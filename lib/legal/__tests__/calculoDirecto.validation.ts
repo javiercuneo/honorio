@@ -224,6 +224,75 @@ for (const enUMA of [15.4, 45.4, 90.4, 150.4, 450.4, 750.4]) {
 }
 
 // ================================================================
+// 4 bis. El hueco entre un grado y el siguiente
+// ================================================================
+//
+// La tabla del art. 21 esta escrita con enteros y entre un renglon y
+// el otro queda un hueco: el primero cierra en 15 UMA y el segundo se
+// rotula desde 16, asi que 15,4 no esta nombrada por ninguno. Igual
+// en los otros cinco cortes.
+//
+// Honorio la toma en el grado de ARRIBA y mide el excedente desde el
+// limite cerrado —15— y no desde el entero del rotulo —16—. Es un
+// hueco de criterio declarado, sin fallo ni doctrina detras, y esta
+// escrito arriba de calcularEscala(). Esto lo fija en numeros: es una
+// eleccion, y una eleccion se puede cambiar sin querer.
+
+console.log('El hueco entre grados cae en el grado de arriba')
+
+/** Cada corte con el grado de arriba que le corresponde. */
+const CORTES: [corte: number, tituloDeArriba: string][] = [
+  [15, '2ª escala (16-45 UMA): 20% a 26%'],
+  [45, '3ª escala (46-90 UMA): 18% a 24%'],
+  [90, '4ª escala (91-150 UMA): 17% a 22%'],
+  [150, '5ª escala (151-450 UMA): 15% a 20%'],
+  [450, '6ª escala (451-750 UMA): 13% a 17%'],
+  [750, '7ª escala (+750 UMA): 12% a 15%'],
+]
+
+for (const [corte, tituloDeArriba] of CORTES) {
+  for (const decimal of [0.1, 0.4, 0.5, 0.6, 0.9]) {
+    const enUMA = corte + decimal
+    const d = calcularDirecto(enUMA * UMA_T, UMA_T)!
+    const et = 'base ' + enUMA + ' UMA'
+
+    ok(
+      et + ' cae en el grado de arriba',
+      d.escala.titulo === tituloDeArriba,
+      'cayo en ' + d.escala.titulo,
+    )
+
+    // Lo que separa esto de un redondeo: el excedente se mide desde el
+    // limite que la ley cierra, no desde el entero del rotulo. Con
+    // 15,4 son 0,4 UMA de excedente sobre 15, y no 15,4 - 16.
+    igual(et + ' mide el excedente desde ' + corte, d.escala.limiteAnterior, corte)
+    igual(et + ' excedente', d.escala.excedente, decimal, 1e-9)
+  }
+
+  // El limite exacto NO se va para arriba: el renglon de abajo dice
+  // "hasta 15" y 15 esta adentro. Los cortes del motor son `<=`.
+  const enElLimite = calcularDirecto(corte * UMA_T, UMA_T)!
+  ok(
+    'base ' + corte + ' UMA exacta se queda en el grado de abajo',
+    enElLimite.escala.titulo !== tituloDeArriba,
+    'cayo en ' + enElLimite.escala.titulo,
+  )
+}
+
+// Y el otro lado del hueco, para que quede dicho que no hay salto: el
+// entero del rotulo cae en el mismo grado que el decimal que lo
+// precede. Si algun dia alguien implementara el rotulo literalmente,
+// 15,4 y 16 quedarian en grados distintos y esto lo cazaria.
+for (const [corte, tituloDeArriba] of CORTES) {
+  const rotulo = calcularDirecto((corte + 1) * UMA_T, UMA_T)!
+  ok(
+    'base ' + (corte + 1) + ' UMA cae en el mismo grado que ' + (corte + 0.4),
+    rotulo.escala.titulo === tituloDeArriba,
+    'cayo en ' + rotulo.escala.titulo,
+  )
+}
+
+// ================================================================
 // 5. Fracciones de etapa y entradas invalidas
 // ================================================================
 

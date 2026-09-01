@@ -115,6 +115,27 @@ export function ScaleBreakdownModal({
               grado anterior y solo lo que excede ese límite tributa la alícuota
               del tramo en curso.
             </p>
+            {/*
+              El hueco entre renglones. Va **siempre** y no solo cuando la
+              base cae adentro: la tabla de arriba lo muestra en cada
+              renglon —un grado cierra en 15 y el siguiente arranca
+              rotulado en 16— asi que la pregunta se la hace cualquiera que
+              la mire, tenga o no una base en el medio.
+            */}
+            <p>
+              <strong>Entre un renglón y el siguiente hay un hueco.</strong> La
+              tabla está escrita con enteros: el primero cierra en 15 UMA y el
+              segundo se rotula desde 16, de modo que una base de 15,4 UMA no
+              está nombrada por ninguno. Pasa en los seis cortes —15, 45, 90,
+              150, 450 y 750— y pasa seguido, porque la base sale de dividir
+              pesos por la UMA. <strong>Esas bases se calculan en el grado de
+              arriba, y no se redondean:</strong> entran enteras y el excedente
+              se mide desde donde la ley cierra el grado anterior, no desde el
+              entero del rótulo. Lo funda el párrafo de arriba, que manda
+              aplicar la alícuota al excedente. <strong>No se encontró fallo ni
+              doctrina sobre el punto</strong>, así que queda dicho como lo que
+              es: una elección de la app.
+            </p>
             {escala.escalera ? (
               <p>
                 En este caso el piso es{" "}

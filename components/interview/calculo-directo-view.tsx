@@ -38,6 +38,7 @@ import {
   Segmented,
   SinIA,
 } from '@/components/dashboard/primitives'
+import { huecoDe } from '@/components/dashboard/ReglaArt21'
 import { calcularDirecto, fraccionDeRango } from '@/lib/legal/calculo-directo'
 import type { EtapasRol } from '@/lib/legal/calculo-directo'
 import { calcularMediacion } from '@/lib/legal/mediacion'
@@ -222,6 +223,46 @@ export function CalculoDirectoView({
                   ) : null}
                 </dl>
               )}
+
+              {/*
+                Acá el hueco no es una sutileza: esta pantalla imprime el
+                rótulo entero de la escala. Con una base de 15,4 UMA dice
+                "2ª escala (16-45 UMA)" arriba de un "Base en UMA 15,40",
+                que es una contradicción a la vista de cualquiera que sepa
+                leer la tabla. O se explica, o se esconde.
+              */}
+              {r && huecoDe(r.baseEnUMA) !== null ? (
+                <div className="mt-4">
+                  <Disclosure
+                    concepto="Esta base cae entre dos renglones de la tabla"
+                    articulo="art. 21"
+                  >
+                    <p className="text-[13px] leading-relaxed text-muted-foreground">
+                      La escala está escrita con números enteros: el renglón
+                      anterior cierra en {huecoDe(r.baseEnUMA)} UMA y el
+                      siguiente se rotula desde {huecoDe(r.baseEnUMA)! + 1}.
+                      Una base de {umaNum(r.baseEnUMA)} UMA no está nombrada
+                      por ninguno de los dos, y como sale de dividir pesos por
+                      la UMA, caer en uno de esos seis huecos no es raro.
+                    </p>
+                    <p className="mt-3 text-[13px] leading-relaxed text-muted-foreground">
+                      <strong>Se calcula en el grado de arriba, y la base no
+                      se redondea:</strong> entra entera y el excedente se mide
+                      desde {huecoDe(r.baseEnUMA)} UMA —donde la ley cierra el
+                      grado anterior— y no desde el{' '}
+                      {huecoDe(r.baseEnUMA)! + 1} del rótulo. Lo funda el
+                      segundo párrafo del art. 21, que manda aplicar la
+                      alícuota <em>al excedente</em> sobre el máximo del grado
+                      anterior: si hay excedente, hay grado siguiente.
+                    </p>
+                    <p className="mt-3 text-[12px] leading-relaxed text-faint">
+                      <strong>No se encontró fallo ni doctrina sobre el
+                      punto.</strong> Queda dicho como lo que es: acá la app
+                      eligió, y la elección se puede discutir.
+                    </p>
+                  </Disclosure>
+                </div>
+              ) : null}
             </div>
           </div>
         </Card>
