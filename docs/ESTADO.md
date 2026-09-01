@@ -21,17 +21,22 @@ pregunta «¿por qué esto quedó así?».
 
 ## Dónde estamos
 
-Versión **3.4.2**, publicada en `honorio.ar`. Las **17 validaciones** de
+Versión **3.4.3**, publicada en `honorio.ar`. Las **17 validaciones** de
 `lib/legal/__tests__` están en verde y corren solas en CI. **No hay nada urgente
 ni bloqueante.**
 
-Es un PARCHE: **el motor no se tocó y ninguna cifra cambia.** Trae dos cosas: el
-**hueco entre un grado y el siguiente del art. 21** queda declarado —la app lo
-resolvía y no lo decía—, y el **cron de la UMA vuelve a llegar al sitio**, que no
-llegaba por una trampa de GitHub Actions. Las dos están en el
-[`CHANGELOG`](../CHANGELOG.md); el criterio del hueco, más abajo en «Lo que la
-app declara abierto porque no hay nada detrás», y la trampa del deploy en «La UMA
-y el UHOM».
+Es un PARCHE: **el motor no se tocó y ninguna cifra cambia.** Entra
+**«Castañeda»**, que es el primer fallo del archivo que *hace la cuenta* del
+art. 21 en vez de transcribirlo, y su caso queda como **ancla externa** de las
+validaciones: hasta hoy todos los controles comparaban el motor contra algo
+nuestro.
+
+La 3.4.2, del mismo día, trajo otras dos: el **hueco entre un grado y el
+siguiente del art. 21** quedó declarado —la app lo resolvía y no lo decía— y el
+**cron de la UMA volvió a llegar al sitio**, que no llegaba por una trampa de
+GitHub Actions. Las tres están en el [`CHANGELOG`](../CHANGELOG.md); el criterio
+del hueco, más abajo en «Lo que la app declara abierto porque no hay nada
+detrás», y la trampa del deploy en «La UMA y el UHOM».
 
 La 3.4.1 fue el orden del dashboard genérico y del cálculo directo, de la
 devolución de SG del 21/8. Lo que gobierna esas decisiones está más abajo, en
@@ -329,6 +334,14 @@ está la regla y su razón, que es lo que hay que saber antes de tocar el archiv
 
 - **Una interpretación se funda en un fallo o no se afirma.** Los ocho criterios
   de `jurisprudencia.ts` la cumplen.
+- **Un fallo que hace la cuenta vale más que uno que transcribe el artículo**, y
+  por eso «Castañeda» (CFed. Mendoza, Sala B, 12/03/2021) va primero en
+  `ESCALA_CORRELACION`. Las dos lecturas del art. 21 transcriben lo mismo; lo
+  que las separa es una cifra, y la sentencia la dice: *«piso mínimo… 11,7 UMA
+  (26 % de 45 UMA)»*, que es la tercera constante de `calcularEscala()`. Su caso
+  cierra contra el motor hasta el centésimo y **está cargado como ancla externa**
+  en `calculoDirecto.validation.ts`: si alguien «arregla» el factor de
+  correlación, falla contra una sentencia y no contra una opinión nuestra.
 - **`Doctrina` es un tipo aparte de `Fallo`, y la pantalla los separa.** Un
   fallo dice lo que un tribunal resolvió; un autor dice lo que le parece.
 - **`fallos: []` es un estado válido y se declara.** Donde no hay ninguno, la

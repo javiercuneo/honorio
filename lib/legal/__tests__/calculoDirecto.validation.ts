@@ -159,6 +159,54 @@ igual('hoja · auxiliares min', hoja.auxiliares.rango.minUMA, 10.467, CIFRAS)
 igual('hoja · auxiliares max', hoja.auxiliares.rango.maxUMA, 20.934, CIFRAS)
 igual('hoja · auxiliares promedio', hoja.auxiliares.promedioUMA, 15.701, CIFRAS)
 
+// ================================================================
+// 2 bis. Ancla externa: un fallo que hace la cuenta
+// ================================================================
+//
+// CFed. Mendoza, Sala B, "Castañeda c/ Estado Nacional y SENASA",
+// FMZ 61000834/2010/CA1-CA3, 12/03/2021. Es la mejor ancla que tiene
+// este archivo y por lejos: **no es una hoja de calculo nuestra, es un
+// tribunal enumerando los siete pasos y corriendolos con numeros.**
+//
+// La sentencia dice, textual:
+//
+//   "Piso minimo que no se puede franquear (maximo del grado inmediato
+//    anterior de la escala): 11,7 UMA (26% de 45 UMA)."
+//   "Excedente: 26,07 UMA (71,07 BR - 45 UMA)."
+//   "el juez no puede regular menos de 16,39 UMA ni mas de 17,95 UMA."
+//
+// Base $226.872,44 con la UMA de la Ac. CSJN 2/20, $3.192.
+//
+// Es lo que funda ESCALA_CORRELACION, y por eso vale como control y no
+// solo como cita: si algun dia alguien "arregla" el factor de
+// correlacion para que acumule todos los maximos previos, esto falla
+// contra una sentencia y no contra una opinion nuestra.
+
+console.log('Ancla externa: CFed. Mendoza, Sala B, "Castañeda"')
+
+const cast = calcularDirecto(226_872.44, 3_192)!
+
+// La sentencia trunca en el centesimo en vez de redondear -escribe
+// 17,95 donde la cuenta da 17,9581-, asi que se compara con esa
+// tolerancia y no con la del resto del archivo.
+const TRUNCA = 0.01
+
+igual('Castañeda · base en UMA', cast.baseEnUMA, 71.07, TRUNCA)
+ok('Castañeda · 3a escala', cast.escala.titulo.startsWith('3ª'), cast.escala.titulo)
+igual('Castañeda · piso del grado anterior', cast.escala.maximoEscalaAnterior, 11.7)
+igual('Castañeda · el piso es el 26 % de 45 UMA', cast.escala.maximoEscalaAnterior, 45 * 0.26)
+igual('Castañeda · excedente sobre 45 UMA', cast.escala.excedente, 26.07, TRUNCA)
+igual('Castañeda · regulacion minima', cast.patrocinante.tres.minUMA, 16.39, TRUNCA)
+igual('Castañeda · regulacion maxima', cast.patrocinante.tres.maxUMA, 17.95, TRUNCA)
+
+// Y lo que el fallo descarta sin nombrarlo: acumular todos los maximos
+// previos daria 12,75 de piso, y la banda entera se correria.
+ok(
+  'Castañeda · el piso NO es 12,75 (la lectura contraria)',
+  Math.abs(cast.escala.maximoEscalaAnterior - 12.75) > 1e-6,
+  'el piso quedo en ' + cast.escala.maximoEscalaAnterior,
+)
+
 // Un cuarto de una etapa, que la hoja tenia como fila fija.
 const cuarto = fraccionDeRango(hoja.patrocinante.una, 0.25)
 igual('hoja · 1/4 de etapa min', cuarto.minUMA, 3.492, CIFRAS)

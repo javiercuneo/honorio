@@ -45,6 +45,73 @@ posible —cambió la UMA— que no se podía comprobar.
 
 ---
 
+## 3.4.3 — 1 de septiembre de 2026
+
+PARCHE. **El motor no se tocó y ninguna cifra cambia.** Siguen siendo 17
+validaciones, en verde. Lo que entra es un fallo, y con él un ancla que el
+archivo no tenía: hasta hoy todos los controles comparaban el motor contra algo
+nuestro.
+
+### «Castañeda» dejó de ser una pista y es el mejor fallo del archivo
+
+Estaba anotado en `jurisprudencia.ts` desde el 20/8 como una pista de la nota de
+Careaga Quiroga, con la aclaración honesta de que **no se había leído la
+sentencia**. Se leyó.
+
+**CFed. Mendoza, Sala B, «Castañeda c/ Estado Nacional y SENASA», FMZ
+61000834/2010/CA1-CA3, 12/03/2021.** Es mejor que el que ya estaba —RINDEL— por
+una razón concreta: **no transcribe el segundo párrafo del art. 21, lo aplica.**
+Transcribirlo no distingue nada, porque las dos lecturas posibles transcriben lo
+mismo. Lo que decide es una cifra, y la sentencia la dice:
+
+> «Piso mínimo que no se puede franquear (máximo del grado inmediato anterior de
+> la escala): **11,7 UMA (26 % de 45 UMA)**.»
+
+Ese 11,7 es, literalmente, la tercera de las seis constantes de
+`calcularEscala()`. Y sale de donde la app la saca —el tope del grado anterior
+por la alícuota mayor de ese grado—, no de acumular todos los máximos previos,
+que daría 12,75.
+
+La sentencia además **enumera los siete pasos** del cálculo, y son uno por uno
+lo que hace el motor. Su caso cierra contra el nuestro hasta el centésimo:
+
+| | el fallo | Honorio |
+|---|---|---|
+| base | $226.872,44 · UMA $3.192 | 71,0753 UMA |
+| escala | 3ª | 3ª (46-90 UMA) |
+| piso del grado anterior | 11,7 UMA | 11,7 UMA |
+| excedente | 26,07 UMA | 26,0753 UMA |
+| regulación mínima | 16,39 UMA | 16,3935 UMA |
+| regulación máxima | 17,95 UMA | 17,9581 UMA |
+
+*(La sentencia trunca en el centésimo en vez de redondear: escribe 17,95 donde
+la cuenta da 17,9581.)*
+
+### Por qué esto es un control y no sólo una cita
+
+El caso entró a `calculoDirecto.validation.ts` como **ancla externa**, al lado de
+la de la hoja de cálculo. La diferencia importa: la hoja es nuestra, la sentencia
+no. **Si algún día alguien «arregla» el factor de correlación para que acumule
+todos los máximos previos, la validación falla contra un tribunal y no contra una
+opinión nuestra.**
+
+### Lo que no cambia
+
+- **La lectura contraria se sigue mostrando**, y sigue diciendo que no se
+  encontró quién la sostenga por escrito. Ahora pesa menos —del otro lado hay dos
+  fallos y uno hace la cuenta— pero que nadie la haya defendido no es lo mismo
+  que que el texto no la admita.
+- **Pesaresi pasa a figurar en este criterio**, que es de donde «Castañeda» toma
+  el método: la sentencia lo cita por obra y editorial antes de enumerar los
+  pasos, y lo funda en el orden público del art. 16, último párrafo —aplicarlo
+  mal sería nulidad—.
+- **Queda una pista nueva, sin verificar:** la misma Sala remite a sus autos «SEC
+  c/ Alcántara S.A. s/ ejecuciones varias», FMZ 59531/2018/CA1, del 17/09/2020,
+  sobre cómo se cuantifica en UMA por el art. 20. No se cargó porque no se leyó
+  la sentencia.
+
+---
+
 ## 3.4.2 — 1 de septiembre de 2026
 
 PARCHE. **El motor no se tocó y ninguna cifra cambia**: las 17 validaciones

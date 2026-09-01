@@ -296,15 +296,50 @@ export const CADUCIDAD_ART25: Criterio = {
  * Eso se dice tal cual y no se disimula: el dato es que la alternativa
  * existe y que no se encontro quien la defienda, no que no exista.
  *
- * Una pista sin verificar, para el dia que haga falta otro fallo: la
- * nota de Careaga Quiroga (Diario Judicial, 5/6/2025) cita a la CFed.
- * Mendoza, Sala B, "Castañeda", 12/03/2021. **No se cargo porque no se
- * leyo la sentencia.**
+ * **"Castañeda" ya no es una pista: se leyo la sentencia y esta
+ * cargado.** Lo nombraba la nota de Careaga Quiroga (Diario Judicial,
+ * 5/6/2025) y aca decia "no se cargo porque no se leyo". Se leyo el
+ * 1/9/2026 y es **el mejor de los dos fallos**, porque no transcribe
+ * el parrafo: hace la cuenta, paso por paso y con los numeros a la
+ * vista. Transcribirlo no distingue nada -las dos lecturas transcriben
+ * lo mismo-; lo que decide es una cifra, y la sentencia la dice:
+ *
+ *   "Piso minimo que no se puede franquear (maximo del grado inmediato
+ *    anterior de la escala): 11,7 UMA (26% de 45 UMA)."
+ *
+ * Ese 11,7 es, literalmente, la tercera constante de
+ * `calcularEscala()`, y sale de donde la app la saca: el tope del grado
+ * anterior por la alicuota mayor de ese grado. No de acumular los
+ * maximos previos, que daria 12,75.
+ *
+ * Los siete pasos que enumera son, uno por uno, lo que hace el motor, y
+ * su caso cierra contra el nuestro hasta el centesimo:
+ * `calculoDirecto.validation.ts` lo corre como ancla externa.
+ *
+ * La sentencia toma el metodo de Pesaresi, que ya estaba citado en este
+ * criterio, y lo justifica en el orden publico del art. 16, ultimo
+ * parrafo: aplicarlo mal seria nulidad.
+ *
+ * Otra pista que deja, sin verificar: la misma Sala remite a sus autos
+ * "SEC c/ ALCANTARA S.A. s/ EJECUCIONES VARIAS", FMZ 59531/2018/CA1,
+ * del 17/09/2020, sobre como se cuantifica en UMA por el art. 20. **No
+ * se cargo porque no se leyo la sentencia.**
  */
 export const ESCALA_CORRELACION: Criterio = {
   sostiene:
     'La ley parte de un honorario básico, que es el máximo de la escala anterior y se calcula aplicando el máximo de esa escala por su porcentaje mayor. Luego, solamente sobre el excedente se aplican los porcentajes —menor o mayor— del grado en el que está la base regulatoria del proceso.',
   fallos: [
+    // Va primero porque es el unico que hace la cuenta. Enumera los siete
+    // pasos y los corre sobre una base de 71,07 UMA: piso 11,7 -"26% de 45
+    // UMA"-, excedente 26,07, y la banda de 16,39 a 17,95 UMA. Es el mismo
+    // numero que da el motor.
+    {
+      tribunal: 'CFed. Mendoza, Sala B',
+      expediente: 'expte. FMZ 61000834/2010/CA1 - CA3',
+      caratula:
+        'CASTAÑEDA, DANIEL ORLANDO c/ ESTADO NACIONAL Y SENASA s/ PROCESO DE CONOCIMIENTO - CONTENCIOSOS ADMINISTRATIVOS',
+      fecha: '12/03/2021',
+    },
     {
       tribunal: 'CFed. Resistencia',
       expediente: 'expte. FRE 3154/2021/CA1',
@@ -314,6 +349,15 @@ export const ESCALA_CORRELACION: Criterio = {
     },
   ],
   doctrina: [
+    // Es de donde "Castañeda" toma el metodo: la sentencia lo cita por
+    // obra y editorial antes de enumerar los siete pasos.
+    {
+      autor: 'Pesaresi, Guillermo M.',
+      obra: 'Honorarios en la Justicia Nacional y Federal: Ley 27.423 anotada, comentada y concordada',
+      editorial: 'Cathedra Jurídica',
+      ciudad: 'Buenos Aires',
+      anio: 2018,
+    },
     {
       autor: 'Díaz, Andrea y Musich, Máximo',
       obra: 'Ley 27.423: honorarios de los profesionales del Derecho y auxiliares de Justicia',
@@ -323,7 +367,10 @@ export const ESCALA_CORRELACION: Criterio = {
     },
   ],
   // Sin fallos ni doctrina, y eso es el dato: la alternativa se discute
-  // y no se le encontro respaldo escrito.
+  // y no se le encontro respaldo escrito. Con "Castañeda" cargado pesa
+  // menos todavia -del otro lado hay dos fallos, y uno hace la cuenta-,
+  // pero se sigue mostrando: que nadie la haya defendido por escrito no
+  // es lo mismo que que el texto no la admita.
   contraria: {
     sostiene:
       'El piso de cada escala sería la acumulación de todos los máximos previos, y no el del grado inmediato anterior: para la 3ª escala, 12,75 UMA en lugar de 11,70.',
