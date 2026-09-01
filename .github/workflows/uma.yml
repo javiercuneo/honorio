@@ -7,8 +7,17 @@
 # un fetch a Google en cada carga esa afirmacion dependia de Google.
 # El porque completo esta en lib/legal/uma.ts y en lib/legal/uhom.ts.
 #
-# El push a main dispara Deploy Pages, asi que el sitio queda con los
-# valores nuevos sin que nadie toque nada.
+# **Este workflow pide el deploy a mano, y tiene que hacerlo.** Aca
+# decia que el push a main disparaba Deploy Pages solo, y era falso:
+# GitHub no dispara workflows por un push hecho con el GITHUB_TOKEN
+# del propio runner. Es un cortafuegos contra la recursion infinita y
+# no se puede desactivar. El sintoma no era un error sino un silencio:
+# el commit aparecia en main, el workflow salia en verde y el sitio
+# seguia sirviendo el valor viejo hasta que un humano empujara
+# cualquier otra cosa. Paso dos veces —el 15/8 y el 1/9/26— y la
+# segunda dejo a honorio.ar calculando la mediacion con el UHOM de
+# agosto. Por eso el ultimo paso llama a Deploy Pages con `gh workflow
+# run`, que si arranca porque es una llamada explicita a la API.
 #
 # El cron corre todos los dias. Corria los dias 1 y 15, con el
 # razonamiento de que dos pasadas alcanzaban para que nunca pasara mas
@@ -37,8 +46,11 @@ on:
     - cron: '0 11 * * *' # 08:00 en Buenos Aires
   workflow_dispatch:
 
+# `actions: write` es lo que habilita el `gh workflow run` del ultimo
+# paso. Sin eso el deploy no se puede pedir y volvemos al silencio.
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: uma
@@ -58,9 +70,11 @@ jobs:
         run: node scripts/actualizar-uma.mjs
 
       - name: Commitear si cambio
+        id: commitear
         run: |
           if git diff --quiet -- data/uma.json data/uhom.json; then
             echo "Sin cambios."
+            echo "cambio=no" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           git config user.name  "github-actions[bot]"
@@ -68,3 +82,14 @@ jobs:
           git add data/uma.json data/uhom.json
           git commit -m "chore: actualizar los valores de la UMA y el UHOM"
           git push
+          echo "cambio=si" >> "$GITHUB_OUTPUT"
+
+      # Solo si algo cambio. Pedir el deploy en cada pasada diaria seria
+      # republicar el mismo sitio 365 veces al año para nada, y ademas
+      # llenaria el historial de Actions, que es donde se mira cuando
+      # algo no llego.
+      - name: Publicar el sitio con los valores nuevos
+        if: steps.commitear.outputs.cambio == 'si'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run pages.yml --ref main
