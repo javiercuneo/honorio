@@ -115,6 +115,20 @@ mismo ejemplo calcula el máximo como el 15 % del total de la base e ignora el
 factor de correlación del art. 21 —el criterio que la propia app funda con
 `RINDEL` y con Díaz & Musich—. Su punto de partida arranca corrido un 5,4 %.
 
+### `minimos-data.ts` nunca se verificó contra la ley
+
+Son unas cuarenta cifras. Están verificadas contra el asistente clásico —el
+archivo dice ser copia fiel de él— y **que sea fiel a la copia no prueba que sea
+fiel a la norma**: es la misma clase de error que dejó los documentos de dominio
+describiendo mal el motor, verificar una descripción contra otra descripción.
+
+**Baja de `herramientas-judiciales` el 6/9/2026**, donde figuraba como pendiente
+propio. El archivo es de acá, así que el trabajo es de acá. Lo que quedó de aquel
+lado es que `06_MATRIZ_DE_PROCESOS.md` y `07_GLOSARIO.md` citan estas cifras:
+**si una se mueve, se mueven las dos citas.**
+
+Ningún número se toca hasta leer el artículo que lo funda, uno por uno.
+
 ### Lo que la app declara abierto porque no hay nada detrás
 
 No son deudas: son huecos de criterio dichos como lo que son, en pantalla. Si
