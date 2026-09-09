@@ -23,6 +23,45 @@ historia de `honorio/` viajó completa con `git subtree split`, así que
 calculadoras, el asistente clásico y la documentación de dominio.
 
 ---
+## La sincronización de la UMA y el UHOM, calibrada — el 9/9
+
+Los tres puntos que venían anotados desde el 24/8 quedaron hechos. Se
+verificaron contra la planilla antes de tocar nada, que era la primera línea de
+trabajo: sigue trayendo `UMA_VIGENCIA`, `UHOM_VIGENCIA`, `UHOM_FUENTE` y
+`UHOM_URL`.
+
+- **`vigencia` no es `capturado`, y desde acá se guardan las dos.** `capturado`
+  es el día en que el cron vio el valor; `vigencia`, el día desde el que rige.
+  Ese mismo día estaban a cincuenta días de distancia: la UMA vigente se capturó
+  el 20/8 y rige desde el **1/7**. De confundirlas salió mostrar «rige desde el
+  20 de agosto» un valor de julio. La vigencia se completa también cuando el
+  valor no cambió, como `fuente` y `url`, y **sólo se completa: nunca se borra ni
+  se reescribe un valor**. Es opcional en el tipo porque las entradas anteriores
+  al 9/9 no la tienen y no se puede inventar.
+- **El control de forma del UHOM pasó a avisar en vez de abortar.** Un umbral de
+  salto sí puede abortar —un salto imposible es casi siempre un error de
+  lectura—, pero una regla de forma no: la autoridad que fija el valor puede
+  apartarse de ella. Noviembre de 2022 salió en 2003, contra la regla de redondeo
+  del decreto 2536/15, y es **el único de los 71 valores de la serie que no
+  termina en cero**: con el control como aborto, ese mes la sincronización se
+  habría plantado ante el número correcto.
+- **Los umbrales pasaron a salir de la serie y no de una estimación**, con la
+  regla del doble del salto máximo observado. Estaban los dos mal, cada uno para
+  su lado:
+
+  | | Antes | Salto real más grande | Ahora |
+  |---|---|---|---|
+  | UMA | 0,6 | **20,0 %** (dic. 2022) | 0,4 |
+  | UHOM | 0,15 | **30,8 %** (jun. 2017) | 0,6 |
+
+  El de la UMA estaba tres veces más flojo que el movimiento máximo observado:
+  **un valor leído a la mitad pasaba sin que nada chillara**, que es justo el
+  error que el umbral existe para cazar. El del UHOM habría frenado **5 de los 70
+  saltos** de la serie.
+
+El invariante que dejó cada uno quedó en `ESTADO.md`, en «La UMA y el UHOM».
+
+---
 ## `ESTADO.md` estaba pasado de techo y nadie lo miraba — el 8/9
 
 **Honorio era el único de los seis repositorios sin `.githooks/`**, o sea el

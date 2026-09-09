@@ -178,50 +178,6 @@ son unas horas y no importa.
   diluiría lo que significa «las 18 validaciones del motor». Si el módulo crece,
   merece su propio corredor.
 
-#### La sincronización de la UMA y el UHOM, calibrada el 9/9/2026
-
-Los tres puntos que venían anotados desde el 24/8 **están hechos**, y lo que
-queda es el invariante de cada uno. Se verificaron contra la planilla antes de
-tocar nada, que era la primera línea de trabajo: sigue trayendo `UMA_VIGENCIA`,
-`UHOM_VIGENCIA`, `UHOM_FUENTE` y `UHOM_URL`.
-
-- **`vigencia` no es `capturado`, y ahora se guardan las dos.** `capturado` es el
-  día en que el cron vio el valor; `vigencia`, el día desde el que rige. Hoy
-  mismo están a cincuenta días de distancia: la UMA vigente se capturó el
-  20/8 y rige desde el **1/7**. De confundirlas salió mostrar «rige desde el 20
-  de agosto» un valor de julio. La vigencia se completa también cuando el valor
-  no cambió, como `fuente` y `url`, y **sólo se completa: nunca se borra ni se
-  reescribe un valor**. Es opcional en el tipo porque las entradas anteriores al
-  9/9 no la tienen y no se puede inventar.
-- **El control de forma del UHOM avisa, no aborta.** Un umbral de salto sí puede
-  abortar —un salto imposible es casi siempre un error de lectura—, pero una
-  regla de forma no: la autoridad que fija el valor puede apartarse de ella.
-  Noviembre de 2022 salió en 2003, contra la regla de redondeo del decreto
-  2536/15, y es **el único de los 71 valores de la serie que no termina en
-  cero**: con el control como aborto, ese mes la sincronización se habría
-  plantado ante el número correcto.
-- **Los umbrales salen de la serie, no de una estimación, y la regla es el doble
-  del salto máximo observado.** Estaban los dos mal, cada uno para su lado:
-
-  | | Antes | Salto real más grande | Ahora |
-  |---|---|---|---|
-  | UMA | 0,6 | **20,0 %** (dic. 2022) | 0,4 |
-  | UHOM | 0,15 | **30,8 %** (jun. 2017) | 0,6 |
-
-  El de la UMA estaba tres veces más flojo que el movimiento máximo observado:
-  **un valor leído a la mitad pasaba sin que nada chillara**, que es justo el
-  error que el umbral existe para cazar. El del UHOM habría frenado **5 de los 70
-  saltos** de la serie. **Si algún día uno frena un valor bueno, la respuesta no
-  es aflojarlo a ojo: es mirar la serie y recalibrar.**
-
-**Dónde está la serie:** `data/serie-uma.json` y `data/serie-uhom.json` de
-`herramientas-judiciales`, reconstruidas de los actos —67 y 71 valores, con la
-norma al lado— y verificadas por su `npm run verificar-series`.
-
-**Lo que sigue abierto es de presentación:** `vigencia` se guarda y todavía no se
-muestra en ningún lado. El informe cita la norma, no su fecha. Cuando se muestre,
-la frase es «rige desde», y sale de `vigencia` y nunca de `capturado`.
-
 ### Pendiente de diseño y contenido
 
 - **Assets de marca.** `components/brand.tsx` usa `mask-image` + `currentColor`
@@ -654,13 +610,30 @@ dos y compara.
 - **La procedencia sólo se completa, nunca se borra.** Que la planilla no diga
   nada no es que diga que no hay norma. Y se completa aunque el valor no cambie
   —pero **nunca el valor**: completar el registro no es reescribir historia—.
+- **`vigencia` no es `capturado` y se guardan las dos.** `capturado` es el día en
+  que el cron vio el valor; `vigencia`, el día desde el que rige, y hoy están a
+  cincuenta días de distancia. `vigencia` es opcional porque las entradas
+  anteriores al 9/9 no la tienen y no se puede inventar. **Todavía no se muestra
+  en ningún lado**, que es lo que sigue abierto de esto: cuando se muestre, la
+  frase es «rige desde» y sale de `vigencia`, nunca de `capturado`.
 - **`public/legacy/core.js` conserva su `cargarUMA()` y no se toca.** Es copia
   del asistente clásico, que se mantiene en el otro repositorio y todavía la
   usa. Simplemente no se la llama: `adapters.setUMA()` pisa `window.valorUMA`.
 - **El UHOM no se comporta como la UMA.** Se mueve todos los meses y es
   derivado: **UR-SINEP × 12, redondeado a la decena próxima superior**. De ahí
-  que el script tenga umbral propio (15 % y no 60 %) y un control de forma que
-  la UMA no puede tener: el valor siempre termina en cero.
+  que el script tenga umbral propio y un control de forma que la UMA no puede
+  tener: el valor siempre termina en cero.
+- **Los dos umbrales salen de la serie, con la regla del doble del salto máximo
+  observado** —0,4 la UMA y 0,6 el UHOM, calibrados el 9/9/2026—. **Si alguno
+  frena un valor bueno, la respuesta no es aflojarlo a ojo: es mirar la serie y
+  recalibrar.** La serie está en `data/serie-uma.json` y `data/serie-uhom.json`
+  de `herramientas-judiciales` —67 y 71 valores reconstruidos de los actos, con
+  la norma al lado, verificados por su `npm run verificar-series`—. Por qué los
+  dos umbrales anteriores estaban mal, en `HISTORIA.md`.
+- **El control de forma del UHOM avisa, no aborta.** Un umbral de salto sí puede
+  abortar, porque un salto imposible es casi siempre un error de lectura; una
+  regla de forma no, porque la autoridad que fija el valor puede apartarse de
+  ella y ya se apartó una vez.
 
 ### El campo numérico de la base
 
