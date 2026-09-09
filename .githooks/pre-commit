@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+# Lo que se controla en cada commit y es propio de ESTE repositorio.
+#
+# Lo corre el hook compartido de la maquina, despues de verificar datos
+# personales. **Aca no se repite ese control**: el verificador de datos es
+# uno solo para todos los repositorios, vive versionado en
+# herramientas-judiciales y lo corre el hook compartido antes que a este
+# archivo. Si falta, el compartido bloquea; no hace falta repetirlo.
+#
+# Saltear en un caso puntual:  git commit --no-verify
+
+set -u
+
+raiz=$(git rev-parse --show-toplevel)
+
+# --- El presupuesto de docs/ESTADO.md ------------------------------------
+#
+# ESTADO.md se lee entero al empezar cada sesion, asi que cada linea de mas
+# se paga en todas las sesiones que vengan.
+#
+# POR QUE ESTE ARCHIVO EXISTE RECIEN AHORA. Honorio era el unico de los seis
+# repositorios sin .githooks/, o sea el unico donde este control no corria.
+# Y era el unico pasado de techo: el 7/9/2026 estaba en 1028 lineas sin que
+# nada lo mirara. No es casualidad, es la misma causa de siempre: la causa
+# del problema no es que nadie limpie, es que limpiar no tiene momento. Cada
+# sesion agrega su seccion y ninguna tiene motivo para sacar la de la
+# anterior. Por eso hay un techo y no una recomendacion.
+#
+# EL TECHO ES 1100 Y NO 1000, y conviene saber por que antes de bajarlo.
+# El 8/9/2026 se podo de 1028 a 971 sacando lo que el CHANGELOG ya contaba
+# entero --las notas de las cuatro versiones 3.4.x y el indice de lo ya
+# hecho--. Lo que quedo casi no es cronica: son criterios juridicos vivos
+# --los ocho de jurisprudencia.ts, los pisos de auxiliares, el exhorto del
+# art. 50, las dos lecturas del art. 41--, que es exactamente lo que este
+# archivo tiene que llevar. El numero correcto es el tamanio que queda
+# despues de una poda mas margen para una sesion adentro, no una cifra
+# redonda igual para todos: 971 + 130.
+#
+# Si un dia hay que subirlo otra vez, la pregunta correcta no es cuanto
+# sino QUE HAY ADENTRO QUE YA ESTA CERRADO. En este repositorio la respuesta
+# suele estar en el CHANGELOG: si una seccion de ESTADO.md cuenta que trajo
+# una version, ya esta escrita dos veces.
+#
+# Corre SOLO si el commit toca docs/ESTADO.md, que es la unica forma de que
+# crezca: un commit de codigo no tiene por que pagar este chequeo.
+#
+# El script es UNO SOLO para los seis repos y vive en
+# herramientas-judiciales, igual que el verificador de datos. Varias copias
+# de la misma regla se desincronizan solas.
+if git diff --cached --name-only | grep -qx "docs/ESTADO.md"; then
+  verificador="/c/IA/herramientas-judiciales/scripts/verificar-estado.mjs"
+  if [ -f "$verificador" ] && command -v node >/dev/null 2>&1; then
+    node "$verificador" "$raiz/docs/ESTADO.md" 1100 || exit 1
+  else
+    printf '\033[33m  AVISO  no se pudo controlar el presupuesto de ESTADO.md\033[0m\n'
+    printf '         falta node o %s\n' "$verificador"
+  fi
+fi
+
+exit 0

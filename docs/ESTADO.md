@@ -3,7 +3,7 @@
 Documento de continuidad entre sesiones. **Leer antes de empezar a trabajar.**
 Se actualiza en el mismo commit que el trabajo, para que nunca mienta.
 
-Última actualización: 2026-08-24 · rama `main`
+Última actualización: 2026-09-08 · rama `main`
 
 Lleva **sólo lo que sigue vivo**: dónde está el trabajo, qué está abierto, qué
 se sabe roto, qué decisiones no hay que contradecir sin saberlo y qué trampas
@@ -25,58 +25,20 @@ Versión **3.4.3**, publicada en `honorio.ar`. Las **17 validaciones** de
 `lib/legal/__tests__` están en verde y corren solas en CI. **No hay nada urgente
 ni bloqueante.**
 
-Es un PARCHE: **el motor no se tocó y ninguna cifra cambia.** Entra
-**«Castañeda»**, que es el primer fallo del archivo que *hace la cuenta* del
-art. 21 en vez de transcribirlo, y su caso queda como **ancla externa** de las
-validaciones: hasta hoy todos los controles comparaban el motor contra algo
-nuestro.
+**Qué trajo cada versión está en el [`CHANGELOG`](../CHANGELOG.md) y por qué, en
+[`HISTORIA.md`](HISTORIA.md).** Acá no se repite: son dos archivos que ya existen
+para eso. Lo único de la 3.4.3 que hay que tener presente para trabajar es que
+**«Castañeda» quedó cargado como ancla externa** en
+`calculoDirecto.validation.ts` —el primer fallo que *hace la cuenta* del art. 21
+en vez de transcribirlo—, así que si alguien «arregla» el factor de correlación
+falla contra una sentencia y no contra una opinión nuestra.
 
-La 3.4.2, del mismo día, trajo otras dos: el **hueco entre un grado y el
-siguiente del art. 21** quedó declarado —la app lo resolvía y no lo decía— y el
-**cron de la UMA volvió a llegar al sitio**, que no llegaba por una trampa de
-GitHub Actions. Las tres están en el [`CHANGELOG`](../CHANGELOG.md); el criterio
-del hueco, más abajo en «Lo que la app declara abierto porque no hay nada
-detrás», y la trampa del deploy en «La UMA y el UHOM».
-
-La 3.4.1 fue el orden del dashboard genérico y del cálculo directo, de la
-devolución de SG del 21/8. Lo que gobierna esas decisiones está más abajo, en
-«Las tres zonas del dashboard».
-
-La 3.4.0 quedó marcada `MUEVE UN NÚMERO` porque el exhorto daba otro resultado: el
-inciso a) dejó de mostrarse como un honorario de 3 UMA y pasó a ser el piso que la
-ley dice que es, y el auxiliar del inciso c) tiene banda propia, que antes salía
-en cero. Ningún otro tipo de proceso cambió.
-
-**La regla de versionado cambió el 21/8 y está explicada en el
-[`CHANGELOG`](../CHANGELOG.md).** Antes, cualquier cambio de criterio que moviera
-una cifra era MAYOR; aplicada literalmente dejaba a Honorio en la versión 10 antes
-de fin de año, porque completar la ley es casi siempre arreglar el número de algún
-proceso. Ahora eso es MENOR con la marca `MUEVE UN NÚMERO`, y **la marca es la que
-garantiza la reproducibilidad, no el dígito**: obliga a decir qué caso da distinto.
-MAYOR queda para un cambio de régimen.
-
-El trabajo del 20/8 —los huecos de criterio, el art. 41, el control diario de la
-UMA y el verificador de datos— **ya tiene su entrada**, la 3.3.0, escrita el 21/8
-con el trabajo hecho. El CHANGELOG queda sin deuda.
-
-Todo lo que estaba planeado está hecho. Cada uno, con sus decisiones y su
-motivo, está contado en [`HISTORIA.md`](HISTORIA.md):
-
-| Qué | Cuándo | Dónde vive |
-|---|---|---|
-| Rediseño visual, entrevista, dashboard, portada, intro y mínimos | hasta 4/8 | `components/` |
-| El flujo hacia atrás dejó de arrastrar respuestas | 3/8 | `lib/wizard/reachability.ts` |
-| La UMA sale del repositorio, la firma y el informe imprimible | 5/8 | `data/uma.json`, `Firma.tsx` |
-| `PLAN_COBERTURA_LEY.md`, entero, en dos tandas | 7/8 | varios |
-| El cálculo directo | 7/8 | `lib/legal/calculo-directo.ts` |
-| Mediación, con el UHOM versionado | 8/8 | `lib/legal/mediacion.ts`, `uhom.ts` |
-| La regulación en prosa | 10/8 | `lib/legal/regulacion-prosa.ts` |
-| Compartir por enlace, citar y reportar; pasada de celular | 12-13/8 | `lib/compartir.ts` |
-| Ley 27.802 y los pisos de los auxiliares | 15/8 | `MINIMOS_AUXILIARES_JUSTICIA` |
-| Los huecos de criterio: de 2 criterios a 8 | 19/8 | `lib/legal/jurisprudencia.ts` |
-| El art. 41 abierto, con las dos lecturas | 20/8 | `ART41_POSTERIORES` |
-| El exhorto: un inciso por vez, con su jurisprudencia | 21/8 | `buildExhorto()`, `ExhortoResult.tsx` |
-| Las tres zonas del dashboard, y el mismo orden en el cálculo directo | 24/8 | `Dashboard.tsx`, `HonorariosBand.tsx` |
+**La regla de versionado, que sí gobierna trabajo de todos los días:** un cambio
+de criterio que mueve una cifra es MENOR con la marca `MUEVE UN NÚMERO`, y
+**la marca es la que garantiza la reproducibilidad, no el dígito** —obliga a
+decir qué caso da distinto—. MAYOR queda para un cambio de régimen. Antes era
+MAYOR cualquier cifra movida, y aplicada literal dejaba a Honorio en la versión
+10 antes de fin de año.
 
 El plan de adopción está **fuera del repositorio**, en `C:\IA\notas\adopcion.md`,
 porque nombra personas. La **Fase 0 quedó cerrada el 13/8**.
@@ -749,42 +711,18 @@ volviera a aparecer *después* de la segunda.
   queda por debajo» queda afuera del pliegue**: es la única razón por la que los
   dos números conviven en pantalla, así que verla no puede depender de abrir
   nada.
-- **El caso es pie y no parte de la cadena.** Es lo que contestaste, no un
-  fundamento, y va sin borde propio porque `ChipsCaso` ya trae el suyo.
-- **La prosa cierra la zona 1**, no la página: es un resultado —la tercera forma
-  de la misma salida— y no una explicación.
-- **Se quitó el realce del «Revocada · 40 %».** Con la sección ya marcada por
-  sujeto, ese `destacado` competía con la marca. Dos jerarquías encimadas no son
-  una jerarquía.
-- **`Disclosure` envuelve sólo cuando hay un valor.** El `flex-wrap` estaba
-  siempre, y sin valor hacía caer la etiqueta «por qué» sola a la segunda línea,
-  alineada a la derecha: se leía como una tabulación caprichosa. **Sólo se ve a
-  partir de 1024 px**, que es donde auxiliares y mediador pasan a dos columnas y
-  el ancho se parte al medio; en una sola columna nunca aparece. Sin valor va
-  `flex-nowrap` y el concepto se achica —para eso tiene `min-w-0`— y envuelve
-  como texto.
-- **Un corte de zona encabeza un grupo, no un solo elemento.** La zona 2 lleva
-  el suyo porque agrupa auxiliares, mediador y partidor. La zona 3 no lleva:
-  tiene un único pliegue que ya se nombra solo, y el corte repetía esa frase una
-  línea más arriba. Por lo mismo el pliegue **no** se llama «cómo se llegó a
-  este número»: `CadenaCalculo` ya se titula así adentro.
-- **La prosa no lleva marca de sujeto y va después de las dos zonas.** El texto
-  lleva una línea por profesional —incluidos peritos y mediador—, así que no es
-  de un sujeto: las redacta a las dos. Lleva una línea arriba que cierra la zona
-  de los otros intervinientes; sin ella se leía como una sección más de esa
-  zona.
-- **Los encabezados de sección salen todos de `EncabezadoSeccion`.** Estaban los
-  cinco escritos a mano y ya habían divergido en separaciones. `ProsaSection`
-  era el más distinto y por eso era el único sin separación visible.
-- **El mediador no anuncia «si hubo mediación previa».** Es una condición obvia
-  —equivale a aclarar «si se designaron peritos» arriba de los auxiliares— y la
-  insignia envolvía a una segunda línea, que desalineaba la sección de la de al
-  lado. Decisión de Javier del 24/8.
-- **El cálculo directo sigue el mismo orden y no pliega nada.** Su segunda
-  instancia quedaba última, después de auxiliares y mediador, y eso no era una
-  decisión: era el orden en que se fue escribiendo. Pero ahí la herramienta de
-  etapas y fracción **es** la pantalla, y su balance es otro a propósito: filas
-  en vez de recuadros, los tres roles juntos, y la UMA como unidad principal.
+- **La prosa cierra la zona 1** —es un resultado, la tercera forma de la misma
+  salida, y no una explicación—, **no lleva marca de sujeto** porque redacta una
+  línea por profesional, y **el caso es pie y no parte de la cadena**.
+- **El cálculo directo sigue el mismo orden y no pliega nada.** Ahí la
+  herramienta de etapas y fracción **es** la pantalla, y su balance es otro a
+  propósito: filas en vez de recuadros, los tres roles juntos, y la UMA como
+  unidad principal.
+
+Las decisiones finas de maqueta de esa sesión —el `flex-wrap` de `Disclosure`,
+dónde va un corte de zona, por qué el mediador no anuncia su condición, la
+unificación de `EncabezadoSeccion`, qué cambió en el papel— están en el
+[`CHANGELOG`](../CHANGELOG.md), en la 3.4.1, y ninguna está abierta.
 
 ### Las tres reglas que gobiernan el contenido
 
@@ -968,8 +906,12 @@ Consecuencias que hay que sostener:
   la selección recién hecha. Usar una ref al último render.
 - **El auto-avance es solo por teclado, a propósito.** Con el mouse, equivocarse
   de tarjeta te sacaba de la pregunta.
-- **`git commit -m` con here-string falla** en el entorno del autor (guardia de
-  sandbox). Usar `git commit -F <archivo>`.
+- **`git commit -m` con here-string NO falla, medido el 7/9/2026.** Esta línea
+  decía lo contrario y era falsa. Anda en Bash —heredoc con `-F -`, y también
+  `-m` multilínea— y en PowerShell con su `@'...'@`, con `$` y backticks
+  literales en los dos. **Lo que falla es mezclar los dos shells**: la sintaxis
+  de PowerShell adentro de Bash mete un `@` suelto como asunto del commit.
+  Cada shell con la suya y no hay trampa.
 - **No hay `npm run lint`.** Declaraba `eslint .` sin que `eslint` estuviera
   instalado. Verificar con `npm run check`.
 - **`next-env.d.ts` no se versiona.** Next lo regenera y alterna solo según si

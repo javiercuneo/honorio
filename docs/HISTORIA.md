@@ -23,6 +23,52 @@ historia de `honorio/` viajó completa con `git subtree split`, así que
 calculadoras, el asistente clásico y la documentación de dominio.
 
 ---
+## `ESTADO.md` estaba pasado de techo y nadie lo miraba — el 8/9
+
+**Honorio era el único de los seis repositorios sin `.githooks/`**, o sea el
+único donde el control de presupuesto de `ESTADO.md` no corría. Y era el único
+pasado del techo: 1028 líneas, con la última actualización del 24/8. Las dos
+cosas son la misma: el control existe desde el 7/9 y se cableó en los cinco
+hermanos, pero acá no, así que el archivo creció dos semanas sin que nada lo
+mirara. La causa nunca es que nadie limpie —es que limpiar no tiene momento—, y
+este repositorio fue la demostración.
+
+**La poda: 1028 → 971, y fue casi toda de-duplicación contra el `CHANGELOG`.**
+La sección «Dónde estamos» llevaba las notas de las cuatro versiones 3.4.x
+—qué trajo cada una, con su detalle— y una tabla índice de todo lo ya hecho. Eso
+es trabajo del `CHANGELOG` y de este archivo, que ya lo contaban entero. De la
+sección del dashboard salió el detalle fino de maqueta del 24/8 —el `flex-wrap`
+de `Disclosure`, el corte de zona, el anuncio del mediador, `EncabezadoSeccion`—,
+que está en la 3.4.1 del `CHANGELOG` con más detalle del que había acá. No se
+perdió una línea: se dejó de escribir dos veces.
+
+Quedaron los invariantes: el orden de las tres zonas, que plegar una herramienta
+no oculta un número, que el pliegue va en `<details>` y no en estado de React
+—para que el interruptor del imprimible lo gobierne—, y el sujeto como cuarto eje
+de color.
+
+**Y se corrigió una afirmación falsa que el archivo arrastraba.** Decía que
+«`git commit -m` con here-string falla en el entorno del autor». Se midió el 7/9
+y no falla: anda en Bash y en PowerShell, cada uno con su sintaxis; lo que falla
+es mezclarlas. La misma frase estaba en `METODO.md`, que es la fuente de los
+cinco repos, y allá quedó anotada para que la corrija el operador.
+
+**El techo quedó en 1100 y no en 1000, a propósito.** Lo que queda después de la
+poda casi no es crónica: son criterios jurídicos vivos —los ocho de
+`jurisprudencia.ts`, los pisos de auxiliares, el exhorto del art. 50, las dos
+lecturas del art. 41—, que es exactamente lo que este archivo tiene que llevar.
+El número correcto es el tamaño que queda después de una poda más margen para
+una sesión adentro, no una cifra redonda igual para todos. El razonamiento está
+escrito adentro del hook, para que quien lo quiera bajar lea primero por qué está
+donde está.
+
+Se agregó además un `.gitattributes`, que no existía: fija los hooks en LF. Sin
+eso, este repositorio viaja a la notebook de la oficina y si allá `core.autocrlf`
+estuviera en `true`, el hook llegaría con CRLF y **dejaría de correr sin avisar**.
+Ya pasó una vez en `herramientas-judiciales` con `verificar-datos.sh`.
+
+---
+
 ## La devolución de SG y las tres zonas del dashboard — el 24/8
 
 La primera devolución honesta de alguien de afuera. SG probó Honorio con varios

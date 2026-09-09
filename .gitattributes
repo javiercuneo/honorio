@@ -1,0 +1,16 @@
+# Los hooks se ejecutan con bash, y un archivo con CRLF no corre: bash lee el
+# \r como parte del comando y falla con un error que no nombra el problema.
+# Peor todavia, un hook que no corre NO AVISA: el commit pasa como si el
+# control hubiera dado bien.
+#
+# Aca no alcanza con que el archivo este bien en esta maquina. `core.autocrlf`
+# esta en false en la maquina de casa, pero este repositorio viaja a la
+# notebook de la oficina, y si alla estuviera en true el checkout entregaria
+# el hook con CRLF. Esta regla lo fija en el repositorio y deja de depender de
+# la configuracion de cada maquina.
+#
+# Ya paso una vez, en herramientas-judiciales, con verificar-datos.sh: en CI
+# no se veia porque en Linux sale LF igual.
+.githooks/** text eol=lf
+*.sh text eol=lf
+*.mjs text eol=lf
