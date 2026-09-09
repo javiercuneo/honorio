@@ -3,7 +3,7 @@
 Documento de continuidad entre sesiones. **Leer antes de empezar a trabajar.**
 Se actualiza en el mismo commit que el trabajo, para que nunca mienta.
 
-Última actualización: 2026-09-08 · rama `main`
+Última actualización: 2026-09-09 · rama `main`
 
 Lleva **sólo lo que sigue vivo**: dónde está el trabajo, qué está abierto, qué
 se sabe roto, qué decisiones no hay que contradecir sin saberlo y qué trampas
@@ -21,17 +21,22 @@ pregunta «¿por qué esto quedó así?».
 
 ## Dónde estamos
 
-Versión **3.4.3**, publicada en `honorio.ar`. Las **17 validaciones** de
+Versión **3.4.4**, publicada en `honorio.ar`. Las **17 validaciones** de
 `lib/legal/__tests__` están en verde y corren solas en CI. **No hay nada urgente
 ni bloqueante.**
 
 **Qué trajo cada versión está en el [`CHANGELOG`](../CHANGELOG.md) y por qué, en
 [`HISTORIA.md`](HISTORIA.md).** Acá no se repite: son dos archivos que ya existen
-para eso. Lo único de la 3.4.3 que hay que tener presente para trabajar es que
-**«Castañeda» quedó cargado como ancla externa** en
-`calculoDirecto.validation.ts` —el primer fallo que *hace la cuenta* del art. 21
-en vez de transcribirlo—, así que si alguien «arregla» el factor de correlación
-falla contra una sentencia y no contra una opinión nuestra.
+para eso. Dos cosas de las últimas versiones hay que tener presentes para
+trabajar:
+
+- **«Castañeda» quedó cargado como ancla externa** en
+  `calculoDirecto.validation.ts` —el primer fallo que *hace la cuenta* del
+  art. 21 en vez de transcribirlo—, así que si alguien «arregla» el factor de
+  correlación falla contra una sentencia y no contra una opinión nuestra.
+- **La pantalla de mínimos ya no muestra como vigentes cuatro filas que el
+  Decreto 1077/2017 observó**, y el texto de la ley que muestra está verificado
+  contra Infoleg. Los detalles, más abajo.
 
 **La regla de versionado, que sí gobierna trabajo de todos los días:** un cambio
 de criterio que mueve una cifra es MENOR con la marca `MUEVE UN NÚMERO`, y
@@ -77,19 +82,32 @@ mismo ejemplo calcula el máximo como el 15 % del total de la base e ignora el
 factor de correlación del art. 21 —el criterio que la propia app funda con
 `RINDEL` y con Díaz & Musich—. Su punto de partida arranca corrido un 5,4 %.
 
-### `minimos-data.ts` nunca se verificó contra la ley
+### Los mínimos, verificados contra la ley el 9/9/2026
 
-Son unas cuarenta cifras. Están verificadas contra el asistente clásico —el
-archivo dice ser copia fiel de él— y **que sea fiel a la copia no prueba que sea
-fiel a la norma**: es la misma clase de error que dejó los documentos de dominio
-describiendo mal el motor, verificar una descripción contra otra descripción.
+**Cerrado.** Se leyeron uno por uno los arts. 19, 31, 44, 48, 58, 60, 61 y 61 bis
+contra el texto actualizado de Infoleg. **Las cuarenta cifras estaban bien y
+ninguna se movió.** Lo que estaba mal era otra cosa, y quedan dos invariantes:
 
-**Baja de `herramientas-judiciales` el 6/9/2026**, donde figuraba como pendiente
-propio. El archivo es de acá, así que el trabajo es de acá. Lo que quedó de aquel
-lado es que `06_MATRIZ_DE_PROCESOS.md` y `07_GLOSARIO.md` citan estas cifras:
-**si una se mueve, se mueven las dos citas.**
+- **Cuatro `textoLegal` no eran el texto de la ley y ahora sí lo son** (arts. 19,
+  31, 44 y 58). El del art. 19 le atribuía al artículo una redacción que no está
+  en él, heredada del cuadro explicativo del asistente clásico. Ver la trampa del
+  art. 19 al final de este documento: **es la que más veces se repitió.**
+- **Cuatro filas de la tabla b) del art. 19 no rigen y ahora lo dicen.** El
+  art. 3° del Decreto 1077/2017 las observó enteras —locación (2 UMA), boleto de
+  compraventa (3), sociedades (5), otros contratos (2)—; el decreto las nombra
+  una por una, así que no hay duda de alcance. **Se conservan con su cifra**, con
+  la insignia «No rige» y el texto que dice qué fijaba la ley y qué la observó.
+  El motivo es de Javier y vale escribirlo: *no es un piso exigible, pero es lo
+  que el legislador consideró que valía esa labor, y eso sirve para fundar un
+  pedido.* Borrarlas dejaría a quien busca «locación» sin ninguna respuesta, que
+  informa peor que una respuesta con su advertencia. **La contrapartida es
+  innegociable: una fila observada no se puede leer como vigente**, así que la
+  advertencia va afuera de todo desplegable, como la insignia del 5 % de los
+  auxiliares. El campo es `MinimoItem.observado`.
 
-Ningún número se toca hasta leer el artículo que lo funda, uno por uno.
+`06_MATRIZ_DE_PROCESOS.md` y `07_GLOSARIO.md` de `herramientas-judiciales` citan
+estas cifras: **si una se mueve, se mueven las dos citas.** Ninguna se movió, pero
+las cuatro filas observadas les faltan a los dos documentos.
 
 ### Lo que la app declara abierto porque no hay nada detrás
 
@@ -246,11 +264,20 @@ los pasos el 5/8, las descripciones de la cautelar el 6/8— y una tercera el
 19/8, con un criterio de abogados puesto en la sección de auxiliares. **Ninguna
 de las 17 mira qué dice un rótulo ni dónde está puesto un párrafo.**
 
+**La cuarta, el 9/9, es la peor de la serie y por eso conviene tenerla presente:
+el `textoLegal` del art. 19 en `minimos-data.ts` no era el art. 19.** Era una
+redacción de otra fuente, y la pantalla de mínimos la mostraba en serif, que en
+esta app significa «esto es la norma». Estuvo así desde que el archivo existe,
+con las 17 en verde todo el tiempo, porque las cifras que acompañaban al texto
+sí eran las correctas. **Un texto legal transcripto se verifica contra el texto
+legal, y no hay otra forma.**
+
 No hace falta automatizarlo todavía, pero sí saber dónde mirar: los
 `description` y `hint` de las `CardOption` de `wizard-schema.ts`, los `motivo`
-de `format.ts` y los `explicacion.expanded` de cada paso. **Cada vez que uno de
-esos strings nombra un porcentaje o un artículo, hay que leerlo contra
-`resolveReglas()` y contra la ley**, porque nada más lo va a hacer.
+de `format.ts`, los `explicacion.expanded` de cada paso y **los `textoLegal` de
+`minimos-data.ts`**. **Cada vez que uno de esos strings nombra un porcentaje o
+un artículo, hay que leerlo contra `resolveReglas()` y contra la ley**, porque
+nada más lo va a hacer.
 
 ---
 
@@ -348,6 +375,16 @@ está la regla y su razón, que es lo que hay que saber antes de tocar el archiv
 
 - **Una interpretación se funda en un fallo o no se afirma.** Los ocho criterios
   de `jurisprudencia.ts` la cumplen.
+- **La pantalla de mínimos afirmaba lo suyo sin nada detrás hasta el 9/9/2026.**
+  Decía «si el cálculo del art. 21 queda por debajo de un mínimo aplicable, el
+  mínimo manda», que era nuestra lectura de la última oración del art. 16. Ahora
+  lo sostiene `MINIMOS_ORDEN_PUBLICO` con **«Martinuzzi» (CSJN, 03/09/2026)**,
+  donde la Corte deja sin efecto una regulación de 14 UMA en un amparo —el
+  art. 48 fija 20— porque la cámara no explicó por qué prescindió del mínimo
+  «sin declarar su inconstitucionalidad ni elaborar argumentación plausible
+  alguna», y porque citar artículos no es fundar (art. 15). **Conviene tener
+  presente de dónde salió el criterio:** las tres pantallas de resultado tenían
+  fundamento y ésta no, y nadie lo había notado.
 - **Un fallo que hace la cuenta vale más que uno que transcribe el artículo**, y
   por eso «Castañeda» (CFed. Mendoza, Sala B, 12/03/2021) va primero en
   `ESCALA_CORRELACION`. Las dos lecturas del art. 21 transcriben lo mismo; lo
@@ -876,6 +913,27 @@ Consecuencias que hay que sostener:
 
 ## Trampas conocidas
 
+- **El art. 19 no termina donde termina su primer párrafo, y se vuelve a
+  tropezar con eso cada pocas semanas.** El artículo instituye la UMA **y en su
+  segundo párrafo trae las dos tablas de mínimos** —a) asuntos judiciales no
+  susceptibles de apreciación pecuniaria, b) labor extrajudicial—, que son
+  justamente las que muestra la pantalla de mínimos. Quien lee el encabezado y se
+  detiene ahí concluye que el artículo «no tiene incisos», y esa conclusión ya
+  aparece registrada **el 10/8 dos veces**, en el plan de la prosa, y otra vez en
+  la reescritura del glosario. **Un `grep` de «ARTÍCULO 19» devuelve una línea; un
+  artículo se lee hasta el encabezado siguiente.**
+  - **La variante que llegó al código y sobrevivió más de un año:** el cuadro
+    explicativo del asistente clásico atribuye al art. 19 un texto que empieza
+    «Cuando no fuere posible apreciar el valor pecuniario del asunto…», que **no
+    está en la Ley 27.423**. `minimos-data.ts` lo había copiado y la pantalla lo
+    mostraba en serif, que en esta app significa «esto es la norma». Corregido el
+    9/9/2026.
+  - **Por qué se repite y qué lo corta:** la advertencia existía, pero vivía en
+    `herramientas-judiciales/docs/domain/07_GLOSARIO.md`, que **no se lee al
+    trabajar en Honorio**. Por eso está acá ahora. Y al informar una corrección
+    sobre este artículo conviene decir en la misma frase que las tablas de
+    mínimos están en él: describirla como «el texto del art. 19 estaba mal» se
+    lee, con razón, como si fuera otra vez el mismo error.
 - **El panel del navegador no compone frames si el panel no está a la vista.**
   Se anotó mucho tiempo como si fuera una limitación del entorno, y no lo es:
   **la causa es que el panel está cerrado o en segundo plano.** Con el panel

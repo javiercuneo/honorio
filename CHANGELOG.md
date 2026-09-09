@@ -45,6 +45,58 @@ posible —cambió la UMA— que no se podía comprobar.
 
 ---
 
+## 3.4.4 — 9 de septiembre de 2026
+
+PARCHE. **El motor no se tocó y ninguna cifra del cálculo cambia.** Siguen
+siendo 17 validaciones, en verde. Lo que cambia es la pantalla de mínimos: entra
+un fallo de la Corte, se corrige el texto de la ley que la pantalla mostraba, y
+cuatro filas dejan de presentarse como vigentes.
+
+### «Martinuzzi»: el mínimo manda, y ahora lo dice la Corte y no nosotros
+
+**CSJN, «Martinuzzi c/ Omint SA de Servicios s/ amparo», CCF 9469/2018/3/RH2,
+03/09/2026.** Primera instancia reguló 22 UMA en un amparo, la Sala I de la Civil
+y Comercial Federal las bajó a 14, y la Corte deja sin efecto esa reducción: la
+cámara reguló por debajo del mínimo de 20 UMA del art. 48 *«sin declarar su
+inconstitucionalidad ni elaborar argumentación plausible alguna»*, y fundó de
+manera aparente —citar artículos no es fundar, lo dice el art. 15—.
+
+La pantalla de mínimos afirmaba desde siempre que «si el cálculo del art. 21
+queda por debajo de un mínimo aplicable, el mínimo manda». Era correcto y era
+**nuestro**: la lectura de la última oración del art. 16. Era la única de las
+tres pantallas de resultado sin un `Fundamento`. Entra como
+`MINIMOS_ORDEN_PUBLICO`.
+
+### Cuatro mínimos que el Poder Ejecutivo vetó y la app mostraba como vigentes
+
+El **art. 3° del Decreto 1077/2017** observó cuatro filas enteras de la tabla b)
+del art. 19 —redacción de contrato de locación (2 UMA), boleto de compraventa
+(3), contrato o estatuto de sociedades (5) y otros contratos (2)—. **Nunca
+entraron en vigencia** y la pantalla las listaba junto a los mínimos que sí
+rigen.
+
+**Se conservan con su cifra, con la insignia «No rige»** y una línea que dice qué
+fijaba la ley y qué norma la observó. No es un piso exigible, pero es lo que el
+legislador consideró que valía esa labor, y eso sirve para fundar un pedido;
+borrarlas dejaría a quien busca «locación» sin ninguna respuesta. La advertencia
+va **afuera de todo desplegable**: una fila observada no se puede leer como
+vigente.
+
+### El texto de la ley que la pantalla mostraba no siempre era el texto de la ley
+
+Se verificó `minimos-data.ts` entero contra el texto actualizado de Infoleg,
+artículo por artículo. **Las cuarenta cifras estaban bien.** Cuatro `textoLegal`
+no eran transcripciones y ahora lo son (arts. 19, 31, 44 y 58).
+
+El del art. 19 es el que importa: la app le atribuía al artículo una redacción
+que **no está en la Ley 27.423** —«Cuando no fuere posible apreciar el valor
+pecuniario del asunto…»—, heredada del cuadro explicativo del asistente clásico,
+y la pantalla la mostraba en serif, que en esta app significa *esto es la norma*.
+**Ninguna de las 17 validaciones podía verlo**: comparan números, y los números
+que acompañaban a ese texto eran correctos.
+
+---
+
 ## 3.4.3 — 1 de septiembre de 2026
 
 PARCHE. **El motor no se tocó y ninguna cifra cambia.** Siguen siendo 17

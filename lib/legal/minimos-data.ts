@@ -3,9 +3,32 @@
 // ---------------------------------------------------------------
 // lib/legal/minimos-data.ts
 // Datos de referencia de los minimos arancelarios (Ley 27.423).
-// Copia fiel de asistente-honorarios-clasico/js/calculations.js,
-// funcion mostrarTablasMinimos() (lineas 345-484).
 // Framework-agnostic: solo datos, sin React.
+//
+// **Verificado contra el texto de la ley el 9/9/2026**, articulo por
+// articulo, contra el texto actualizado de Infoleg. Hasta ese dia el
+// archivo se presentaba como "copia fiel" de
+// asistente-honorarios-clasico/js/calculations.js, que es la misma
+// clase de garantia que verificar una descripcion contra otra
+// descripcion: fiel a la copia no es fiel a la norma.
+//
+// Que dio la verificacion:
+//
+//   - **Las cifras estan todas bien.** Los ~40 numeros coinciden con
+//     los arts. 19, 31, 44, 48, 58, 60, 61 y 61 bis. Ninguno se movio.
+//   - **Cuatro `textoLegal` no eran el texto de la ley** y se
+//     reemplazaron por la transcripcion literal (arts. 19, 31, 44 y
+//     58). El del art. 19 era el mas grave: la app atribuia al
+//     articulo una redaccion que no esta en el —"Cuando no fuere
+//     posible apreciar el valor pecuniario del asunto..."—, y la
+//     pantalla la mostraba en serif, que en esta app significa "esto
+//     es el texto de la ley". El art. 19 real instituye la UMA y
+//     enuncia las tablas; no dice nada de eso.
+//   - **Cuatro filas de la tabla b) no rigen y ahora lo dicen.** El
+//     art. 3 del Decreto 1077/2017 observo enteras las de locacion (2),
+//     boleto de compraventa (3), sociedades (5) y otros contratos (2),
+//     y estaban listadas como minimos vigentes. Se conservan con su
+//     cifra y con la advertencia: ver `MinimoItem.observado`.
 // ---------------------------------------------------------------
 
 export interface MinimoItem {
@@ -19,6 +42,23 @@ export interface MinimoItem {
    * nombre de tribunal no coinciden: no es un diccionario de sinonimos.
    */
   alias?: string[]
+  /**
+   * Que dice la fila si **no rige**, y por que.
+   *
+   * **La fila se conserva con su cifra a proposito.** Es lo que el
+   * Congreso fijo como minimo y el Poder Ejecutivo veto antes de que
+   * entrara en vigencia: no es un piso exigible, pero es lo que el
+   * legislador considero que valia esa labor, y eso sirve para fundar
+   * un pedido. Borrarla dejaria a quien busca "locacion" sin ninguna
+   * respuesta, que informa peor que una respuesta con su advertencia.
+   * Decision de Javier del 9/9/2026.
+   *
+   * **La contrapartida es innegociable y la presentacion la cumple:**
+   * una fila con `observado` no se puede leer como vigente. La
+   * advertencia va afuera de todo desplegable, como la insignia del
+   * 5 % de los auxiliares.
+   */
+  observado?: string
 }
 
 export interface MinimoGrupo {
@@ -40,7 +80,8 @@ export const MINIMOS_JUDICIAL: MinimoCategoria = {
   id: 'judicial',
   titulo: 'Mínimos en asuntos judiciales no susceptibles de apreciación pecuniaria (art. 19 inc. a)',
   articulo: 'Art. 19',
-  textoLegal: 'ARTÍCULO 19.- Cuando no fuere posible apreciar el valor pecuniario del asunto, los jueces fijarán los honorarios teniendo en cuenta la naturaleza de las actuaciones y la gestión profesional desarrollada, con arreglo a las siguientes pautas: a) En asuntos judiciales:',
+  textoLegal:
+    'ARTÍCULO 19.- Institúyese la Unidad de Medida Arancelaria (UMA) para los honorarios profesionales de los abogados, procuradores y auxiliares de la Justicia, la que equivaldrá al tres por ciento (3 %) de la remuneración básica asignada al cargo de juez federal de primera instancia. La Corte Suprema de Justicia de la Nación suministrará y publicará mensualmente, por el medio a determinar por dicho Alto Tribunal, el valor resultante, eliminando las fracciones decimales, e informará a las diferentes cámaras el valor de la UMA. Sin perjuicio del sistema porcentual establecido en las disposiciones siguientes, los honorarios mínimos que correspondan percibir a los abogados, procuradores y auxiliares de la Justicia por su actividad profesional, resultarán de la cantidad de UMA que se detallan en las siguientes tablas: a) Honorarios mínimos en asuntos judiciales no susceptibles de apreciación pecuniaria.',
   alias: ['sin monto', 'monto indeterminado'],
   grupos: [{
     items: [
@@ -70,7 +111,8 @@ export const MINIMOS_EXTRAJUDICIAL: MinimoCategoria = {
   id: 'extrajudicial',
   titulo: 'Mínimos por labor extrajudicial (art. 19 inc. b)',
   articulo: 'Art. 19',
-  textoLegal: 'ARTÍCULO 19.- Cuando no fuere posible apreciar el valor pecuniario del asunto, los jueces fijarán los honorarios teniendo en cuenta la naturaleza de las actuaciones y la gestión profesional desarrollada, con arreglo a las siguientes pautas: b) En asuntos extrajudiciales:',
+  textoLegal:
+    'ARTÍCULO 19.- Institúyese la Unidad de Medida Arancelaria (UMA) para los honorarios profesionales de los abogados, procuradores y auxiliares de la Justicia, la que equivaldrá al tres por ciento (3 %) de la remuneración básica asignada al cargo de juez federal de primera instancia. La Corte Suprema de Justicia de la Nación suministrará y publicará mensualmente, por el medio a determinar por dicho Alto Tribunal, el valor resultante, eliminando las fracciones decimales, e informará a las diferentes cámaras el valor de la UMA. Sin perjuicio del sistema porcentual establecido en las disposiciones siguientes, los honorarios mínimos que correspondan percibir a los abogados, procuradores y auxiliares de la Justicia por su actividad profesional, resultarán de la cantidad de UMA que se detallan en las siguientes tablas: b) Honorarios mínimos por la labor extrajudicial.',
   grupos: [{
     items: [
       { label: 'Consulta verbal', uma: 0.5 },
@@ -78,10 +120,31 @@ export const MINIMOS_EXTRAJUDICIAL: MinimoCategoria = {
       { label: 'Redacción de carta documento', uma: 1 },
       { label: 'Estudio o información de actuaciones judiciales o administrativas', uma: 1.5 },
       { label: 'Asistencia y asesoramiento del cliente en la realización de actos jurídicos', uma: 1.5 },
-      { label: 'Redacción de contrato de locación', uma: 2 },
-      { label: 'Redacción de boleto de compraventa', uma: 3 },
-      { label: 'Redacción de contrato o estatuto de sociedades comerciales, asociaciones o fundaciones y constitución de personas jurídicas en general', uma: 5 },
-      { label: 'Redacción de otros contratos', uma: 2 },
+      {
+        label: 'Redacción de contrato de locación',
+        uma: 2,
+        observado:
+          'La ley lo fijaba en «del 1 % al 5 % del valor del contrato, con un mínimo de 2 UMA». Observado por el art. 3° del Decreto 1077/2017 (B.O. 21/12/2017): nunca entró en vigencia.',
+      },
+      {
+        label: 'Redacción de boleto de compraventa',
+        uma: 3,
+        observado:
+          'La ley lo fijaba en «del 1 % al 5 % del valor del mismo, con un mínimo de 3 UMA». Observado por el art. 3° del Decreto 1077/2017 (B.O. 21/12/2017): nunca entró en vigencia.',
+      },
+      {
+        label:
+          'Redacción de contrato o estatuto de sociedades comerciales, asociaciones o fundaciones y constitución de personas jurídicas en general',
+        uma: 5,
+        observado:
+          'La ley lo fijaba en «del 1 % al 3 % del capital social, con un mínimo de 5 UMA». Observado por el art. 3° del Decreto 1077/2017 (B.O. 21/12/2017): nunca entró en vigencia.',
+      },
+      {
+        label: 'Redacción de otros contratos',
+        uma: 2,
+        observado:
+          'La ley lo fijaba en «del 0,3 % al 5 % del valor de los mismos, con un mínimo de 2 UMA». Observado por el art. 3° del Decreto 1077/2017 (B.O. 21/12/2017): nunca entró en vigencia.',
+      },
       { label: 'Arreglo extrajudicial', uma: 1 },
       { label: 'Gastos administrativos de estudio para iniciación de juicios', uma: 0.5 },
       { label: 'Redacción de denuncia penal (sin firma de letrado)', uma: 3 },
@@ -94,7 +157,8 @@ export const MINIMOS_ART58: MinimoCategoria = {
   id: 'art58',
   titulo: 'Mínimos del art. 58 (juicios susceptibles de apreciación pecuniaria no previstos en otros artículos)',
   articulo: 'Art. 58',
-  textoLegal: 'Art. 58: Mínimo establecido para regular honorarios de juicios susceptibles de apreciación pecuniaria que no estuviesen previstos en otros artículos.',
+  textoLegal:
+    'ARTÍCULO 58.- El mínimo establecido para regular honorarios de juicios susceptibles de apreciación pecuniaria que no estuviesen previstos en otros artículos será el siguiente: a) En los procesos de conocimiento, de diez (10) UMA; b) En los ejecutivos, de seis (6) UMA; c) En los procesos de mediación, de dos (2) UMA; d) En el caso de auxiliares de la Justicia, de cuatro (4) UMA.',
   alias: ['con monto', 'ordinario', 'daños y perjuicios'],
   grupos: [{
     items: [
@@ -110,7 +174,8 @@ export const MINIMOS_RECURSOS_CSJN: MinimoCategoria = {
   id: 'recursos_csjn',
   titulo: 'Recursos ante la CSJN (art. 31)',
   articulo: 'Art. 31',
-  textoLegal: 'Art. 31: La interposición ante la CSJN de los recursos extraordinarios, de inconstitucionalidad, de revisión, de casación, ordinarios, directos y otros similares o que no sean los normales de acceso, no podrá remunerarse en una cantidad inferior a 20 UMA. Las quejas por denegación de estos recursos no podrán remunerarse en una cantidad inferior a 15 UMA. Si dichos recursos fueren concedidos y se tramitaren, se estará a lo dispuesto en el artículo 21.',
+  textoLegal:
+    'ARTÍCULO 31.- La interposición ante la Corte Suprema de Justicia de la Nación de los recursos extraordinarios, de inconstitucionalidad, de revisión, de casación, ordinarios, directos y otros similares o que no sean los normales de acceso, no podrá remunerarse en una cantidad inferior a veinte (20) UMA. Las quejas por denegación de estos recursos no podrán remunerarse en una cantidad inferior a quince (15) UMA. Si dichos recursos fueren concedidos y se tramitaren, se estará a lo dispuesto en el artículo 21.',
   grupos: [{
     items: [
       { label: 'Queja por denegación de recurso', uma: 15 },
@@ -247,7 +312,7 @@ export const MINIMOS_ACCIONES_48: MinimoCategoria = {
   id: 'acciones_48',
   titulo: 'Mínimos del art. 48',
   articulo: 'Art. 48',
-  textoLegal: 'ARTÍCULO 48.- Por la interposición de acciones de inconstitucionalidad, de amparo, de hábeas data, de hábeas corpus, en caso de que no puedan regularse de conformidad con la escala del artículo 21, se aplicarán las normas del artículo 16, con un mínimo de 20 UMA.',
+  textoLegal: 'ARTÍCULO 48.- Por la interposición de acciones de inconstitucionalidad, de amparo, de hábeas data, de hábeas corpus, en caso de que no puedan regularse de conformidad con la escala del artículo 21, se aplicarán las normas del artículo 16, con un mínimo de veinte (20) UMA.',
   grupos: [{
     items: [{ label: 'Acciones de inconstitucionalidad, amparo, hábeas data, hábeas corpus', uma: 20 }],
   }],
@@ -257,7 +322,8 @@ export const MINIMOS_CONTENCIOSO_44: MinimoCategoria = {
   id: 'contencioso_44',
   titulo: 'Mínimos del art. 44',
   articulo: 'Art. 44',
-  textoLegal: 'ARTÍCULO 44.- La interposición de acciones y peticiones de naturaleza administrativa seguirá las siguientes reglas… En los casos en que los asuntos no sean susceptibles de apreciación pecuniaria, la regulación no será inferior a 7 o 5 UMA, según se trate del ejercicio de acciones contencioso administrativas o actuaciones administrativas, respectivamente.',
+  textoLegal:
+    'ARTÍCULO 44.- La interposición de acciones y peticiones de naturaleza administrativa seguirá las siguientes reglas: a) Demandas contencioso administrativas: se aplicarán los principios establecidos en los artículos 21 y 23 de la presente; si la cuestión es susceptible de apreciación pecuniaria se aplicará la escala del primero de ellos; b) Actuaciones ante organismos de la administración pública, empresas del Estado, municipalidades, entes descentralizados, autárquicos: si tales procedimientos estuvieran reglados por normas especiales, el profesional podrá solicitar regulación judicial de su labor, si la cuestión es susceptible de apreciación pecuniaria, aplicándose el inciso a) del presente artículo, con una reducción del cincuenta por ciento (50%). En los casos en que los asuntos no sean susceptibles de apreciación pecuniaria, la regulación no será inferior a siete (7) o cinco (5) UMA, según se trate del ejercicio de acciones contencioso administrativas o actuaciones administrativas, respectivamente.',
   grupos: [{
     items: [
       { label: 'Acciones contencioso administrativas', uma: 7 },

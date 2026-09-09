@@ -23,11 +23,14 @@ import {
   Cifra,
   EnUMA,
   Etiqueta,
+  Fundamento,
+  Insignia,
   LedgerRow,
   Disclosure,
   Norma,
   SinIA,
 } from '@/components/dashboard/primitives'
+import { MINIMOS_ORDEN_PUBLICO } from '@/lib/legal/jurisprudencia'
 import type { MinimoCategoria, MinimoItem } from '@/lib/legal/minimos-data'
 import {
   buscarMinimos,
@@ -68,16 +71,48 @@ function Concepto({
   umaValor: number
   tokens: string[]
 }) {
-  return (
+  const fila = (
     <LedgerRow
-      concepto={<Resaltado texto={item.label} tokens={tokens} />}
-      valor={<Cifra value={item.uma * umaValor} className="text-value-min" />}
+      concepto={
+        <span className="flex min-w-0 flex-wrap items-baseline gap-2">
+          <Resaltado texto={item.label} tokens={tokens} />
+          {item.observado ? (
+            <Insignia tono="bg-destructive/15 text-destructive">
+              No rige
+            </Insignia>
+          ) : null}
+        </span>
+      }
+      valor={
+        <Cifra
+          value={item.uma * umaValor}
+          className={item.observado ? 'text-faint' : 'text-value-min'}
+        />
+      }
       sub={
         <span className="font-mono text-[11px] text-faint">
           {item.umaLabel ?? <EnUMA value={item.uma} />}
         </span>
       }
     />
+  )
+
+  if (!item.observado) return fila
+
+  /*
+    La cifra queda —es lo que el legislador fijó y sirve para fundar—
+    pero la advertencia va **afuera de todo desplegable**, como la
+    insignia del 5 % de los auxiliares: es la única razón por la que
+    esta fila sigue en pantalla, así que verla no puede depender de
+    abrir nada.
+  */
+  return (
+    <div className="-mx-3 my-1 rounded-sm border-l-2 border-destructive/40 bg-destructive/[0.05] px-3">
+      {fila}
+      <p className="pb-2.5 text-[12px] leading-relaxed text-destructive">
+        {item.observado}
+      </p>
+    </div>
   )
 }
 
@@ -179,6 +214,20 @@ export function MinimosView({
           Ninguno se aplica solo: si el cálculo del art. 21 queda por debajo de
           un mínimo aplicable, el mínimo manda.
         </p>
+
+        {/*
+          Hasta el 9/9/2026 la frase de arriba no tenía nada detrás: era
+          nuestra lectura de la última oración del art. 16. Ahora la
+          sostiene la Corte.
+        */}
+        <div className="mt-3 rounded-lg border border-border bg-card px-5">
+          <Disclosure
+            concepto="Por qué el mínimo manda"
+            articulo="Arts. 15, 16 y 48"
+          >
+            <Fundamento criterio={MINIMOS_ORDEN_PUBLICO} />
+          </Disclosure>
+        </div>
 
         {/* Buscador */}
         <div className="sticky top-0 z-20 -mx-6 mt-7 bg-background/95 px-6 py-3 backdrop-blur md:-mx-8 md:px-8">

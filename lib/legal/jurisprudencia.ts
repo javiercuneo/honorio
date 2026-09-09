@@ -409,6 +409,44 @@ export const ESCALA_CORRELACION: Criterio = {
  * cita interna no trae numero de expediente y la sentencia no se
  * leyo.**
  */
+/**
+ * Que un minimo de la ley es de orden publico: para regular por
+ * debajo hay que declarar su inconstitucionalidad o fundar por que se
+ * prescinde de el, y no alcanza con citar articulos.
+ *
+ * **Es el fallo que le faltaba a la pantalla de minimos.** Esa
+ * pantalla decia "si el calculo del art. 21 queda por debajo de un
+ * minimo aplicable, el minimo manda" sin nada detras: era la lectura
+ * de la ultima oracion del art. 16 —"Los jueces no podran apartarse de
+ * los minimos establecidos en la presente ley, los cuales revisten
+ * caracter de orden publico"—, correcta pero nuestra.
+ *
+ * El caso: primera instancia regulo 22 UMA en un amparo, la Sala I de
+ * la Civil y Comercial Federal las bajo a 14 y la Corte deja sin
+ * efecto esa reduccion. Dos motivos que van juntos: el tribunal fundo
+ * de manera aparente —cito normas y dijo que valoro "el tipo de accion
+ * intentada, la extension y calidad juridica de la labor desarrollada
+ * y el resultado obtenido", que es lo que el art. 15 declara
+ * insuficiente— y regulo por debajo del minimo de 20 UMA del art. 48
+ * sin decir por que.
+ *
+ * Es de la Corte y es del 3/9/2026.
+ */
+export const MINIMOS_ORDEN_PUBLICO: Criterio = {
+  sostiene:
+    'La cámara omitió explicitar —siquiera sucintamente— el fundamento por el cual prescindió de aplicar lo dispuesto en la citada norma, que había sido expresamente invocada por los recurrentes y citada en la resolución aquí apelada, sin declarar su inconstitucionalidad ni elaborar argumentación plausible alguna para regular los honorarios de los letrados por debajo del importe mínimo establecido en la ley.',
+  fallos: [
+    {
+      tribunal: 'CSJN',
+      expediente: 'CCF 9469/2018/3/RH2',
+      caratula:
+        'MARTINUZZI, LUISA RAQUEL MARIA c/ OMINT SA DE SERVICIOS s/AMPARO',
+      fecha: '03/09/2026',
+      url: 'https://sjconsulta.csjn.gov.ar/sjconsulta/documentos/verDocumentoByIdLinksJSP.html?idDocumento=8317461',
+    },
+  ],
+}
+
 export const MINIMOS_PROCESO_COMPLETO: Criterio = {
   sostiene:
     'El art. 58 del arancel establece mínimos para todos aquellos supuestos en los que, por aplicación del resto del articulado de la ley, los cálculos arrojen cifras inferiores a las que determina; y esos mínimos se encuentran previstos para el proceso completo.',
