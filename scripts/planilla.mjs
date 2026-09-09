@@ -13,43 +13,29 @@
 // Es el mismo razonamiento que ya estaba anotado para `parseImporte`
 // y el campo de la entrevista, llevado un paso mas.
 //
-// **Desde el 9/9/2026 hay dos fuentes y esto lee las dos.** La
-// planilla sigue mandando; `valores` es la que la va a reemplazar y
-// esta a prueba. La comparacion vive aca por el mismo motivo que el
-// lector: si cada script decidiera por su cuenta que significa "dicen
-// lo mismo", dos lecturas distintas del mismo CSV se darian la razon
-// entre ellas. Lo que cambia entre un script y otro es que hacer con
-// la diferencia, no como se mide.
+// **Desde el 9/9/2026 la planilla volvio a ser la unica fuente.** El
+// proyecto `valores` —un Worker que sirvio el mismo diccionario
+// durante el solapamiento— se dio de baja el mismo dia: para dos
+// numeros que se cargan catorce veces al ano, una base desplegada
+// detras de una clave costaba mas que la planilla que ya existia.
 // ---------------------------------------------------------------
 
+/**
+ * La fuente. La planilla de Google publicada como CSV.
+ *
+ * **Sirve el valor vigente, no el ultimo cargado**, y eso es lo unico
+ * que quedo del experimento de `valores`. El UHOM se publica por tabla
+ * trimestral, asi que la planilla tiene cargados tambien los meses que
+ * todavia no rigen: la hoja `Vigencias` elige el que rige hoy y
+ * `MEDIDAS` publica ese.
+ *
+ * **Cargar solo el primer mes de una tabla es el error que ya paso una
+ * vez.** El mes siguiente se publica el valor viejo y nada lo avisa,
+ * porque el control diario compara la fuente contra lo publicado y las
+ * dos coinciden —en el numero equivocado—.
+ */
 export const PLANILLA =
   'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ8tumvxptTGBCfScMwWxK7r6ATnGfMw061GKGdzfIVyThcSGzUqjI-vcpME1AtykPmjqTq0xdjgc7D/pub?output=csv'
-
-/**
- * La segunda fuente. El Worker del proyecto `valores`, que sirve el
- * mismo diccionario `clave,valor` que la planilla publicada de Google
- * —las mismas ocho filas, con las mismas claves— porque ese es su
- * contrato y es lo que hace que migrar sea cambiar una constante.
- *
- * **Hoy no manda: se compara.** Mientras dure el solapamiento la
- * planilla es la que decide el numero y esta es la que lo controla.
- * Cuando pase un ciclo completo sin discrepancia —una UMA nueva y un
- * UHOM nuevo—, `PLANILLA` pasa a apuntar aca y todo lo que sigue de
- * `leerValores` para abajo se borra.
- *
- * La diferencia fina, que importa si algun dia no coinciden: **sirve
- * el valor vigente hoy, no el ultimo cargado.** El UHOM se publica por
- * trimestre adelantado, asi que ahi adentro estan cargados tambien los
- * meses que todavia no rigen y no salen en este CSV.
- *
- * Se puede apuntar a otro lado con la variable de entorno `VALORES`,
- * igual que `SITIO` en el control. Esta para poder probar la
- * comparacion contra un CSV armado a mano —que es la unica forma de
- * ver que la sincronizacion efectivamente se planta cuando difieren,
- * sin esperar a que difieran de verdad—. Ningun workflow la define.
- */
-export const VALORES =
-  process.env.VALORES ?? 'https://valores.javiercuneol.workers.dev/valores.csv'
 
 /**
  * CSV minimo, con comillas. Google entrecomilla cualquier celda que
@@ -234,76 +220,4 @@ export async function leerPlanilla(alFallar) {
   }
 
   return comoDiccionario(csv)
-}
-
-/**
- * Baja la segunda fuente. Devuelve `{ tabla }` o `{ motivo }`.
- *
- * **No recibe `alFallar` y eso es la decision, no un olvido.** La
- * planilla que no responde tiene que abortar, porque sin ella no hay
- * numero. Esta que no responde no puede abortar nada: durante el
- * solapamiento no es la fuente del numero sino su control, y un
- * control caido no vuelve malo al valor que estaba controlando. Si
- * frenara la publicacion, la infraestructura nueva —que todavia no se
- * gano nada— podria dejar al sitio con la UMA vieja, que es
- * exactamente el peor resultado posible de este repositorio.
- *
- * El timeout esta por lo mismo: un fetch colgado frena el cron igual
- * que un aborto, solo que sin decir nada.
- */
-export async function leerValores() {
-  let respuesta
-
-  try {
-    respuesta = await fetch(VALORES, {
-      cache: 'no-store',
-      signal: AbortSignal.timeout(15000),
-    })
-  } catch (e) {
-    return { motivo: 'no respondio (' + e.message + ')' }
-  }
-
-  // El Worker contesta 503 cuando le falta el valor vigente de alguna
-  // unidad, en vez de servir media tabla. Cae aca.
-  if (!respuesta.ok) return { motivo: 'respondio HTTP ' + respuesta.status }
-
-  const cuerpo = await respuesta.text()
-  if (/^\s*[<{]/.test(cuerpo)) return { motivo: 'devolvio HTML o JSON en vez de CSV' }
-
-  const tabla = comoDiccionario(cuerpo)
-
-  const faltan = Object.values(CLAVES)
-    .map((k) => k.valor)
-    .filter((c) => !tabla.has(c))
-
-  if (faltan.length) return { motivo: 'no trajo la fila ' + faltan.join(' ni ') }
-
-  return { tabla }
-}
-
-/**
- * En que difieren las dos fuentes. Una entrada por unidad y campo que
- * no coincida; vacio si dicen lo mismo.
- *
- * **No decide nada.** Que una diferencia frene la publicacion o
- * solamente avise es del script que llama, y no es lo mismo para todos
- * los campos: un numero equivocado le arruina la regulacion a alguien,
- * una cita que quedo vieja se corrige en la corrida siguiente. Es la
- * misma linea que separa el rojo del aviso en `verificar-publicado`.
- */
-export function diferencias(planilla, valores) {
-  const salida = []
-
-  for (const unidad of Object.keys(CLAVES)) {
-    const a = leerUnidad(planilla, unidad)
-    const b = leerUnidad(valores, unidad)
-
-    for (const campo of ['valor', 'fuente', 'url', 'vigencia']) {
-      if (a[campo] !== b[campo]) {
-        salida.push({ unidad, campo, planilla: a[campo], valores: b[campo] })
-      }
-    }
-  }
-
-  return salida
 }

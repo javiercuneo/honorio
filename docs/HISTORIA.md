@@ -23,6 +23,68 @@ historia de `honorio/` viajó completa con `git subtree split`, así que
 calculadoras, el asistente clásico y la documentación de dominio.
 
 ---
+## `valores` nació y se jubiló el mismo día — el 9/9
+
+Un Worker de Cloudflare con base D1, desplegado en
+`valores.javiercuneol.workers.dev`, que servía el mismo diccionario de ocho filas
+que la planilla de Google. Iba a reemplazarla; el cron ya leía las dos fuentes y
+comparaba, con la regla de que si no decían el mismo número no se publicaba.
+**Se retiró el mismo día, antes de que el solapamiento terminara.**
+
+**El argumento que lo tumbó no fue técnico.** La UMA cambia dos veces al año y el
+UHOM una por mes: catorce escrituras anuales. Para eso había que mantener
+desplegados un Worker, una base, un secret, migraciones y un runbook, con una
+clave que hacía falta justo en el peor momento —sale la resolución, uno está con
+el teléfono—. Javier lo dijo en una línea: le es más fácil abrir el navegador y
+escribir un valor en una planilla.
+
+**Y la justificación entera colgaba de una premisa que se cayó.** El `ESTADO.md`
+de `valores` daba cuatro razones de por qué existía, y la primera era que la
+planilla de Google se jubilaba con el ledger. Las otras tres —distinta vida útil,
+distinto régimen, distinto gesto— explicaban por qué esto no debía vivir *adentro
+del ledger*, que es otra pregunta. Contestaban «dónde ponemos esto si la planilla
+muere», no «hay que matar la planilla». Decidido que la planilla se queda para
+estos dos números, las tres quedaron sin objeto.
+
+**Mientras tanto el solapamiento cobraba el peor costo posible: carga doble.**
+Cada valor nuevo había que cargarlo en los dos lados o la sincronización se
+plantaba y el sitio no publicaba. La condición de salida era un ciclo completo
+sin discrepancia —una UMA nueva y un UHOM nuevo—, o sea meses de carga duplicada
+para llegar a un destino que ya no se quería.
+
+**Lo que sí valía se conservó, y no era la infraestructura: era la regla.** «Se
+sirve el valor vigente, no el último cargado.» El UHOM se publica por tabla
+trimestral, así que hay meses cargados que todavía no rigen, y cada uno tiene que
+salir al aire el día que le toca. Esa regla ya había atrapado un error real: la
+primera semilla cargó septiembre y diciembre y se salteó los dos del medio; el 1
+de octubre el sitio habría publicado el valor de septiembre y **nada lo habría
+avisado**, porque el control diario compara la fuente contra lo publicado y las
+dos habrían coincidido en el número equivocado.
+
+Esa regla no necesitaba un Worker: necesitaba una columna. La planilla pasó a
+tener una hoja `Vigencias` con una fila por mes y una fórmula que elige la que
+rige hoy. Se probó en siete fechas —desde antes de la primera tabla hasta marzo
+de 2027— y en las siete devolvió lo que correspondía.
+
+**De paso se cortaron dos dependencias que nadie había pedido.** La planilla traía
+la UMA, el UHOM y la cita por `IMPORTRANGE` desde otra planilla, y la URL de la
+resolución por `EXTRAER_URL`, una función de Apps Script. Las dos se fueron: los
+valores están escritos en el archivo y no depende de nada más. El costo es que el
+número ya no sigue solo a la planilla de trabajo, y hay que escribirlo acá.
+
+**Del lado del código se borró todo lo que el propio archivo mandaba borrar.**
+`planilla.mjs` quedó en 223 líneas de 309: se fueron la constante `VALORES`,
+`leerValores` y `diferencias`. `actualizar-uma.mjs` quedó en 281 de 355, sin el
+bloque del solapamiento. Lo que se quedó es `CLAVES` y `leerUnidad` en el lector
+compartido, que habían subido ahí para que dos fuentes se interpretaran igual: el
+motivo sobrevive porque `verificar-publicado.mjs` sigue importando de ahí, y un
+control que lee distinto de lo que controla no controla nada.
+
+La migración se verificó neutra antes de tocar nada: el parser de Honorio corrido
+contra la planilla nueva y contra la que está en la nube devuelve los mismos dos
+valores, con la misma cita, la misma URL y la misma vigencia.
+
+---
 ## La sincronización de la UMA y el UHOM, calibrada — el 9/9
 
 Los tres puntos que venían anotados desde el 24/8 quedaron hechos. Se

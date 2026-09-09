@@ -527,41 +527,29 @@ está la regla y su razón, que es lo que hay que saber antes de tocar el archiv
   `scripts/actualizar-uma.mjs` la baja de la planilla, la compara y agrega una
   entrada si cambió; un cron **diario** (`.github/workflows/uma.yml`) lo corre.
 
-#### El solapamiento con `valores`, abierto desde el 9/9/2026
+#### La planilla es la fuente, y sirve el valor vigente
 
-La planilla de Google se va a jubilar: la reemplaza el proyecto `valores`
-(`C:\IA\valores`, desplegado en `valores.javiercuneol.workers.dev`), que sirve
-el mismo diccionario `clave,valor` con las mismas ocho filas. **Migrar es
-cambiar `PLANILLA` en `scripts/planilla.mjs`**, y hasta entonces el cron lee las
-dos y compara.
+Los dos números salen de una sola planilla —`C:\IA\input generico para
+todo\VALORES.xlsx`, publicada como CSV— que desde el 9/9/2026 **no depende de
+ningún `IMPORTRANGE` ni de Apps Script**: los valores están escritos adentro.
 
-- **Difieren en el número: no se publica.** Una de las dos está mal y desde
-  afuera no hay forma de saber cuál, así que publicar cualquiera es publicar a
-  cara o cruz. Difieren en la cita, el link o la vigencia: **avisa y publica
-  igual**, que es la misma línea que ya separaba el rojo del aviso en el control
-  diario.
-- **La segunda fuente que no contesta no frena nada.** Es la que está a prueba,
-  no la que manda: si pudiera abortar, infraestructura nueva podría dejar el
-  sitio con la UMA vieja, que es el peor resultado posible de este repositorio.
-  Avisa y sigue con la planilla. Por lo mismo el `fetch` lleva timeout: colgado
-  frena igual que abortando, y sin decirlo.
-- **Se comparan interpretadas, no en crudo.** En crudo no coinciden nunca aunque
-  digan lo mismo: la planilla trae `104.220` y la norma adentro de una frase;
-  `valores`, `104220` y la cita sola. Lo que tiene que coincidir es lo que cada
-  una haría publicar, y por eso `leerUnidad` y `CLAVES` viven en el lector
-  compartido: eran la única copia que sabía leer el diccionario y con dos
-  fuentes habrían sido tres.
-- **Si se planta, se emparejan las dos fuentes** —cargar el valor en `valores`
-  se hace desde el teléfono— **y se vuelve a correr el workflow**. Repetirlo sin
-  emparejarlas se planta de nuevo en el mismo lugar; el control diario lo dice
-  en su salida para no mandar a ese lazo.
-- **Cuándo se termina:** cuando pase un ciclo completo sin discrepancia —una UMA
-  nueva y un UHOM nuevo—, `PLANILLA` pasa a apuntar a `/valores.csv` y se borra
-  todo lo que en `planilla.mjs` va de `leerValores` para abajo.
-- **`VALORES` se puede apuntar a otro lado por variable de entorno**, como
-  `SITIO` en el control. Es para probar la comparación contra un CSV armado a
-  mano: los cuatro caminos —coinciden, difiere el número, difiere la cita, la
-  fuente no contesta— se verificaron así el 9/9/2026. Ningún workflow la define.
+- **Sirve el valor vigente, no el último cargado.** El UHOM se publica por tabla
+  trimestral, así que la hoja `Vigencias` tiene cargados también los meses que
+  todavía no rigen y `MEDIDAS` publica el que rige hoy. **Cuando entra una tabla
+  nueva se cargan todos sus meses**, no el primero: cargar sólo el primero
+  publica el valor viejo el mes siguiente y **nada lo avisa**, porque el control
+  diario compara la fuente contra lo publicado y las dos coinciden —en el número
+  equivocado—. Ya pasó una vez.
+- **Las dos vigencias viajan como texto `AAAA-MM-DD`**, con las celdas en formato
+  Texto a propósito. El lector exige esa forma exacta y no adivina otra:
+  `03/07/2026` tiene dos lecturas y elegir mal corre la vigencia de una norma
+  tres meses.
+- **Al subirla de nuevo a Google va por Importar → Reemplazar hoja de cálculo**,
+  nunca como archivo nuevo. Un archivo nuevo tiene otro ID y el link del CSV que
+  `PLANILLA` lleva escrito deja de existir, con el sitio quedándose en el valor
+  viejo. Y `MEDIDAS` tiene que seguir siendo la primera hoja, porque el CSV
+  publica la primera.
+
 - **El cron pide el deploy a mano, y tiene que hacerlo.** Acá decía que «el push
   dispara el deploy» y era falso: **GitHub no dispara workflows por un push
   hecho con el `GITHUB_TOKEN` del runner**, que es un cortafuegos contra la

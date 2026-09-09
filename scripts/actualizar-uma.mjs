@@ -22,11 +22,11 @@
 // `verificar-publicado.mjs`. Ahi esta el porque de cada decision de
 // lectura —el diccionario, las comillas, la celda de URL aparte—.
 //
-// **Desde el 9/9/2026 hay una segunda fuente y este script las compara
-// antes de escribir nada.** El proyecto `valores` sirve el mismo
-// diccionario que la planilla y va a reemplazarla; mientras tanto las
-// dos tienen que decir el mismo numero, y si no lo dicen no se publica.
-// El detalle esta abajo, en «El solapamiento».
+// **Desde el 9/9/2026 la planilla es la unica fuente otra vez.** Hubo
+// un dia en que `valores` —un Worker— sirvio el mismo diccionario y
+// este script comparaba los dos antes de escribir nada. Se dio de baja:
+// para dos numeros que se cargan catorce veces al anio, mantener una
+// base desplegada detras de una clave costaba mas que la planilla.
 //
 // **Las dos unidades no se comportan igual y por eso cada una trae su
 // umbral y su control.** La UMA se mueve dos veces por anio y en
@@ -58,13 +58,7 @@ import { readFileSync, writeFileSync } from 'node:fs'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import {
-  VALORES,
-  diferencias,
-  leerPlanilla,
-  leerUnidad,
-  leerValores,
-} from './planilla.mjs'
+import { leerPlanilla, leerUnidad } from './planilla.mjs'
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..')
 const DESTINO_UMA = join(RAIZ, 'data', 'uma.json')
@@ -112,76 +106,6 @@ function abortar(motivo) {
 const tabla = await leerPlanilla(abortar)
 
 const hoy = new Date().toISOString().slice(0, 10)
-
-// ---- El solapamiento ----
-//
-// Las dos fuentes tienen que decir lo mismo, y si no lo dicen no se
-// publica. Es la red que ya uso el ledger para cambiar de fuente sin
-// que el cambio se estrene sobre un numero de verdad: una de las dos
-// esta mal y desde afuera no hay forma de saber cual, asi que publicar
-// cualquiera de las dos es publicar a cara o cruz. El valor de ayer,
-// que es lo que queda, por lo menos se sabe de donde salio.
-//
-// **Que hace y que no hace la diferencia, segun el campo.** El numero
-// aborta; la cita, el link y la vigencia avisan. Es la linea que ya
-// estaba trazada en `verificar-publicado.mjs` y el motivo es el mismo:
-// un valor equivocado le arruina la regulacion a alguien, una cita
-// vieja se corrige sola en la corrida siguiente y mientras tanto el
-// calculo es correcto. Si el aborto significara las dos cosas dejaria
-// de significar la primera.
-//
-// **La segunda fuente que no contesta no frena nada** —el porque esta
-// en `leerValores`—: la planilla sigue siendo la que manda hasta que
-// esto haya andado un ciclo entero.
-const segunda = await leerValores()
-
-if (!segunda.tabla) {
-  console.warn(
-    '  Aviso: no se pudo comparar contra la segunda fuente: ' +
-      segunda.motivo +
-      '. Se sigue con la planilla, que es la que manda mientras dure el ' +
-      'solapamiento.',
-  )
-} else {
-  const distintas = diferencias(tabla, segunda.tabla)
-
-  for (const d of distintas.filter((x) => x.campo !== 'valor')) {
-    console.warn(
-      '  Aviso: ' +
-        d.unidad +
-        ' — las dos fuentes traen distinta ' +
-        d.campo +
-        '. La planilla: ' +
-        JSON.stringify(d.planilla) +
-        '. valores: ' +
-        JSON.stringify(d.valores) +
-        '. No frena la publicación, pero conviene emparejarlas.',
-    )
-  }
-
-  const enElNumero = distintas.filter((x) => x.campo === 'valor')
-
-  if (enElNumero.length) {
-    abortar(
-      'las dos fuentes no dicen el mismo número.\n' +
-        enElNumero
-          .map(
-            (d) =>
-              '  ' +
-              d.unidad +
-              ': la planilla dice ' +
-              (d.planilla === null ? 'nada legible' : '$' + d.planilla.toLocaleString('es-AR')) +
-              ' y valores dice ' +
-              (d.valores === null ? 'nada legible' : '$' + d.valores.toLocaleString('es-AR')),
-          )
-          .join('\n') +
-        '\nQué hacer: corregir la que esté mal —la planilla, o ' +
-        VALORES.replace('/valores.csv', '') +
-        '— y volver a correr «UMA y UHOM». Las dos tienen que decir lo mismo ' +
-        'hasta que se jubile la planilla.',
-    )
-  }
-}
 
 /**
  * Lee una clave de la planilla, la controla contra lo que ya hay y la
@@ -323,9 +247,11 @@ function actualizar({ clave, etiqueta, destino, saltoMaximo, valor, fuente, url,
 
 // Que fila dice el numero, cual la norma, cual el link y cual la
 // vigencia esta en `CLAVES`, del lector compartido, y se interpreta con
-// `leerUnidad`. Estaba escrito aca y funcionaba; se mudo cuando aparecio
-// la segunda fuente, porque comparar dos fuentes exige interpretarlas
-// igual y esta era la unica copia que sabia como.
+// `leerUnidad`. Estaba escrito aca y funcionaba; se mudo cuando hubo que
+// leer la planilla en dos lugares a la vez, y se queda alla aunque el
+// segundo lugar —la comparacion contra `valores`— ya no exista:
+// `verificar-publicado.mjs` sigue importando de aca, y un control que
+// lee distinto de lo que controla no controla nada.
 actualizar({
   clave: 'UMA',
   etiqueta: 'La UMA',

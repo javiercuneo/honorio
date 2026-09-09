@@ -38,13 +38,6 @@
 # Si la planilla no responde, o trae algo que no pasa los controles,
 # el script falla y no toca ningun archivo. Publicar con el valor de
 # ayer es mejor que publicar con uno inventado.
-#
-# **Desde el 9/9/26 hay una razon mas de falla: el solapamiento.** El
-# script lee tambien el proyecto `valores` -la fuente que va a
-# reemplazar a la planilla- y si las dos no dicen el mismo numero no
-# publica. Se arregla emparejando las dos fuentes, no repitiendo este
-# workflow: sin eso se planta de nuevo en el mismo lugar. El detalle
-# esta en docs/ESTADO.md.
 # ------------------------------------------------------------------
 name: UMA y UHOM
 
