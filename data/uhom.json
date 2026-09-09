@@ -1,5 +1,5 @@
 {
-  "actualizado": "2026-09-01",
+  "actualizado": "2026-09-09",
   "historia": [
     {
       "valor": 12960,
@@ -11,7 +11,8 @@
       "valor": 13210,
       "fuente": "tabla oficial del Ministerio de Justicia",
       "url": "https://www.argentina.gob.ar/sites/default/files/2018/07/40_tabla_honorarios_mediadores_decreto_2536_valores_septiembre_diciembre_2026.pdf",
-      "capturado": "2026-09-01"
+      "capturado": "2026-09-01",
+      "vigencia": "2026-09-01"
     }
   ]
 }

@@ -45,6 +45,70 @@ posible —cambió la UMA— que no se podía comprobar.
 
 ---
 
+## 3.5.0 — 9 de septiembre de 2026
+
+MENOR. **Ninguna cifra del cálculo cambia y el motor no se tocó.** Entra una
+validación —van 18—, un archivo de datos y un campo. Lo que cambia es lo que
+protege al número publicado.
+
+### Los tres controles de la sincronización, calibrados contra la serie real
+
+Los umbrales que deciden si un valor bajado de la planilla se publica o se
+rechaza venían de una estimación. Se midieron contra las series reconstruidas de
+los actos —67 valores de UMA y 71 de UHOM— y **estaban los dos mal, cada uno
+para su lado**:
+
+| | Antes | Salto real más grande | Ahora |
+|---|---|---|---|
+| UMA | 0,6 | 20,0 % (dic. 2022) | 0,4 |
+| UHOM | 0,15 | 30,8 % (jun. 2017) | 0,6 |
+
+El de la UMA estaba tres veces más flojo que el movimiento máximo observado:
+**un valor leído a la mitad pasaba sin que nada chillara**, que es exactamente el
+error que el umbral existe para cazar. El del UHOM estaba al revés y **habría
+frenado 5 de los 70 saltos de la serie** (+30,8 %, +24 %, +20 %, +18,4 %, +16 %),
+o sea que abortaba la sincronización ante valores oficiales buenos. La regla que
+los fija ahora es el doble del salto máximo observado en cada serie.
+
+**El control de forma del UHOM pasa a aviso.** Abortaba si el valor no terminaba
+en cero, y noviembre de 2022 salió en 2003 —contra la propia regla de redondeo
+del decreto 2536/15—: es el único de los 71 valores que la rompe, y la tabla
+oficial construye toda su escala sobre él. Un umbral de salto puede abortar; una
+regla de forma no, porque quien fija el valor puede apartarse de ella.
+
+**Y entra `vigencia`, que no es `capturado`.** El segundo es el día en que el
+cron vio el valor; el primero, el día desde el que rige. Hoy están a cincuenta
+días de distancia: la UMA vigente se capturó el 20/8 y **rige desde el 1/7**. De
+confundirlas salió mostrar «rige desde el 20 de agosto» un valor de julio. Se
+guarda, todavía no se muestra.
+
+### La validación 18: que un texto legal sea el texto legal
+
+Diecisiete validaciones comparan números. **Ésta compara un texto contra su
+fuente**, que es la clase de error que la 3.4.4 encontró en el art. 19 y que
+ninguna de las otras podía ver.
+
+`textosLegales.validation.ts` parte cada `textoLegal` de `minimos-data.ts` en
+oraciones —32 hoy— y exige que cada una aparezca literal en `data/ley-27423.md`,
+comparando sin tildes, sin mayúsculas y sin puntuación: laxa en la forma,
+estricta en las palabras.
+
+**Lleva su propio canario**, porque un control de este tipo sin él no prueba
+nada: comprueba que la cita inventada del art. 19 **no** se encuentre en la ley.
+Sin eso, un normalizador roto que devolviera la cadena vacía daría verde en todo
+lo demás sin estar mirando nada. Reinyectando el texto viejo, la validación
+falla: se probó antes de darla por buena.
+
+Entra `data/ley-27423.md`, copia del texto de la ley que hasta ahora vivía sólo
+en `herramientas-judiciales`. Es texto de una ley —sin problema de licencia— y
+tenerlo acá es lo que permite que el control corra sin el otro repositorio.
+
+**Lo que no cubre, dicho para que nadie le pida de más:** que el artículo citado
+sea el que corresponde al concepto. Un texto del art. 44 rotulado como art. 58
+pasaría. Cierra la cita inventada, no la mal atribuida.
+
+---
+
 ## 3.4.4 — 9 de septiembre de 2026
 
 PARCHE. **El motor no se tocó y ninguna cifra del cálculo cambia.** Siguen

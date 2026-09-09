@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------
 // Validacion del texto de la regulacion en prosa.
 //
-// **Esta es la validacion mas importante de las diecisiete, y no
+// **Esta es la validacion mas importante de las dieciocho, y no
 // porque cubra mas.** Las otras dieciseis comparan numeros, y hasta
 // ahora eso alcanzaba porque todo lo que el motor producia era un
 // numero. La prosa no: produce un documento con forma de resolucion

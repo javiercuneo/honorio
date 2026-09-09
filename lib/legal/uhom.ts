@@ -52,6 +52,21 @@ export interface ValorUHOM {
   url: string | null
   /** Fecha en que el build lo tomo de la planilla (ISO, AAAA-MM-DD). */
   capturado: string
+  /**
+   * Desde cuando rige, segun la planilla (ISO, AAAA-MM-DD).
+   *
+   * **No es `capturado` y la distincion no es cosmetica.** `capturado`
+   * es el dia en que el cron vio el valor; `vigencia` es el dia desde
+   * el que la norma lo pone en vigor, y pueden estar a meses de
+   * distancia: la UMA vigente al 9/9/2026 se capturo el 20 de agosto y
+   * rige desde el 1 de julio. Presentar el primero como si fuera el
+   * segundo afirma algo falso sobre una norma.
+   *
+   * Es opcional porque **los valores cargados antes del 9/9/2026 no la
+   * tienen y no se puede inventar**: la planilla no traia la fila. Un
+   * `null` dice "no consta", que es distinto de una fecha equivocada.
+   */
+  vigencia?: string | null
 }
 
 /**
@@ -68,6 +83,7 @@ export const HISTORIA_UHOM: ValorUHOM[] = tabla.historia.map((v) => ({
   fuente: v.fuente,
   url: v.url,
   capturado: v.capturado,
+  vigencia: 'vigencia' in v ? v.vigencia : null,
 }))
 
 const ultimo = HISTORIA_UHOM[HISTORIA_UHOM.length - 1]

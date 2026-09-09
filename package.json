@@ -1,6 +1,6 @@
 {
   "name": "honorio",
-  "version": "3.4.4",
+  "version": "3.5.0",
   "private": true,
   "description": "Asistente para la regulación de honorarios (Ley 27.423)",
   "license": "AGPL-3.0-or-later",

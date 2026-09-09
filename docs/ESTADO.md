@@ -21,7 +21,7 @@ pregunta «¿por qué esto quedó así?».
 
 ## Dónde estamos
 
-Versión **3.4.4**, publicada en `honorio.ar`. Las **17 validaciones** de
+Versión **3.5.0**, publicada en `honorio.ar`. Las **18 validaciones** de
 `lib/legal/__tests__` están en verde y corren solas en CI. **No hay nada urgente
 ni bloqueante.**
 
@@ -172,57 +172,55 @@ son unas horas y no importa.
      advertencia o si es ruido para el 99 % de los casos.
   4. **Si el «completo» sigue siendo el completo** cuando el proceso terminó
      antes de la apertura a prueba.
-- **El UHOM entra sin procedencia.** La planilla trae el número pero no su
-  norma —la fila `Acordada` describe la UMA—. Mientras no existan las filas
-  `UHOM_FUENTE` y `UHOM_URL`, cada valor nuevo entra sin cita y el script avisa;
-  el de agosto está cargado a mano.
 - **`lib/compartir.ts` no tiene validación permanente.** Se probó con trece
   casos contra los módulos reales, pero `scripts/validate.mjs` corre
   `lib/legal/__tests__/*.validation.ts` y meter ahí algo que no es el motor
-  diluiría lo que significa «las 17 validaciones del motor». Si el módulo crece,
+  diluiría lo que significa «las 18 validaciones del motor». Si el módulo crece,
   merece su propio corredor.
-- **No se guarda desde cuándo rige la UMA.** Decisión de Javier del 5/8: el dato
-  no está en su planilla y levantarlo le agrega fricción diaria. El informe cita
-  la norma, no su vigencia. Es el dato que faltaría para calcular con la UMA
-  vigente a una fecha anterior. **Esto quedó superado y hay que releerlo con el
-  bloque de abajo**: el 24/8 se anotó del otro lado que la planilla ya tiene
-  `UMA_VIGENCIA` y `UHOM_VIGENCIA`, así que la fricción que fundaba la decisión
-  ya no existiría. Antes de tocar nada, mirar la planilla: lo de arriba es del
-  5/8 y lo de abajo, del 24/8.
 
-#### Los cuatro de `scripts/actualizar-uma.mjs`
+#### La sincronización de la UMA y el UHOM, calibrada el 9/9/2026
 
-**Vinieron del `ESTADO.md` de `herramientas-judiciales`, donde estaban anotados
-desde el 24/8 bajo el título «Del lado de Honorio, anotado el 24/8 y no tocado
-desde acá».** Se mudaron el 1/9/2026: son trabajo de este repositorio y es acá
-donde se van a cerrar, que es la misma decisión del 31/8 que trajo los cuatro
-puntos del plan de cobertura. Allá quedó un puntero y nada más.
+Los tres puntos que venían anotados desde el 24/8 **están hechos**, y lo que
+queda es el invariante de cada uno. Se verificaron contra la planilla antes de
+tocar nada, que era la primera línea de trabajo: sigue trayendo `UMA_VIGENCIA`,
+`UHOM_VIGENCIA`, `UHOM_FUENTE` y `UHOM_URL`.
 
-**Ninguno se verificó contra la planilla al mudarlos**, así que se leen como lo
-que son: una nota del 24/8. La primera línea de trabajo es abrirla y ver si
-sigue siendo cierta.
+- **`vigencia` no es `capturado`, y ahora se guardan las dos.** `capturado` es el
+  día en que el cron vio el valor; `vigencia`, el día desde el que rige. Hoy
+  mismo están a cincuenta días de distancia: la UMA vigente se capturó el
+  20/8 y rige desde el **1/7**. De confundirlas salió mostrar «rige desde el 20
+  de agosto» un valor de julio. La vigencia se completa también cuando el valor
+  no cambió, como `fuente` y `url`, y **sólo se completa: nunca se borra ni se
+  reescribe un valor**. Es opcional en el tipo porque las entradas anteriores al
+  9/9 no la tienen y no se puede inventar.
+- **El control de forma del UHOM avisa, no aborta.** Un umbral de salto sí puede
+  abortar —un salto imposible es casi siempre un error de lectura—, pero una
+  regla de forma no: la autoridad que fija el valor puede apartarse de ella.
+  Noviembre de 2022 salió en 2003, contra la regla de redondeo del decreto
+  2536/15, y es **el único de los 71 valores de la serie que no termina en
+  cero**: con el control como aborto, ese mes la sincronización se habría
+  plantado ante el número correcto.
+- **Los umbrales salen de la serie, no de una estimación, y la regla es el doble
+  del salto máximo observado.** Estaban los dos mal, cada uno para su lado:
 
-1. **Leer `UMA_VIGENCIA` y `UHOM_VIGENCIA` y escribir `vigencia` en cada entrada
-   de `historia`.** Hoy sólo hay `capturado`, que es el día en que el cron vio el
-   valor, y **no es lo mismo**: de ahí salió mostrar «rige desde el 20 de agosto»
-   un valor que rige desde el 1 de julio. Y completarla también cuando el valor
-   no cambió, como ya se hace con `fuente` y `url`.
-2. **El control de forma del UHOM —`v % 10 === 0`— tiene que pasar a aviso.**
-   Noviembre de 2022 salió en 2003, contra la regla de redondeo del decreto
-   2536/15, y la tabla oficial lo declara así y construye toda su escala sobre
-   él. O sea que ese control **abortaría la sincronización por un valor
-   oficial**.
-3. **Los dos umbrales de salto están mal calibrados**, y desde que existe la
-   serie completa hay con qué calibrarlos. `SALTO_MAXIMO_UHOM = 0.15` es **más
-   chico que saltos que ya ocurrieron** —enero 2024 +16 %, junio 2022 +24 %,
-   enero 2019 +20 %—, así que frena valores buenos; `SALTO_MAXIMO_UMA = 0.6` es
-   al revés, tan flojo que deja pasar un valor leído a la mitad cuando el salto
-   más grande de la serie es +20 %.
+  | | Antes | Salto real más grande | Ahora |
+  |---|---|---|---|
+  | UMA | 0,6 | **20,0 %** (dic. 2022) | 0,4 |
+  | UHOM | 0,15 | **30,8 %** (jun. 2017) | 0,6 |
 
-**Dónde está la serie con la que calibrar:** `data/serie-uma.json` y
-`data/serie-uhom.json` de `herramientas-judiciales`, reconstruidas de los actos
-—67 valores cada una, con la norma al lado— y verificadas por su
-`npm run verificar-series`.
+  El de la UMA estaba tres veces más flojo que el movimiento máximo observado:
+  **un valor leído a la mitad pasaba sin que nada chillara**, que es justo el
+  error que el umbral existe para cazar. El del UHOM habría frenado **5 de los 70
+  saltos** de la serie. **Si algún día uno frena un valor bueno, la respuesta no
+  es aflojarlo a ojo: es mirar la serie y recalibrar.**
+
+**Dónde está la serie:** `data/serie-uma.json` y `data/serie-uhom.json` de
+`herramientas-judiciales`, reconstruidas de los actos —67 y 71 valores, con la
+norma al lado— y verificadas por su `npm run verificar-series`.
+
+**Lo que sigue abierto es de presentación:** `vigencia` se guarda y todavía no se
+muestra en ningún lado. El informe cita la norma, no su fecha. Cuando se muestre,
+la frase es «rige desde», y sale de `vigencia` y nunca de `capturado`.
 
 ### Pendiente de diseño y contenido
 
@@ -256,28 +254,35 @@ sigue siendo cierta.
 **Ninguno abierto.** Los que hubo están en
 [`HISTORIA.md`](HISTORIA.md#trampas-que-dejaron-de-serlo), con qué los cubre hoy.
 
-### Lo que las 17 validaciones no cubren
+### Lo que las validaciones cubren de los textos, y lo que no
 
-**Las validaciones comparan números, así que un texto que promete un porcentaje
-puede mentir con todas en verde.** Pasó dos veces en dos días —los rótulos de
-los pasos el 5/8, las descripciones de la cautelar el 6/8— y una tercera el
-19/8, con un criterio de abogados puesto en la sección de auxiliares. **Ninguna
-de las 17 mira qué dice un rótulo ni dónde está puesto un párrafo.**
+**Diecisiete comparan números, así que un texto que promete un porcentaje puede
+mentir con todas en verde.** Pasó cuatro veces: los rótulos de los pasos el 5/8,
+las descripciones de la cautelar el 6/8, un criterio de abogados puesto en la
+sección de auxiliares el 19/8, y **el `textoLegal` del art. 19, que no era el
+art. 19** —una redacción de otra fuente mostrada en serif, o sea con la
+tipografía que en esta app significa «esto es la norma»—. Ese último estuvo mal
+desde que el archivo existe, con todo en verde, porque las cifras que lo
+acompañaban sí eran correctas.
 
-**La cuarta, el 9/9, es la peor de la serie y por eso conviene tenerla presente:
-el `textoLegal` del art. 19 en `minimos-data.ts` no era el art. 19.** Era una
-redacción de otra fuente, y la pantalla de mínimos la mostraba en serif, que en
-esta app significa «esto es la norma». Estuvo así desde que el archivo existe,
-con las 17 en verde todo el tiempo, porque las cifras que acompañaban al texto
-sí eran las correctas. **Un texto legal transcripto se verifica contra el texto
-legal, y no hay otra forma.**
+**De esos cuatro, uno ya no puede volver a pasar.** `textosLegales.validation.ts`
+—la 18— parte cada `textoLegal` en oraciones y exige que cada una aparezca
+literal en `data/ley-27423.md`. Lleva su propio canario: comprueba que la cita
+inventada del art. 19 **no** se encuentre, porque un normalizador roto daría
+verde en todo lo demás sin estar mirando nada. Reinyectando el texto viejo, la
+validación falla; se probó.
 
-No hace falta automatizarlo todavía, pero sí saber dónde mirar: los
-`description` y `hint` de las `CardOption` de `wizard-schema.ts`, los `motivo`
-de `format.ts`, los `explicacion.expanded` de cada paso y **los `textoLegal` de
-`minimos-data.ts`**. **Cada vez que uno de esos strings nombra un porcentaje o
-un artículo, hay que leerlo contra `resolveReglas()` y contra la ley**, porque
-nada más lo va a hacer.
+**Lo que sigue sin cubrir, y es lo que hay que leer a mano:** que el artículo
+citado sea el que corresponde al concepto —un texto del art. 44 rotulado como
+art. 58 pasaría—, y todo lo que no dice ser una transcripción: los `description`
+y `hint` de las `CardOption` de `wizard-schema.ts`, los `motivo` de `format.ts` y
+los `explicacion.expanded` de cada paso. **Cada vez que uno de esos strings
+nombra un porcentaje o un artículo, hay que leerlo contra `resolveReglas()` y
+contra la ley**, porque nada más lo va a hacer.
+
+**Y si escribís una transcripción nueva en cualquier archivo, hacela pasar por
+la 18.** El control no está atado a `minimos-data.ts`: está atado a la idea de
+que una cita tiene una fuente.
 
 ---
 
@@ -1018,7 +1023,7 @@ Consecuencias que hay que sostener:
 ## Cómo verificar un cambio
 
 ```bash
-npm run check    # tipos + las 17 validaciones. Es lo que corre CI.
+npm run check    # tipos + las 18 validaciones. Es lo que corre CI.
 npm run build    # el export estatico, que es lo que se publica
 npm run uma      # trae el valor de la UMA de la planilla, si cambio
 npm run verificar # controla que honorio.ar calcule con el valor de la planilla

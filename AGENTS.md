@@ -65,7 +65,7 @@ Orden de prioridades cuando entran en conflicto:
 Un solo comando, y es el mismo que corre CI:
 
 ```bash
-npm run check      # tipos + las 17 validaciones
+npm run check      # tipos + las 18 validaciones
 ```
 
 Por separado, si necesitás aislar:
@@ -80,6 +80,13 @@ Las validaciones de `lib/legal/__tests__/*.validation.ts` son scripts sueltos
 —no hay framework de tests, a propósito— que comparan la salida del motor
 contra casos conocidos y salen con código distinto de cero si algo no coincide.
 `scripts/validate.mjs` las corre todas y junta los resultados.
+
+**Diecisiete comparan números. Una, no:** `textosLegales.validation.ts` compara
+cada `textoLegal` de `minimos-data.ts` contra `data/ley-27423.md`, oración por
+oración. Existe porque un texto que dice ser una transcripción es la única clase
+de string que tiene una fuente contra la cual compararse, y porque ya pasó que
+uno no lo fuera con todo lo demás en verde. **Si transcribís un artículo en
+cualquier archivo nuevo, esa transcripción puede entrar acá.**
 
 **Tienen que quedar todas en verde antes de dar un cambio por hecho.** Corren
 en `.github/workflows/motor.yml` en cada push y cada PR, y otra vez antes de
