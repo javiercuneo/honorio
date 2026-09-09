@@ -12,10 +12,44 @@
 //
 // Es el mismo razonamiento que ya estaba anotado para `parseImporte`
 // y el campo de la entrevista, llevado un paso mas.
+//
+// **Desde el 9/9/2026 hay dos fuentes y esto lee las dos.** La
+// planilla sigue mandando; `valores` es la que la va a reemplazar y
+// esta a prueba. La comparacion vive aca por el mismo motivo que el
+// lector: si cada script decidiera por su cuenta que significa "dicen
+// lo mismo", dos lecturas distintas del mismo CSV se darian la razon
+// entre ellas. Lo que cambia entre un script y otro es que hacer con
+// la diferencia, no como se mide.
 // ---------------------------------------------------------------
 
 export const PLANILLA =
   'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ8tumvxptTGBCfScMwWxK7r6ATnGfMw061GKGdzfIVyThcSGzUqjI-vcpME1AtykPmjqTq0xdjgc7D/pub?output=csv'
+
+/**
+ * La segunda fuente. El Worker del proyecto `valores`, que sirve el
+ * mismo diccionario `clave,valor` que la planilla publicada de Google
+ * —las mismas ocho filas, con las mismas claves— porque ese es su
+ * contrato y es lo que hace que migrar sea cambiar una constante.
+ *
+ * **Hoy no manda: se compara.** Mientras dure el solapamiento la
+ * planilla es la que decide el numero y esta es la que lo controla.
+ * Cuando pase un ciclo completo sin discrepancia —una UMA nueva y un
+ * UHOM nuevo—, `PLANILLA` pasa a apuntar aca y todo lo que sigue de
+ * `leerValores` para abajo se borra.
+ *
+ * La diferencia fina, que importa si algun dia no coinciden: **sirve
+ * el valor vigente hoy, no el ultimo cargado.** El UHOM se publica por
+ * trimestre adelantado, asi que ahi adentro estan cargados tambien los
+ * meses que todavia no rigen y no salen en este CSV.
+ *
+ * Se puede apuntar a otro lado con la variable de entorno `VALORES`,
+ * igual que `SITIO` en el control. Esta para poder probar la
+ * comparacion contra un CSV armado a mano —que es la unica forma de
+ * ver que la sincronizacion efectivamente se planta cuando difieren,
+ * sin esperar a que difieran de verdad—. Ningun workflow la define.
+ */
+export const VALORES =
+  process.env.VALORES ?? 'https://valores.javiercuneol.workers.dev/valores.csv'
 
 /**
  * CSV minimo, con comillas. Google entrecomilla cualquier celda que
@@ -107,10 +141,75 @@ export function urlDesde(texto) {
 }
 
 /**
- * Baja la planilla y la devuelve como diccionario `clave -> valor`.
+ * Una fecha del diccionario, o null.
+ *
+ * **Se exige AAAA-MM-DD y no se intenta interpretar nada mas.** Una
+ * fecha ambigua —03/07/2026— tiene dos lecturas y las dos son
+ * plausibles; adivinar mal corre la vigencia de una norma tres meses.
+ * Si la celda no tiene la forma esperada, el valor entra sin vigencia,
+ * que es lo que venia pasando y no rompe nada.
+ */
+export function fecha(raw) {
+  const t = String(raw ?? '').trim()
+  return /^\d{4}-\d{2}-\d{2}$/.test(t) ? t : null
+}
+
+/**
+ * Que fila significa que, para cada unidad. Es el contrato del CSV, y
+ * las dos fuentes lo cumplen: son las mismas ocho claves.
+ *
+ * **Estaba escrito en los dos call sites de `actualizar-uma.mjs` y
+ * ahora esta una sola vez**, porque desde que hay dos fuentes que
+ * comparar habria pasado a estar en tres lugares. Es la misma historia
+ * de `parseImporte`, que llego a tener tres copias.
+ */
+export const CLAVES = {
+  UMA: { valor: 'UMA', fuente: 'ACORDADA', url: 'URL', vigencia: 'UMA_VIGENCIA' },
+  UHOM: { valor: 'UHOM', fuente: 'UHOM_FUENTE', url: 'UHOM_URL', vigencia: 'UHOM_VIGENCIA' },
+}
+
+/**
+ * Lo que una fuente dice de una unidad, ya interpretado: el numero, la
+ * cita, el link y desde cuando rige.
+ *
+ * **Interpretado y no en crudo, y esa es la unica forma de comparar dos
+ * fuentes.** En crudo nunca coinciden aunque digan lo mismo: la planilla
+ * trae `104.220` y la norma metida adentro de una frase de uso diario;
+ * `valores` trae `104220` y la cita sola. Lo que tiene que coincidir es
+ * lo que cada una haria publicar, que es esto.
+ *
+ * `valor` sale null si la fila falta o no tiene un numero legible. Quien
+ * llama distingue los dos casos —los mensajes de error no son el
+ * mismo— mirando el diccionario.
+ */
+export function leerUnidad(tabla, unidad) {
+  const k = CLAVES[unidad]
+  const celdaNorma = tabla.get(k.fuente) ?? ''
+
+  return {
+    valor: parseImporte(tabla.get(k.valor) ?? ''),
+    fuente: normaDesde(celdaNorma),
+    // La celda propia gana sobre una URL suelta dentro de la frase: es
+    // la que la fuente declara a proposito.
+    url: tabla.get(k.url) || urlDesde(celdaNorma) || null,
+    vigencia: fecha(tabla.get(k.vigencia)),
+  }
+}
+
+/**
+ * El CSV como diccionario `clave -> valor`.
  *
  * Se lee por clave y no por posicion: agregar una fila o cambiarlas de
  * orden no puede romper el numero.
+ */
+function comoDiccionario(csv) {
+  return new Map(
+    filasCSV(csv).map((f) => [f[0].trim().toUpperCase(), (f[1] ?? '').trim()]),
+  )
+}
+
+/**
+ * Baja la planilla y la devuelve como diccionario.
  *
  * `alFallar` recibe el motivo y decide que hacer. Los dos scripts que
  * la usan no fallan igual —uno no debe tocar los archivos, el otro
@@ -134,7 +233,77 @@ export async function leerPlanilla(alFallar) {
     alFallar('la planilla devolvio HTML en vez de CSV (¿se despublico?)')
   }
 
-  return new Map(
-    filasCSV(csv).map((f) => [f[0].trim().toUpperCase(), (f[1] ?? '').trim()]),
-  )
+  return comoDiccionario(csv)
+}
+
+/**
+ * Baja la segunda fuente. Devuelve `{ tabla }` o `{ motivo }`.
+ *
+ * **No recibe `alFallar` y eso es la decision, no un olvido.** La
+ * planilla que no responde tiene que abortar, porque sin ella no hay
+ * numero. Esta que no responde no puede abortar nada: durante el
+ * solapamiento no es la fuente del numero sino su control, y un
+ * control caido no vuelve malo al valor que estaba controlando. Si
+ * frenara la publicacion, la infraestructura nueva —que todavia no se
+ * gano nada— podria dejar al sitio con la UMA vieja, que es
+ * exactamente el peor resultado posible de este repositorio.
+ *
+ * El timeout esta por lo mismo: un fetch colgado frena el cron igual
+ * que un aborto, solo que sin decir nada.
+ */
+export async function leerValores() {
+  let respuesta
+
+  try {
+    respuesta = await fetch(VALORES, {
+      cache: 'no-store',
+      signal: AbortSignal.timeout(15000),
+    })
+  } catch (e) {
+    return { motivo: 'no respondio (' + e.message + ')' }
+  }
+
+  // El Worker contesta 503 cuando le falta el valor vigente de alguna
+  // unidad, en vez de servir media tabla. Cae aca.
+  if (!respuesta.ok) return { motivo: 'respondio HTTP ' + respuesta.status }
+
+  const cuerpo = await respuesta.text()
+  if (/^\s*[<{]/.test(cuerpo)) return { motivo: 'devolvio HTML o JSON en vez de CSV' }
+
+  const tabla = comoDiccionario(cuerpo)
+
+  const faltan = Object.values(CLAVES)
+    .map((k) => k.valor)
+    .filter((c) => !tabla.has(c))
+
+  if (faltan.length) return { motivo: 'no trajo la fila ' + faltan.join(' ni ') }
+
+  return { tabla }
+}
+
+/**
+ * En que difieren las dos fuentes. Una entrada por unidad y campo que
+ * no coincida; vacio si dicen lo mismo.
+ *
+ * **No decide nada.** Que una diferencia frene la publicacion o
+ * solamente avise es del script que llama, y no es lo mismo para todos
+ * los campos: un numero equivocado le arruina la regulacion a alguien,
+ * una cita que quedo vieja se corrige en la corrida siguiente. Es la
+ * misma linea que separa el rojo del aviso en `verificar-publicado`.
+ */
+export function diferencias(planilla, valores) {
+  const salida = []
+
+  for (const unidad of Object.keys(CLAVES)) {
+    const a = leerUnidad(planilla, unidad)
+    const b = leerUnidad(valores, unidad)
+
+    for (const campo of ['valor', 'fuente', 'url', 'vigencia']) {
+      if (a[campo] !== b[campo]) {
+        salida.push({ unidad, campo, planilla: a[campo], valores: b[campo] })
+      }
+    }
+  }
+
+  return salida
 }

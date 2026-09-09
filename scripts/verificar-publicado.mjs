@@ -157,4 +157,13 @@ console.error('\n' + SITIO + ' esta calculando con un valor que no es el de la p
 for (const p of problemas) console.error('  ' + p + '\n')
 console.error('Que hacer: GitHub → Actions → «UMA y UHOM» → Run workflow.')
 console.error('Si eso no lo arregla, fijate si el ultimo Deploy Pages fallo.')
+// Mientras dure el solapamiento hay una cuarta razon posible, y sin
+// esta linea el paso a seguir manda a un lazo: volver a disparar la
+// sincronizacion no arregla una discrepancia entre las dos fuentes, se
+// planta de nuevo en el mismo lugar. La lee el mismo mail que avisa.
+console.error(
+  'Y si «UMA y UHOM» tambien fallo, mira su log: durante el solapamiento se ' +
+    'planta cuando la planilla y `valores` no dicen el mismo numero. Eso se ' +
+    'arregla emparejando las dos fuentes, no repitiendo el workflow.',
+)
 process.exit(1)

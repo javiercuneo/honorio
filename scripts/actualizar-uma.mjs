@@ -22,6 +22,12 @@
 // `verificar-publicado.mjs`. Ahi esta el porque de cada decision de
 // lectura —el diccionario, las comillas, la celda de URL aparte—.
 //
+// **Desde el 9/9/2026 hay una segunda fuente y este script las compara
+// antes de escribir nada.** El proyecto `valores` sirve el mismo
+// diccionario que la planilla y va a reemplazarla; mientras tanto las
+// dos tienen que decir el mismo numero, y si no lo dicen no se publica.
+// El detalle esta abajo, en «El solapamiento».
+//
 // **Las dos unidades no se comportan igual y por eso cada una trae su
 // umbral y su control.** La UMA se mueve dos veces por anio y en
 // saltos grandes; el UHOM cambia todos los meses en saltos de ~2 %,
@@ -38,9 +44,10 @@
 // Salidas:
 //   0  con o sin cambios (el workflow mira el diff de git, no el
 //      codigo de salida: "no cambio nada" es el caso normal)
-//   1  la planilla no se pudo leer, o lo que trajo no pasa los
-//      controles. Falla fuerte y no toca el archivo: es preferible
-//      publicar con el valor de ayer que con uno inventado.
+//   1  la planilla no se pudo leer, lo que trajo no pasa los
+//      controles, o las dos fuentes no dicen el mismo numero. Falla
+//      fuerte y no toca el archivo: es preferible publicar con el
+//      valor de ayer que con uno inventado.
 //
 // Que este script termine bien no significa que el sitio quedo con el
 // valor nuevo: entre esto y honorio.ar estan el commit y el deploy.
@@ -51,7 +58,13 @@ import { readFileSync, writeFileSync } from 'node:fs'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { leerPlanilla, normaDesde, parseImporte, urlDesde } from './planilla.mjs'
+import {
+  VALORES,
+  diferencias,
+  leerPlanilla,
+  leerUnidad,
+  leerValores,
+} from './planilla.mjs'
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..')
 const DESTINO_UMA = join(RAIZ, 'data', 'uma.json')
@@ -90,20 +103,6 @@ const SALTO_MAXIMO_UMA = 0.4
 /** Idem, sobre la serie del UHOM: 2 x 30,8 % redondeado. */
 const SALTO_MAXIMO_UHOM = 0.6
 
-/**
- * Una fecha de la planilla, o null.
- *
- * **Se exige AAAA-MM-DD y no se intenta interpretar nada mas.** Una
- * fecha ambigua —03/07/2026— tiene dos lecturas y las dos son
- * plausibles; adivinar mal corre la vigencia de una norma tres meses.
- * Si la celda no tiene la forma esperada, el valor entra sin vigencia,
- * que es lo que venia pasando y no rompe nada.
- */
-function fecha(raw) {
-  const t = String(raw ?? '').trim()
-  return /^\d{4}-\d{2}-\d{2}$/.test(t) ? t : null
-}
-
 function abortar(motivo) {
   console.error('No se actualizaron los valores: ' + motivo)
   console.error('data/uma.json y data/uhom.json quedan como estaban.')
@@ -113,6 +112,76 @@ function abortar(motivo) {
 const tabla = await leerPlanilla(abortar)
 
 const hoy = new Date().toISOString().slice(0, 10)
+
+// ---- El solapamiento ----
+//
+// Las dos fuentes tienen que decir lo mismo, y si no lo dicen no se
+// publica. Es la red que ya uso el ledger para cambiar de fuente sin
+// que el cambio se estrene sobre un numero de verdad: una de las dos
+// esta mal y desde afuera no hay forma de saber cual, asi que publicar
+// cualquiera de las dos es publicar a cara o cruz. El valor de ayer,
+// que es lo que queda, por lo menos se sabe de donde salio.
+//
+// **Que hace y que no hace la diferencia, segun el campo.** El numero
+// aborta; la cita, el link y la vigencia avisan. Es la linea que ya
+// estaba trazada en `verificar-publicado.mjs` y el motivo es el mismo:
+// un valor equivocado le arruina la regulacion a alguien, una cita
+// vieja se corrige sola en la corrida siguiente y mientras tanto el
+// calculo es correcto. Si el aborto significara las dos cosas dejaria
+// de significar la primera.
+//
+// **La segunda fuente que no contesta no frena nada** —el porque esta
+// en `leerValores`—: la planilla sigue siendo la que manda hasta que
+// esto haya andado un ciclo entero.
+const segunda = await leerValores()
+
+if (!segunda.tabla) {
+  console.warn(
+    '  Aviso: no se pudo comparar contra la segunda fuente: ' +
+      segunda.motivo +
+      '. Se sigue con la planilla, que es la que manda mientras dure el ' +
+      'solapamiento.',
+  )
+} else {
+  const distintas = diferencias(tabla, segunda.tabla)
+
+  for (const d of distintas.filter((x) => x.campo !== 'valor')) {
+    console.warn(
+      '  Aviso: ' +
+        d.unidad +
+        ' — las dos fuentes traen distinta ' +
+        d.campo +
+        '. La planilla: ' +
+        JSON.stringify(d.planilla) +
+        '. valores: ' +
+        JSON.stringify(d.valores) +
+        '. No frena la publicación, pero conviene emparejarlas.',
+    )
+  }
+
+  const enElNumero = distintas.filter((x) => x.campo === 'valor')
+
+  if (enElNumero.length) {
+    abortar(
+      'las dos fuentes no dicen el mismo número.\n' +
+        enElNumero
+          .map(
+            (d) =>
+              '  ' +
+              d.unidad +
+              ': la planilla dice ' +
+              (d.planilla === null ? 'nada legible' : '$' + d.planilla.toLocaleString('es-AR')) +
+              ' y valores dice ' +
+              (d.valores === null ? 'nada legible' : '$' + d.valores.toLocaleString('es-AR')),
+          )
+          .join('\n') +
+        '\nQué hacer: corregir la que esté mal —la planilla, o ' +
+        VALORES.replace('/valores.csv', '') +
+        '— y volver a correr «UMA y UHOM». Las dos tienen que decir lo mismo ' +
+        'hasta que se jubile la planilla.',
+    )
+  }
+}
 
 /**
  * Lee una clave de la planilla, la controla contra lo que ya hay y la
@@ -127,15 +196,17 @@ const hoy = new Date().toISOString().slice(0, 10)
  * No sale del proceso al terminar: la UMA no puede quedar sin
  * actualizar porque el UHOM haya cambiado o al reves.
  */
-function actualizar({ clave, etiqueta, destino, saltoMaximo, fuente, url, vigencia, forma }) {
+function actualizar({ clave, etiqueta, destino, saltoMaximo, valor, fuente, url, vigencia, forma }) {
   if (!tabla.has(clave)) {
     abortar(
       'la planilla no tiene una fila ' + clave + '. Filas: ' + [...tabla.keys()].join(', '),
     )
   }
 
-  const valor = parseImporte(tabla.get(clave))
-
+  // El numero ya viene interpretado por `leerUnidad`, que es el mismo
+  // que interpreta las dos fuentes para compararlas. Volver a parsear
+  // la celda aca abriria la puerta a que el valor que se compara y el
+  // que se publica no sean el mismo.
   if (valor === null || valor <= 0) {
     abortar(
       'la fila ' + clave + ' no tiene un numero legible: ' + JSON.stringify(tabla.get(clave)),
@@ -250,32 +321,27 @@ function actualizar({ clave, etiqueta, destino, saltoMaximo, fuente, url, vigenc
 
 // ---- La UMA ----
 
-const celdaNorma = tabla.get('ACORDADA') ?? ''
-
+// Que fila dice el numero, cual la norma, cual el link y cual la
+// vigencia esta en `CLAVES`, del lector compartido, y se interpreta con
+// `leerUnidad`. Estaba escrito aca y funcionaba; se mudo cuando aparecio
+// la segunda fuente, porque comparar dos fuentes exige interpretarlas
+// igual y esta era la unica copia que sabia como.
 actualizar({
   clave: 'UMA',
   etiqueta: 'La UMA',
   destino: DESTINO_UMA,
   saltoMaximo: SALTO_MAXIMO_UMA,
-  fuente: normaDesde(celdaNorma),
-  // La celda propia gana sobre una URL suelta dentro de la frase: es la
-  // que la planilla declara a proposito.
-  url: tabla.get('URL') || urlDesde(celdaNorma) || null,
-  vigencia: fecha(tabla.get('UMA_VIGENCIA')),
+  ...leerUnidad(tabla, 'UMA'),
 })
 
 // ---- El UHOM ----
-
-const celdaNormaUhom = tabla.get('UHOM_FUENTE') ?? ''
 
 actualizar({
   clave: 'UHOM',
   etiqueta: 'El UHOM',
   destino: DESTINO_UHOM,
   saltoMaximo: SALTO_MAXIMO_UHOM,
-  fuente: normaDesde(celdaNormaUhom),
-  url: tabla.get('UHOM_URL') || urlDesde(celdaNormaUhom) || null,
-  vigencia: fecha(tabla.get('UHOM_VIGENCIA')),
+  ...leerUnidad(tabla, 'UHOM'),
   forma: {
     // UR-SINEP x 12, redondeado a la decena proxima superior: siempre
     // termina en cero. Es lo unico comprobable sin tener la UR-SINEP
