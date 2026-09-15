@@ -163,8 +163,10 @@ compartido, se arregla allá —que es la fuente— y se propaga a propósito.
   decoración.
 - **Commits en español**, con prefijo tipo `feat:`, `fix:`, `docs:`, `chore:`.
   Miralos con `git log --oneline` antes de escribir el tuyo.
-- **`git commit -m` con here-string falla** en el entorno del autor. Usá
-  `git commit -F <archivo>`.
+- **Commits de varias líneas: cada shell con su sintaxis.** En Bash, heredoc
+  con `git commit -F -`; en PowerShell, `@'...'@`. Lo que falla es mezclarlas:
+  la de PowerShell adentro de Bash mete un `@` suelto como asunto del commit.
+  `git commit -F <archivo>` anda en los dos.
 - **Licencia AGPL-3.0-or-later.** Si aparece un PR, lo primero que se mira es la
   aceptación de [`CONTRIBUTING.md`](CONTRIBUTING.md): sin eso se pierde la
   opción de licenciar comercialmente. El motivo está en el README y no hace

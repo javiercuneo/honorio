@@ -12,6 +12,11 @@ import { Button } from '@/components/ui/button'
 // archivo y no del repositorio entero.
 import { CALCULADORA_MEDIACION, DOCUMENTACION } from '@/lib/enlaces'
 
+// Cuantas validaciones corren antes de publicar. No se escribe a mano:
+// lo cuenta next.config.mjs al compilar, porque escrito aca quedo en 17
+// cuando ya eran 18.
+const VALIDACIONES = process.env.NEXT_PUBLIC_VALIDACIONES
+
 // No describen los pasos —eso ya lo cuenta el panel de la derecha—
 // sino lo que la herramienta hace distinto: declarar cada regla.
 const notes = [
@@ -124,7 +129,7 @@ export function IntroView({
                     <li>Esta herramienta es de carácter referencial; no sustituye el criterio del juez ni debe considerarse un dictamen profesional</li>
 <li>Los resultados se basan en interpretaciones de la <a href="https://servicios.infoleg.gob.ar/infolegInternet/anexos/305000-309999/305057/texact.htm" target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-foreground">Ley 27.423 </a>que podrían diferir de tu criterio o del de los distintos tribunales</li>                    <li>En cada paso, intentaremos explicitar el fundamento jurídico y su impacto en el cálculo</li>
                     <li>Los criterios que la app adopta donde la ley admite más de una lectura están escritos y publicados: <a href={DOCUMENTACION} target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-foreground">cómo se interpreta la ley</a></li>
-                    <li><strong className="font-medium text-foreground/85">Los cálculos no usan inteligencia artificial.</strong> Son funciones deterministas: el mismo caso da siempre el mismo número. El código se escribió con asistencia de modelos de lenguaje —está dicho en el <a href="https://github.com/javiercuneo/honorio" target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-foreground">repositorio</a>—, pero ningún modelo interviene en el resultado: cada cambio pasa por 17 suites de validación que comparan la salida contra casos conocidos, y si alguna falla el sitio no se publica</li>
+                    <li><strong className="font-medium text-foreground/85">Los cálculos no usan inteligencia artificial.</strong> Son funciones deterministas: el mismo caso da siempre el mismo número. El código se escribió con asistencia de modelos de lenguaje —está dicho en el <a href="https://github.com/javiercuneo/honorio" target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-foreground">repositorio</a>—, pero ningún modelo interviene en el resultado: cada cambio pasa por {VALIDACIONES} suites de validación que comparan la salida contra casos conocidos y los textos citados contra la ley, y si alguna falla el sitio no se publica</li>
                   </ul>
                 </div>
                 <div>

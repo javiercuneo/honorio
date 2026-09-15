@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs'
+import { readdirSync, readFileSync } from 'node:fs'
 
 // La version del motor la firma el informe: es lo que hace que un
 // calculo de hoy se pueda reproducir dentro de dos anios. Se lee de
@@ -6,6 +6,13 @@ import { readFileSync } from 'node:fs'
 // existan dos versiones que puedan discrepar; la que vale es la que
 // se publica.
 const { version } = JSON.parse(readFileSync('./package.json', 'utf8'))
+
+// Cuantas validaciones tiene que pasar un cambio antes de publicarse. La
+// pantalla de inicio lo dice, y escrito a mano quedo en 17 cuando ya
+// eran 18. Se cuenta con la misma regla que scripts/validate.mjs, asi el
+// numero que se lee es el de las que corren.
+const validaciones = readdirSync('./lib/legal/__tests__')
+  .filter((f) => f.endsWith('.validation.ts')).length
 
 /** @type {import('next').NextConfig} */
 // El prefijo de publicacion viene de afuera porque Honorio se sirve
@@ -30,6 +37,7 @@ const nextConfig = {
   env: {
     NEXT_PUBLIC_BASE_PATH: basePath,
     NEXT_PUBLIC_VERSION: version,
+    NEXT_PUBLIC_VALIDACIONES: String(validaciones),
   },
   images: {
     unoptimized: true,

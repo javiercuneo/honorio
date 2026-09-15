@@ -45,6 +45,20 @@ posible —cambió la UMA— que no se podía comprobar.
 
 ---
 
+## 3.5.2 — 15 de septiembre de 2026
+
+PARCHE. **El motor no se tocó y ninguna cifra cambia.** Es un texto de la
+pantalla de inicio.
+
+- **«Información adicional» decía que cada cambio pasa por 17 suites de
+  validación, y desde la 3.5.0 son 18.** Era un texto que promete un número y
+  mentía con todo en verde, que es exactamente la clase de error que ninguna
+  validación caza. **La cantidad ya no se escribe a mano:** la cuenta
+  `next.config.mjs` al compilar, con la misma regla que `scripts/validate.mjs`
+  usa para correrlas, así que la que se lee es la de las que corren.
+- **La frase ahora también dice qué compara la 18**: la salida contra casos
+  conocidos, y los textos citados contra la ley.
+
 ## 3.5.1 — 15 de septiembre de 2026
 
 PARCHE. **El motor no se tocó y ninguna cifra cambia.** Es un cambio de

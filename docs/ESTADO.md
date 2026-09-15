@@ -21,7 +21,7 @@ pregunta «¿por qué esto quedó así?».
 
 ## Dónde estamos
 
-Versión **3.5.1**, publicada en `honorio.ar`. Las **18 validaciones** de
+Versión **3.5.2**, publicada en `honorio.ar`. Las **18 validaciones** de
 `lib/legal/__tests__` están en verde y corren solas en CI. **No hay nada urgente
 ni bloqueante.**
 
@@ -776,7 +776,8 @@ porque la objeción no aparece al entrar sino **mirando el número**. Vive en
 qué se calculó y con qué versión —eso lo hace la firma—, no de qué no.
 
 El desarrollo, que es lo que la hace verificable, está en «Información
-adicional»: funciones deterministas, 17 suites de validación, y si alguna falla
+adicional»: funciones deterministas, las suites de validación —la cantidad la
+cuenta `next.config.mjs` al compilar, no se escribe—, y si alguna falla
 el sitio no se publica.
 
 **Y si vas a contar el caso del art. 22/25, copialo, no lo parafrasees.** La
