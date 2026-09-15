@@ -27,23 +27,13 @@ ni bloqueante.**
 
 **Qué trajo cada versión está en el [`CHANGELOG`](../CHANGELOG.md) y por qué, en
 [`HISTORIA.md`](HISTORIA.md).** Acá no se repite: son dos archivos que ya existen
-para eso. Dos cosas de las últimas versiones hay que tener presentes para
-trabajar:
-
-- **«Castañeda» quedó cargado como ancla externa** en
-  `calculoDirecto.validation.ts` —el primer fallo que *hace la cuenta* del
-  art. 21 en vez de transcribirlo—, así que si alguien «arregla» el factor de
-  correlación falla contra una sentencia y no contra una opinión nuestra.
-- **La pantalla de mínimos ya no muestra como vigentes cuatro filas que el
-  Decreto 1077/2017 observó**, y el texto de la ley que muestra está verificado
-  contra Infoleg. Los detalles, más abajo.
+para eso.
 
 **La regla de versionado, que sí gobierna trabajo de todos los días:** un cambio
 de criterio que mueve una cifra es MENOR con la marca `MUEVE UN NÚMERO`, y
 **la marca es la que garantiza la reproducibilidad, no el dígito** —obliga a
-decir qué caso da distinto—. MAYOR queda para un cambio de régimen. Antes era
-MAYOR cualquier cifra movida, y aplicada literal dejaba a Honorio en la versión
-10 antes de fin de año.
+decir qué caso da distinto—. MAYOR queda para un cambio de régimen. Por qué
+cambió la regla, al principio del CHANGELOG.
 
 El plan de adopción está **fuera del repositorio**, en `C:\IA\notas\adopcion.md`,
 porque nombra personas. La **Fase 0 quedó cerrada el 13/8**.
@@ -81,33 +71,6 @@ reduce y por qué. Si aparece un fallo o un tercer libro, entra al criterio.
 mismo ejemplo calcula el máximo como el 15 % del total de la base e ignora el
 factor de correlación del art. 21 —el criterio que la propia app funda con
 `RINDEL` y con Díaz & Musich—. Su punto de partida arranca corrido un 5,4 %.
-
-### Los mínimos, verificados contra la ley el 9/9/2026
-
-**Cerrado.** Se leyeron uno por uno los arts. 19, 31, 44, 48, 58, 60, 61 y 61 bis
-contra el texto actualizado de Infoleg. **Las cuarenta cifras estaban bien y
-ninguna se movió.** Lo que estaba mal era otra cosa, y quedan dos invariantes:
-
-- **Cuatro `textoLegal` no eran el texto de la ley y ahora sí lo son** (arts. 19,
-  31, 44 y 58). El del art. 19 le atribuía al artículo una redacción que no está
-  en él, heredada del cuadro explicativo del asistente clásico. Ver la trampa del
-  art. 19 al final de este documento: **es la que más veces se repitió.**
-- **Cuatro filas de la tabla b) del art. 19 no rigen y ahora lo dicen.** El
-  art. 3° del Decreto 1077/2017 las observó enteras —locación (2 UMA), boleto de
-  compraventa (3), sociedades (5), otros contratos (2)—; el decreto las nombra
-  una por una, así que no hay duda de alcance. **Se conservan con su cifra**, con
-  la insignia «No rige» y el texto que dice qué fijaba la ley y qué la observó.
-  El motivo es de Javier y vale escribirlo: *no es un piso exigible, pero es lo
-  que el legislador consideró que valía esa labor, y eso sirve para fundar un
-  pedido.* Borrarlas dejaría a quien busca «locación» sin ninguna respuesta, que
-  informa peor que una respuesta con su advertencia. **La contrapartida es
-  innegociable: una fila observada no se puede leer como vigente**, así que la
-  advertencia va afuera de todo desplegable, como la insignia del 5 % de los
-  auxiliares. El campo es `MinimoItem.observado`.
-
-`06_MATRIZ_DE_PROCESOS.md` y `07_GLOSARIO.md` de `herramientas-judiciales` citan
-estas cifras: **si una se mueve, se mueven las dos citas.** Ninguna se movió, pero
-las cuatro filas observadas les faltan a los dos documentos.
 
 ### Lo que la app declara abierto porque no hay nada detrás
 
@@ -156,11 +119,9 @@ son unas horas y no importa.
 ### Deudas anotadas a propósito
 
 - **Los cuatro puntos que `PLAN_COBERTURA_LEY.md` dejó anotados sin fecha, que
-  son lo único vivo de ese plan.** El plan está hecho entero desde el 7/8 y su
-  documento vive en el repositorio `herramientas-judiciales`, porque ahí está la
-  materia prima; **el trabajo pendiente es de acá y por eso se anota acá**, que
-  es lo que faltaba hasta el 31/8. Ninguno es bloqueante y dos pueden no hacerse
-  nunca:
+  son lo único vivo de ese plan.** El documento vive en `herramientas-judiciales`,
+  pero **el trabajo pendiente es de acá y por eso se anota acá**. Ninguno es
+  bloqueante y dos pueden no hacerse nunca:
   1. **Nombrar las etapas por tipo de proceso** (punto 3b).
   2. **Calculadora del art. 42** (punto 5), si alguna vez hace falta.
   3. **El proceso mal encarrilado**, y **sin decisión tomada**: qué debería
@@ -216,10 +177,7 @@ son unas horas y no importa.
 mentir con todas en verde.** Pasó cuatro veces: los rótulos de los pasos el 5/8,
 las descripciones de la cautelar el 6/8, un criterio de abogados puesto en la
 sección de auxiliares el 19/8, y **el `textoLegal` del art. 19, que no era el
-art. 19** —una redacción de otra fuente mostrada en serif, o sea con la
-tipografía que en esta app significa «esto es la norma»—. Ese último estuvo mal
-desde que el archivo existe, con todo en verde, porque las cifras que lo
-acompañaban sí eran correctas.
+art. 19** y estuvo mal desde que el archivo existe, con todo en verde.
 
 **De esos cuatro, uno ya no puede volver a pasar.** `textosLegales.validation.ts`
 —la 18— parte cada `textoLegal` en oraciones y exige que cada una aparezca
@@ -340,16 +298,12 @@ está la regla y su razón, que es lo que hay que saber antes de tocar el archiv
 
 - **Una interpretación se funda en un fallo o no se afirma.** Los ocho criterios
   de `jurisprudencia.ts` la cumplen.
-- **La pantalla de mínimos afirmaba lo suyo sin nada detrás hasta el 9/9/2026.**
-  Decía «si el cálculo del art. 21 queda por debajo de un mínimo aplicable, el
-  mínimo manda», que era nuestra lectura de la última oración del art. 16. Ahora
-  lo sostiene `MINIMOS_ORDEN_PUBLICO` con **«Martinuzzi» (CSJN, 03/09/2026)**,
-  donde la Corte deja sin efecto una regulación de 14 UMA en un amparo —el
-  art. 48 fija 20— porque la cámara no explicó por qué prescindió del mínimo
-  «sin declarar su inconstitucionalidad ni elaborar argumentación plausible
-  alguna», y porque citar artículos no es fundar (art. 15). **Conviene tener
-  presente de dónde salió el criterio:** las tres pantallas de resultado tenían
-  fundamento y ésta no, y nadie lo había notado.
+- **El «mínimo manda» de la pantalla de mínimos lo sostiene
+  `MINIMOS_ORDEN_PUBLICO` con «Martinuzzi» (CSJN, 03/09/2026)**: la Corte deja
+  sin efecto 14 UMA en un amparo —el art. 48 fija 20— porque la cámara
+  prescindió del mínimo «sin declarar su inconstitucionalidad ni elaborar
+  argumentación plausible alguna». Hasta el 9/9 era la única pantalla de
+  resultado sin fundamento, y nadie lo había notado.
 - **Un fallo que hace la cuenta vale más que uno que transcribe el artículo**, y
   por eso «Castañeda» (CFed. Mendoza, Sala B, 12/03/2021) va primero en
   `ESCALA_CORRELACION`. Las dos lecturas del art. 21 transcriben lo mismo; lo
@@ -382,6 +336,23 @@ está la regla y su razón, que es lo que hay que saber antes de tocar el archiv
   fuera el único posible. La del art. 21 va sin ninguna, y la pantalla dice que
   no se encontró quién la sostenga por escrito.
 
+### La pantalla de mínimos
+
+- **Las cuarenta cifras se leyeron contra Infoleg el 9/9/2026** —arts. 19, 31,
+  44, 48, 58, 60, 61 y 61 bis— y ninguna se movió. Los `textoLegal` son
+  transcripciones y la 18 lo controla; ver la trampa del art. 19, al final.
+- **Cuatro filas de la tabla b) del art. 19 no rigen y lo dicen**
+  (`MinimoItem.observado`): el art. 3° del Decreto 1077/2017 observó locación
+  (2 UMA), boleto de compraventa (3), sociedades (5) y otros contratos (2). **Se
+  conservan con su cifra**, y el motivo es de Javier: *no es un piso exigible,
+  pero es lo que el legislador consideró que valía esa labor, y eso sirve para
+  fundar un pedido.* **La contrapartida es innegociable: una fila observada no
+  se puede leer como vigente**, así que la advertencia va afuera de todo
+  desplegable.
+- **Del otro lado queda algo abierto:** `06_MATRIZ_DE_PROCESOS.md` y
+  `07_GLOSARIO.md` de `herramientas-judiciales` citan estas cifras —si una se
+  mueve, se mueven las dos citas— y les faltan las cuatro filas observadas.
+
 ### Los pisos de los auxiliares
 
 - **La ley separa por sujeto, no por tipo de juicio.** Está escrito arriba de
@@ -394,9 +365,9 @@ está la regla y su razón, que es lo que hay que saber antes de tocar el archiv
   | Con monto | art. 61 — 2 UMA | normas específicas; a falta de ellas, art. 58 — 4 UMA |
 
   El 61 **no** desplaza al 58: no hablan del mismo sujeto.
-- **Un piso se aplica, salvo que una norma autorice perforarlo.** Ésta es la
-  regla, y hasta el 21/8/2026 estaba escrita como *«los pisos se muestran, no se
-  aplican»*, que se leía como una prohibición general y no lo es. **La excepción
+- **Un piso se aplica, salvo que una norma autorice perforarlo.** No es *«los
+  pisos se muestran, no se aplican»*, que se leía como una prohibición general y
+  así estuvo escrito hasta el 21/8. **La excepción
   es la de los auxiliares y tiene su cita**: el art. 21 extiende sus normas a los
   peritos *salvo lo dispuesto en el art. 478 CPCCN*, que manda adecuarlos *«por
   debajo de sus topes mínimos inclusive»*. Ahí automatizar el piso sería decidir
@@ -455,11 +426,9 @@ está la regla y su razón, que es lo que hay que saber antes de tocar el archiv
   una incoherencia del texto: en los actos del b) no interviene ningún perito
   —hay oficial de justicia, escribano o martillero con comisión—, y el auxiliar
   aparece en el c). `EXHORTO_INCISOS.admiteAuxiliares` sale de leer los actos uno
-  por uno, y la pantalla lo explica en vez de dejarlo raro.
-- **Hasta el 21/8/2026 la app transcribía un art. 50 incompleto.** Faltaba
-  justamente esa oración, en `ExhortoResult.tsx` y en `render-legacy.ts`, y no
-  estaba en ningún archivo del repositorio. Los dos únicos textos que nombran a
-  los auxiliares en el exhorto son ése y el último párrafo del art. 10.
+  por uno, y la pantalla lo explica en vez de dejarlo raro. Con el último
+  párrafo del art. 10, **es uno de los dos únicos textos que nombran a los
+  auxiliares en el exhorto**, y faltó en la transcripción hasta el 21/8.
 - **La cantidad de actos del inciso a) no multiplica nada.** Se pregunta, viaja en
   `cantidadActos` y sale en la prosa como hecho declarado, para que la resolución
   pueda decir por qué el número está arriba del piso.
@@ -485,12 +454,10 @@ está la regla y su razón, que es lo que hay que saber antes de tocar el archiv
   motor calcula; la banda dentro de la cual se elige; y **un número de otro
   cálculo, mostrado para orientar y que no se regula**. Los pisos de los
   auxiliares ya eran eso, y el tope de la mediación también.
-- **La distinción se marca con una etiqueta, no con un recuadro.** El 21/8 se
-  probó una primitiva `Referencia` —caja punteada, rótulo «no se regula», línea
-  de origen obligatoria— y **se quitó el mismo día**: en una tarjeta que ya tenía
-  seis párrafos de prosa, agregaba ruido en lugar de quitarlo. Lo que quedó es el
-  `articulo` del `LedgerRow` diciendo «pauta, no base». Si algún día hay tres o
-  cuatro usos, la primitiva vuelve a tener sentido; con uno solo no lo tenía.
+- **La distinción se marca con una etiqueta, no con un recuadro:** el
+  `articulo` del `LedgerRow` dice «pauta, no base». Una primitiva `Referencia`
+  se probó el 21/8 y se quitó el mismo día porque agregaba ruido (ver el
+  CHANGELOG); con tres o cuatro usos vuelve a tener sentido.
 - **Una referencia nunca se topea.** Recortar la escala del art. 21 a la banda
   del inciso borraría lo único que informa, que es el tamaño del pleito: 10 UMA y
   20.000 UMA se verían iguales. Lo que sí se topea es **la elección**, y sólo
@@ -554,15 +521,11 @@ ningún `IMPORTRANGE` ni de Apps Script**: los valores están escritos adentro.
   viejo. Y `MEDIDAS` tiene que seguir siendo la primera hoja, porque el CSV
   publica la primera.
 
-- **El cron pide el deploy a mano, y tiene que hacerlo.** Acá decía que «el push
-  dispara el deploy» y era falso: **GitHub no dispara workflows por un push
-  hecho con el `GITHUB_TOKEN` del runner**, que es un cortafuegos contra la
-  recursión y no se puede desactivar. El síntoma no era un error sino un
-  silencio —commit en `main`, workflow en verde, sitio con el valor viejo hasta
-  que un humano empujara cualquier otra cosa—. Pasó el 15/8 y el 1/9/26; la
-  segunda vez dejó a honorio.ar calculando la mediación con el UHOM de agosto.
-  El último paso de `uma.yml` llama a `gh workflow run pages.yml`, y por eso el
-  workflow lleva `actions: write`.
+- **El cron pide el deploy a mano, y tiene que hacerlo:** **GitHub no dispara
+  workflows por un push hecho con el `GITHUB_TOKEN` del runner**, y el síntoma
+  es un silencio —commit en `main`, todo en verde, sitio con el valor viejo—.
+  Por eso el último paso de `uma.yml` llama a `gh workflow run pages.yml` y el
+  workflow lleva `actions: write`. Pasó dos veces; el relato, en el CHANGELOG.
 - **Para forzarlo sin esperar al cron:** Actions → «UMA y UHOM» →
   *Run workflow*. Es el camino cuando la UMA se movió y hay que publicar hoy.
 - **Un control diario comprueba que el sitio calcule con el valor de la
@@ -711,11 +674,8 @@ a la vez: lo activo, lo enfocado y lo seleccionado son siempre el mismo color.
 ### Las tres zonas del dashboard
 
 Salió de la devolución de SG del 21/8/2026 —«me costó leer los datos»— y de
-medir la pantalla: **28 importes, de los que cinco eran la respuesta.** Lo que
-lo causaba no eran las explicaciones, que ella elogió, sino que primera y
-segunda instancia estuvieran separadas por ocho importes de herramientas, que
-tres secciones se dibujaran idénticas entre sí, y que la cifra de primera
-volviera a aparecer *después* de la segunda.
+medir la pantalla: **28 importes, de los que cinco eran la respuesta.** El
+diagnóstico entero está en `HISTORIA.md`.
 
 **El orden es el invariante**, y está escrito arriba de `DashboardGeneral`:
 
@@ -741,9 +701,8 @@ volviera a aparecer *después* de la segunda.
   «incluir los fundamentos» del imprimible lo gobierne. Con `useState` el
   informe saldría con lo que el lector hubiera abierto al leer, que es el bug
   que `imprimir.tsx` existe para evitar.
-- **La tabla de tramos y la barra del excedente estaban fuera de todo
-  desplegable**, así que se imprimían siempre y el interruptor no las tocaba.
-  Al bajar a la zona 3 quedaron adentro, y ahora sí las gobierna.
+- **La tabla de tramos y la barra del excedente viven en la zona 3, adentro de
+  un desplegable**, así que el interruptor del imprimible también las gobierna.
 - **El sujeto del honorario es un cuarto eje de color y no se confunde con los
   tres del cálculo.** Los tres ejes dicen *qué parte de la cuenta* toca una
   regla; el sujeto dice *a quién* se le regula. `propio` reusa cobalto —que ya
@@ -760,12 +719,8 @@ volviera a aparecer *después* de la segunda.
 - **El cálculo directo sigue el mismo orden y no pliega nada.** Ahí la
   herramienta de etapas y fracción **es** la pantalla, y su balance es otro a
   propósito: filas en vez de recuadros, los tres roles juntos, y la UMA como
-  unidad principal.
-
-Las decisiones finas de maqueta de esa sesión —el `flex-wrap` de `Disclosure`,
-dónde va un corte de zona, por qué el mediador no anuncia su condición, la
-unificación de `EncabezadoSeccion`, qué cambió en el papel— están en el
-[`CHANGELOG`](../CHANGELOG.md), en la 3.4.1, y ninguna está abierta.
+  unidad principal. Las decisiones finas de maqueta están en la 3.4.1 del
+  [`CHANGELOG`](../CHANGELOG.md), y ninguna está abierta.
 
 ### Las tres reglas que gobiernan el contenido
 
@@ -905,15 +860,10 @@ fórmulas, el alias `@/*`, los encabezados SPDX— están en
 **AGPL-3.0-or-later** (`LICENSE`, texto verbatim de la FSF). Decidido por Javier
 el 31/7. El motivo, para no rediscutirlo: no quiere restringir el uso ni cobrar
 por la app, quiere que un tercero no pueda cerrar el motor —donde están los
-criterios— como producto propio.
-
-Consecuencias que hay que sostener:
-
-- **Todo PR necesita la aceptación de `CONTRIBUTING.md`**, que incluye la cesión
-  de licencia. Sin eso se pierde la opción de licenciar comercialmente. Si
-  aparece un PR, esto es lo primero que hay que mirar.
-- Los archivos de `lib/legal/` llevan encabezado SPDX. Un archivo nuevo también.
-- Al publicar el motor como paquete o API, arrastrar `LICENSE` y los SPDX.
+criterios— como producto propio. Lo que hay que sostener por eso —la aceptación
+de `CONTRIBUTING.md` en todo PR y los SPDX de `lib/legal/`— está en
+[`AGENTS.md`](../AGENTS.md). Lo que no está ahí: **al publicar el motor como
+paquete o API, arrastrar `LICENSE` y los SPDX.**
 
 ---
 
@@ -941,8 +891,8 @@ Consecuencias que hay que sostener:
     mínimos están en él: describirla como «el texto del art. 19 estaba mal» se
     lee, con razón, como si fuera otra vez el mismo error.
 - **El panel del navegador no compone frames si el panel no está a la vista.**
-  Se anotó mucho tiempo como si fuera una limitación del entorno, y no lo es:
-  **la causa es que el panel está cerrado o en segundo plano.** Con el panel
+  No es una limitación del entorno: **el panel está cerrado o en segundo
+  plano.** Con el panel
   oculto, `document.hidden` es `true`, `requestAnimationFrame` no dispara,
   `clientWidth` mide 0 y las capturas fallan con *«the Browser pane is not
   displayed»*. Consecuencia: `AnimatePresence mode="wait"` nunca completa la
@@ -970,12 +920,10 @@ Consecuencias que hay que sostener:
   la selección recién hecha. Usar una ref al último render.
 - **El auto-avance es solo por teclado, a propósito.** Con el mouse, equivocarse
   de tarjeta te sacaba de la pregunta.
-- **`git commit -m` con here-string NO falla, medido el 7/9/2026.** Esta línea
-  decía lo contrario y era falsa. Anda en Bash —heredoc con `-F -`, y también
-  `-m` multilínea— y en PowerShell con su `@'...'@`, con `$` y backticks
-  literales en los dos. **Lo que falla es mezclar los dos shells**: la sintaxis
-  de PowerShell adentro de Bash mete un `@` suelto como asunto del commit.
-  Cada shell con la suya y no hay trampa.
+- **`git commit -m` con here-string anda**, medido el 7/9/2026: en Bash
+  —heredoc con `-F -`, o `-m` multilínea— y en PowerShell con su `@'...'@`.
+  **Lo que falla es mezclar los dos shells**: la sintaxis de PowerShell adentro
+  de Bash mete un `@` suelto como asunto del commit.
 - **No hay `npm run lint`.** Declaraba `eslint .` sin que `eslint` estuviera
   instalado. Verificar con `npm run check`.
 - **`next-env.d.ts` no se versiona.** Next lo regenera y alterna solo según si
@@ -1008,8 +956,6 @@ Consecuencias que hay que sostener:
   único lugar es `data/uma.json`, y `UMA_VIGENTE` es la única forma de
   leerlo. Un valor por defecto escrito a mano es un número equivocado
   esperando el día que algo falle.
-
----
 - **Para verificar una sección del dashboard sin recorrer la entrevista**, la
   salida es una página `app/verificar/` temporal que arma el resultado con
   `buildGeneral` y monta la sección sola. **Se borra después de verificar**, que

@@ -23,6 +23,65 @@ historia de `honorio/` viajó completa con `git subtree split`, así que
 calculadoras, el asistente clásico y la documentación de dominio.
 
 ---
+## `ESTADO.md` se podó antes de que el techo lo obligara — el 15/9
+
+Con la entrada de `#directo` el archivo llegó a 1035 líneas de 1100 y el hook
+avisó. **La poda lo dejó en 981, y casi toda fue otra vez sacar lo que estaba
+escrito dos veces**: la crónica que quedaba adentro de los invariantes ya
+la cuenta el `CHANGELOG`, con más detalle.
+
+- **«Dónde estamos» repetía dos secciones de abajo**: «Castañeda» como ancla
+  externa y las filas observadas de los mínimos. Quedaron sólo en su sección.
+- **La sección de los mínimos verificados decía «Cerrado» y estaba en «Lo que
+  está abierto».** Pasó a «Lo que gobierna cada módulo» como «La pantalla de
+  mínimos», con sus dos invariantes y lo único abierto, que es del otro
+  repositorio. El texto original está abajo.
+- **Se acortó la crónica de cinco invariantes que el `CHANGELOG` ya cuenta:**
+  «Martinuzzi» y el fundamento que faltaba (3.4.4), la regla vieja de los pisos
+  de auxiliares y el art. 50 incompleto (21/8), la primitiva `Referencia` que
+  se probó y se quitó (21/8), y el deploy que el push del bot nunca disparó. La
+  regla de cada uno quedó entera.
+- **Del dashboard salió el diagnóstico de SG**, que ya está en la sección del
+  24/8 de este archivo, y el párrafo que remitía a la 3.4.1.
+- **La licencia remite a `AGENTS.md`** para lo que ya dice —`CONTRIBUTING.md` en
+  todo PR, los SPDX— y conserva lo que no dice: al publicar el motor como
+  paquete, arrastrar `LICENSE`.
+- **Dos trampas estaban después de un `---` suelto**, fuera de su sección.
+  Volvieron adentro.
+
+Ningún criterio jurídico se tocó: lo que quedó en `ESTADO.md` sigue siendo, como
+en la poda del 8/9, sobre todo criterios vivos.
+
+### Lo que decía la sección de los mínimos, tal cual
+
+> ### Los mínimos, verificados contra la ley el 9/9/2026
+>
+> **Cerrado.** Se leyeron uno por uno los arts. 19, 31, 44, 48, 58, 60, 61 y 61 bis
+> contra el texto actualizado de Infoleg. **Las cuarenta cifras estaban bien y
+> ninguna se movió.** Lo que estaba mal era otra cosa, y quedan dos invariantes:
+>
+> - **Cuatro `textoLegal` no eran el texto de la ley y ahora sí lo son** (arts. 19,
+>   31, 44 y 58). El del art. 19 le atribuía al artículo una redacción que no está
+>   en él, heredada del cuadro explicativo del asistente clásico. Ver la trampa del
+>   art. 19 al final de este documento: **es la que más veces se repitió.**
+> - **Cuatro filas de la tabla b) del art. 19 no rigen y ahora lo dicen.** El
+>   art. 3° del Decreto 1077/2017 las observó enteras —locación (2 UMA), boleto de
+>   compraventa (3), sociedades (5), otros contratos (2)—; el decreto las nombra
+>   una por una, así que no hay duda de alcance. **Se conservan con su cifra**, con
+>   la insignia «No rige» y el texto que dice qué fijaba la ley y qué la observó.
+>   El motivo es de Javier y vale escribirlo: *no es un piso exigible, pero es lo
+>   que el legislador consideró que valía esa labor, y eso sirve para fundar un
+>   pedido.* Borrarlas dejaría a quien busca «locación» sin ninguna respuesta, que
+>   informa peor que una respuesta con su advertencia. **La contrapartida es
+>   innegociable: una fila observada no se puede leer como vigente**, así que la
+>   advertencia va afuera de todo desplegable, como la insignia del 5 % de los
+>   auxiliares. El campo es `MinimoItem.observado`.
+>
+> `06_MATRIZ_DE_PROCESOS.md` y `07_GLOSARIO.md` de `herramientas-judiciales` citan
+> estas cifras: **si una se mueve, se mueven las dos citas.** Ninguna se movió, pero
+> las cuatro filas observadas les faltan a los dos documentos.
+
+---
 ## `valores` nació y se jubiló el mismo día — el 9/9
 
 Un Worker de Cloudflare con base D1, desplegado en
