@@ -45,6 +45,23 @@ posible —cambió la UMA— que no se podía comprobar.
 
 ---
 
+## 3.5.1 — 15 de septiembre de 2026
+
+PARCHE. **El motor no se tocó y ninguna cifra cambia.** Es un cambio de
+interfaz: por dónde se entra al cálculo directo.
+
+- **`honorio.ar/#directo` abre el cálculo directo** sin pasar por la portada ni
+  por la entrevista. Hasta ahora quedaba a dos clics —Comenzar, Cálculo
+  directo—. Lo pidió Javier para el ledger, que abre Honorio en un panel y lo
+  que busca ahí es justamente esa pantalla; el ledger no calcula nada, Honorio
+  sigue siendo la única fuente del número.
+- **El nombre del fragmento es un contrato con el ledger** y está dicho arriba
+  de `FRAGMENTO_DIRECTO`. Si cambia de un lado, cambia del otro.
+- **Al volver desde el cálculo directo se saca el fragmento**, por la misma
+  razón que al reiniciar: si quedara, recargar la página volvería a abrir el
+  cálculo directo.
+- **La portada y el caso compartido (`#c1=…`) siguen igual.**
+
 ## 3.5.0 — 9 de septiembre de 2026
 
 MENOR. **Ninguna cifra del cálculo cambia y el motor no se tocó.** Entra una

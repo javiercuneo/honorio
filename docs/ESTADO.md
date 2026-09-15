@@ -3,7 +3,7 @@
 Documento de continuidad entre sesiones. **Leer antes de empezar a trabajar.**
 Se actualiza en el mismo commit que el trabajo, para que nunca mienta.
 
-Última actualización: 2026-09-09 · rama `main`
+Última actualización: 2026-09-15 · rama `main`
 
 Lleva **sólo lo que sigue vivo**: dónde está el trabajo, qué está abierto, qué
 se sabe roto, qué decisiones no hay que contradecir sin saberlo y qué trampas
@@ -21,7 +21,7 @@ pregunta «¿por qué esto quedó así?».
 
 ## Dónde estamos
 
-Versión **3.5.0**, publicada en `honorio.ar`. Las **18 validaciones** de
+Versión **3.5.1**, publicada en `honorio.ar`. Las **18 validaciones** de
 `lib/legal/__tests__` están en verde y corren solas en CI. **No hay nada urgente
 ni bloqueante.**
 
@@ -331,6 +331,10 @@ está la regla y su razón, que es lo que hay que saber antes de tocar el archiv
   fragmento no recarga la página — es el caso real de pegar un enlace teniendo
   Honorio ya abierto. Y el dashboard espera al motor legacy también cuando se
   entra directo, sin pasar por la entrevista.
+- **`#directo` es contrato con el ledger** (repositorio privado `C:\IA\ledger`),
+  que abre `honorio.ar/#directo` en un panel para ir al cálculo directo sin la
+  portada. Vive en `FRAGMENTO_DIRECTO`: **no se renombra sin cambiar el ledger
+  en el mismo momento**, o el panel vuelve a caer en la portada sin avisar.
 
 ### Jurisprudencia y criterios adoptados
 

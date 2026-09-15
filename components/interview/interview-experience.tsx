@@ -35,6 +35,12 @@ import { CalculoDirectoView } from './calculo-directo-view'
 
 const transition = { duration: 0.4, ease: [0.22, 1, 0.36, 1] as const }
 
+// Entrar por `honorio.ar/#directo` abre el calculo directo sin pasar por
+// la portada. El nombre es contrato con el ledger, que abre Honorio en
+// un panel con esa direccion: si cambia aca, cambia alla en el mismo
+// momento, o el panel vuelve a caer en la portada sin avisar.
+const FRAGMENTO_DIRECTO = '#directo'
+
 export function InterviewExperience() {
   const [showLanding, setShowLanding] = useState(true)
   const [showMinimos, setShowMinimos] = useState(false)
@@ -91,6 +97,12 @@ export function InterviewExperience() {
 
   useEffect(() => {
     const abrirCaso = () => {
+      if (window.location.hash === FRAGMENTO_DIRECTO) {
+        setShowLanding(false)
+        setShowMinimos(false)
+        setShowDirecto(true)
+        return
+      }
       const caso = decodificarCaso(window.location.hash)
       if (!caso) return
       setShowLanding(false)
@@ -261,7 +273,14 @@ export function InterviewExperience() {
   if (showDirecto) {
     return (
       <CalculoDirectoView
-        onBack={() => setShowDirecto(false)}
+        onBack={() => {
+          // Misma razon que en handleRestart: si el fragmento quedara,
+          // recargar volveria a abrir el calculo directo.
+          if (window.location.hash === FRAGMENTO_DIRECTO) {
+            window.history.replaceState(null, '', window.location.pathname + window.location.search)
+          }
+          setShowDirecto(false)
+        }}
         umaValor={umaValorCargado ?? UMA_VIGENTE.valor}
       />
     )
