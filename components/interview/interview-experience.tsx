@@ -30,6 +30,7 @@ import { CardsField } from './cards-field'
 import { LandingView } from './landing-view'
 import { IntroView } from './intro-view'
 import { DashboardView } from './dashboard-view'
+import { REFERENCIAS_VACIAS, type Referencias } from '@/components/dashboard/referencias'
 import { MinimosView } from './minimos-view'
 import { CalculoDirectoView } from './calculo-directo-view'
 
@@ -50,6 +51,10 @@ export function InterviewExperience() {
   const wizard = useWizard(ALL_STEPS, initialUma)
 
   const [direction, setDirection] = useState(1)
+
+  // Viven aca y no en el dashboard porque «Revisar» lo desmonta, y
+  // volver de corregir una respuesta no tiene que borrar las fojas.
+  const [referencias, setReferencias] = useState<Referencias>(REFERENCIAS_VACIAS)
 
   const go = useCallback((dir: number, updater: () => void) => {
     setDirection(dir)
@@ -74,6 +79,7 @@ export function InterviewExperience() {
     if (window.location.hash) {
       window.history.replaceState(null, '', window.location.pathname + window.location.search)
     }
+    setReferencias(REFERENCIAS_VACIAS)
     go(-1, () => wizard.restart())
   }
 
@@ -327,6 +333,8 @@ export function InterviewExperience() {
         onBack={() => go(-1, () => wizard.back())}
         onRestart={handleRestart}
         onShowMinimos={() => setShowMinimos(true)}
+        referencias={referencias}
+        onReferencias={setReferencias}
       />
     )
   }

@@ -10,6 +10,7 @@ import { Dashboard } from "@/components/dashboard/Dashboard"
 import { Firma } from "@/components/dashboard/Firma"
 import { BotonImprimir, HOJA_PROPS } from "@/components/dashboard/imprimir"
 import { BotonCompartir } from "@/components/dashboard/compartir"
+import { ReferenciasExpediente, type Referencias } from "@/components/dashboard/referencias"
 import { PROCESO_LABEL, SENTENCIA_LABEL, EXCEPCIONES_LABEL } from "@/components/dashboard/format"
 import { SinIA } from "@/components/dashboard/primitives"
 import { AppTopbar } from "./app-topbar"
@@ -21,9 +22,18 @@ type DashboardViewProps = {
   onBack: () => void
   onRestart: () => void
   onShowMinimos: () => void
+  referencias: Referencias
+  onReferencias: (r: Referencias) => void
 }
 
-export function DashboardView({ wizard, onBack, onRestart, onShowMinimos }: DashboardViewProps) {
+export function DashboardView({
+  wizard,
+  onBack,
+  onRestart,
+  onShowMinimos,
+  referencias,
+  onReferencias,
+}: DashboardViewProps) {
   const datos = useMemo(() => {
     try {
       wizard.calculate()
@@ -138,6 +148,15 @@ export function DashboardView({ wizard, onBack, onRestart, onShowMinimos }: Dash
             </p>
           </div>
         )}
+
+        {resultado ? (
+          <ReferenciasExpediente
+            pasos={wizard.visibleSteps}
+            answers={wizard.answers}
+            referencias={referencias}
+            onChange={onReferencias}
+          />
+        ) : null}
 
         {resultado ? <Firma answers={wizard.answers} /> : null}
       </motion.div>

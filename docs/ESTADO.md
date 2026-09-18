@@ -3,7 +3,7 @@
 Documento de continuidad entre sesiones. **Leer antes de empezar a trabajar.**
 Se actualiza en el mismo commit que el trabajo, para que nunca mienta.
 
-Última actualización: 2026-09-15 · rama `main`
+Última actualización: 2026-09-18 · rama `main`
 
 Lleva **sólo lo que sigue vivo**: dónde está el trabajo, qué está abierto, qué
 se sabe roto, qué decisiones no hay que contradecir sin saberlo y qué trampas
@@ -21,7 +21,7 @@ pregunta «¿por qué esto quedó así?».
 
 ## Dónde estamos
 
-Versión **3.5.2**, publicada en `honorio.ar`. Las **18 validaciones** de
+Versión **3.5.3**, publicada en `honorio.ar`. Las **18 validaciones** de
 `lib/legal/__tests__` están en verde y corren solas en CI. **No hay nada urgente
 ni bloqueante.**
 
@@ -615,6 +615,20 @@ ningún `IMPORTRANGE` ni de Apps Script**: los valores están escritos adentro.
   también que agregar desplegables no engorde el informe desnudo.
 - **La fecha se resuelve después del montaje**, a propósito: el sitio es un
   export estático y en el HTML sería la fecha del build.
+- **Las referencias al expediente viven en memoria y en ningún otro lado**
+  (`referencias.tsx`). No van al enlace ni a `localStorage`: una carátula con
+  nombres en una URL termina en chats e historiales. Se pierden al recargar, y
+  es el precio aceptado.
+- **Una referencia cita una respuesta, no una pregunta.** La clave es el paso
+  *y* lo contestado: si al revisar cambia la respuesta, la foja no queda colgada
+  de un hecho que ya no es el del caso. Por eso el estado vive en
+  `InterviewExperience` —«Revisar» desmonta el dashboard— y se vacía al
+  reiniciar.
+- **El papel dice de quién son.** El cálculo lo respalda Honorio; las fojas las
+  consigna quien presenta el informe. Sin ese rótulo la autoridad de la
+  herramienta quedaría prestada a lo que afirme el usuario. **No crece hacia un
+  generador de escritos:** se frena en las citas. El cálculo directo no las
+  tiene: no hay respuestas que citar.
 - **La firma va sin matrícula.** Javier es abogado no matriculado y trabaja en
   el Poder Judicial; el rol dice «autor de Honorio», que es lo exacto.
 

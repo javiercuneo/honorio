@@ -45,6 +45,23 @@ posible —cambió la UMA— que no se podía comprobar.
 
 ---
 
+## 3.5.3 — 18 de septiembre de 2026
+
+PARCHE. **El motor no se tocó y ninguna cifra cambia.** Es un agregado al
+informe imprimible.
+
+- **Referencias al expediente.** Al pie del resultado, plegado, un campo por
+  cada respuesta del caso —«fs. 25», «sentencia del 3/4»— y uno optativo para
+  los autos. El caso de Honorio es abstracto a propósito; las referencias lo
+  atan a una causa, y quien recibe el informe puede verificar que cada premisa
+  consta donde se dice. Si se dan, el número vale ahí.
+- **Salen sólo en el papel, y rotuladas como de quien presenta el informe:**
+  Honorio no las verificó. El cálculo lo respalda la herramienta; las fojas,
+  no.
+- **No viajan en el enlace ni se guardan.** El enlace sigue sin llevar ningún
+  dato de nadie. Al recargar la página se pierden.
+- **Si no se completa nada, el informe sale igual que antes.**
+
 ## 3.5.2 — 15 de septiembre de 2026
 
 PARCHE. **El motor no se tocó y ninguna cifra cambia.** Es un texto de la
