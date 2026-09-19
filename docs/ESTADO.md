@@ -174,13 +174,9 @@ son unas horas y no importa.
 ### Lo que las validaciones cubren de los textos, y lo que no
 
 **Diecisiete comparan números, así que un texto que promete un porcentaje puede
-mentir con todas en verde.** Pasó cuatro veces: los rótulos de los pasos el 5/8,
-las descripciones de la cautelar el 6/8, un criterio de abogados puesto en la
-sección de auxiliares el 19/8, y **el `textoLegal` del art. 19, que no era el
-art. 19** y estuvo mal desde que el archivo existe, con todo en verde.
-
-**De esos cuatro, uno ya no puede volver a pasar.** `textosLegales.validation.ts`
-—la 18— parte cada `textoLegal` en oraciones y exige que cada una aparezca
+mentir con todas en verde.** Pasó cuatro veces entre el 5/8 y el 9/9; la lista,
+en `HISTORIA.md`. **Una de esas clases ya no puede volver a pasar:**
+`textosLegales.validation.ts` —la 18— parte cada `textoLegal` en oraciones y exige que cada una aparezca
 literal en `data/ley-27423.md`. Lleva su propio canario: comprueba que la cita
 inventada del art. 19 **no** se encuentre, porque un normalizador roto daría
 verde en todo lo demás sin estar mirando nada. Reinyectando el texto viejo, la
@@ -393,11 +389,9 @@ está la regla y su razón, que es lo que hay que saber antes de tocar el archiv
 
 ### El exhorto del art. 50
 
-- **La entrevista pregunta el inciso, y el motor devuelve uno solo.** Antes
-  devolvía los tres a la vez, que es una tabla y no una respuesta: `bandasDe()`
-  emitía dos bandas —el b) y el c)— para un mismo exhorto, así que el texto
-  regulaba el mismo acto dos veces por dos incisos distintos, y el a), que no
-  tiene banda cerrada, no se podía redactar nunca.
+- **La entrevista pregunta el inciso, y el motor devuelve uno solo.** Tres a
+  la vez es una tabla y no una respuesta: la prosa regulaba el mismo acto dos
+  veces por dos incisos distintos.
 - **El inciso a) es un piso con el techo abierto, y los otros dos son bandas
   cerradas.** Por eso `ExhortoResultado` trae `piso` **o** `banda` y nunca los
   dos: el a) no es un `Rango` con el máximo en infinito. `BandaRegulable.techoAbierto`
@@ -428,7 +422,7 @@ está la regla y su razón, que es lo que hay que saber antes de tocar el archiv
   aparece en el c). `EXHORTO_INCISOS.admiteAuxiliares` sale de leer los actos uno
   por uno, y la pantalla lo explica en vez de dejarlo raro. Con el último
   párrafo del art. 10, **es uno de los dos únicos textos que nombran a los
-  auxiliares en el exhorto**, y faltó en la transcripción hasta el 21/8.
+  auxiliares en el exhorto**.
 - **La cantidad de actos del inciso a) no multiplica nada.** Se pregunta, viaja en
   `cantidadActos` y sale en la prosa como hecho declarado, para que la resolución
   pueda decir por qué el número está arriba del piso.
@@ -437,10 +431,9 @@ está la regla y su razón, que es lo que hay que saber antes de tocar el archiv
   lectura razonable **de su caso**: hay exhortos que se agotan en sí mismos.
   Ponerla en cada texto sería forzar esa interpretación en boca de quien regula.
   Vive en el «por qué», con el fallo que la sostiene.
-- **La pantalla del exhorto no lleva prosa entre las cifras.** Llegó a tener seis
-  párrafos explicativos intercalados y había que leer para encontrar los números.
-  La regla es la del repositorio —**los números no se ocultan y las explicaciones
-  sí**—, y el único modo de esconder que la app tiene es el `Disclosure`.
+- **La pantalla del exhorto no lleva prosa entre las cifras.** La regla es la del
+  repositorio —**los números no se ocultan y las explicaciones sí**—, y el único
+  modo de esconder que la app tiene es el `Disclosure`.
 - **Abierto: no se buscó un fallo donde el honorario de un abogado exceda la banda
   del inciso.** Que las escalas de los incisos b) y c) obliguen en los dos
   extremos es lo que dice el texto, pero para los auxiliares ya se encontró una
@@ -784,28 +777,15 @@ borde derecho de la fila, en toda la app. **No inventar variantes.**
 ### «Los cálculos no usan IA» va en la portada y en las tres pantallas de resultado
 
 Es la **excepción declarada** a la regla de no agregar información: la objeción
-no bloquea una parte de la herramienta, bloquea el uso entero. Salió de una
-usuaria real que usa Honorio y **no lo puede decir en su juzgado**, porque su
-jefa no distingue entre *construido con asistencia de un modelo* y *calcula con
-un modelo*. Eso no se arregla difundiendo más: se arregla dándole una frase para
-señalar.
+no bloquea una parte de la herramienta, bloquea el uso entero, y aparece
+**mirando el número**. Vive en `SinIA`, en `primitives.tsx`, y **no se
+imprime**: en un expediente importa de qué se calculó y con qué versión —eso lo
+hace la firma—, no de qué no. La cantidad de suites que cita «Información
+adicional» la cuenta `next.config.mjs` al compilar: no se escribe. De dónde
+salió, en `HISTORIA.md`.
 
-Está en la portada **y** en el dashboard, el cálculo directo y los mínimos,
-porque la objeción no aparece al entrar sino **mirando el número**. Vive en
-`SinIA`, en `primitives.tsx`, y **no se imprime**: en un expediente importa de
-qué se calculó y con qué versión —eso lo hace la firma—, no de qué no.
-
-El desarrollo, que es lo que la hace verificable, está en «Información
-adicional»: funciones deterministas, las suites de validación —la cantidad la
-cuenta `next.config.mjs` al compilar, no se escribe—, y si alguna falla
-el sitio no se publica.
-
-**Y si vas a contar el caso del art. 22/25, copialo, no lo parafrasees.** La
-versión correcta está en el README de `herramientas-judiciales`, sección «Sobre
-el uso de IA», y en `index.html` del sitio. Ya se contó mal una vez: **el
-criterio nunca estuvo en duda** —está resuelto desde hace seis años y el
-asistente clásico ya lo distinguía—, y lo que falló fue la reescritura del
-código, en una capa que no es la jurídica.
+**Y si vas a contar el caso del art. 22/25, copialo, no lo parafrasees**: el
+criterio nunca estuvo en duda. Dónde está la versión correcta, en `HISTORIA.md`.
 
 ### Los tres rótulos de un paso del wizard
 
@@ -899,18 +879,10 @@ paquete o API, arrastrar `LICENSE` y los SPDX.**
   aparece registrada **el 10/8 dos veces**, en el plan de la prosa, y otra vez en
   la reescritura del glosario. **Un `grep` de «ARTÍCULO 19» devuelve una línea; un
   artículo se lee hasta el encabezado siguiente.**
-  - **La variante que llegó al código y sobrevivió más de un año:** el cuadro
-    explicativo del asistente clásico atribuye al art. 19 un texto que empieza
-    «Cuando no fuere posible apreciar el valor pecuniario del asunto…», que **no
-    está en la Ley 27.423**. `minimos-data.ts` lo había copiado y la pantalla lo
-    mostraba en serif, que en esta app significa «esto es la norma». Corregido el
-    9/9/2026.
-  - **Por qué se repite y qué lo corta:** la advertencia existía, pero vivía en
-    `herramientas-judiciales/docs/domain/07_GLOSARIO.md`, que **no se lee al
-    trabajar en Honorio**. Por eso está acá ahora. Y al informar una corrección
-    sobre este artículo conviene decir en la misma frase que las tablas de
-    mínimos están en él: describirla como «el texto del art. 19 estaba mal» se
-    lee, con razón, como si fuera otra vez el mismo error.
+  - **Llegó al código una vez**, con un texto que no está en la ley, y hoy lo
+    caza la 18; el relato, en `HISTORIA.md`. Al informar una corrección sobre
+    este artículo conviene decir en la misma frase que las tablas de mínimos
+    están en él: «el texto del art. 19 estaba mal» se lee como el mismo error.
 - **El panel del navegador no compone frames si el panel no está a la vista.**
   No es una limitación del entorno: **el panel está cerrado o en segundo
   plano.** Con el panel

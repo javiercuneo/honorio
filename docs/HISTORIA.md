@@ -23,6 +23,100 @@ historia de `honorio/` viajó completa con `git subtree split`, así que
 calculadoras, el asistente clásico y la documentación de dominio.
 
 ---
+## `ESTADO.md` pasó las mil líneas y se volvió a podar — el 19/9
+
+Con las referencias al expediente y el selector de fundamentos del imprimible
+el archivo llegó a 1002 líneas de 1100. **Otra vez casi toda la poda fue sacar
+lo que ya estaba contado en otro lado**, y ninguna regla se perdió:
+
+- **«Los cálculos no usan IA»** repetía el origen que ya cuentan, en este
+  archivo, «Por qué "los cálculos no usan IA" está en la portada» y «Si vas a
+  contar el caso del art. 22/25». Quedaron la regla y el aviso.
+- **El exhorto** conservaba cómo estaba antes: los tres incisos a la vez, los
+  seis párrafos de prosa, la oración que faltó en la transcripción.
+- **Lo que las validaciones cubren de los textos** listaba las cuatro veces que
+  un texto mintió con todo en verde.
+- **La trampa del art. 19** contaba entera la variante que llegó al código,
+  corregida el 9/9.
+
+El texto que salió, tal cual:
+
+### «Los cálculos no usan IA»
+
+> Es la **excepción declarada** a la regla de no agregar información: la objeción
+> no bloquea una parte de la herramienta, bloquea el uso entero. Salió de una
+> usuaria real que usa Honorio y **no lo puede decir en su juzgado**, porque su
+> jefa no distingue entre *construido con asistencia de un modelo* y *calcula con
+> un modelo*. Eso no se arregla difundiendo más: se arregla dándole una frase para
+> señalar.
+>
+> Está en la portada **y** en el dashboard, el cálculo directo y los mínimos,
+> porque la objeción no aparece al entrar sino **mirando el número**. Vive en
+> `SinIA`, en `primitives.tsx`, y **no se imprime**: en un expediente importa de
+> qué se calculó y con qué versión —eso lo hace la firma—, no de qué no.
+>
+> El desarrollo, que es lo que la hace verificable, está en «Información
+> adicional»: funciones deterministas, las suites de validación —la cantidad la
+> cuenta `next.config.mjs` al compilar, no se escribe—, y si alguna falla
+> el sitio no se publica.
+>
+> **Y si vas a contar el caso del art. 22/25, copialo, no lo parafrasees.** La
+> versión correcta está en el README de `herramientas-judiciales`, sección «Sobre
+> el uso de IA», y en `index.html` del sitio. Ya se contó mal una vez: **el
+> criterio nunca estuvo en duda** —está resuelto desde hace seis años y el
+> asistente clásico ya lo distinguía—, y lo que falló fue la reescritura del
+> código, en una capa que no es la jurídica.
+>
+
+### El exhorto: los tres incisos a la vez
+
+> - **La entrevista pregunta el inciso, y el motor devuelve uno solo.** Antes
+>   devolvía los tres a la vez, que es una tabla y no una respuesta: `bandasDe()`
+>   emitía dos bandas —el b) y el c)— para un mismo exhorto, así que el texto
+>   regulaba el mismo acto dos veces por dos incisos distintos, y el a), que no
+>   tiene banda cerrada, no se podía redactar nunca.
+
+### El exhorto: los seis párrafos
+
+> - **La pantalla del exhorto no lleva prosa entre las cifras.** Llegó a tener seis
+>   párrafos explicativos intercalados y había que leer para encontrar los números.
+>   La regla es la del repositorio —**los números no se ocultan y las explicaciones
+>   sí**—, y el único modo de esconder que la app tiene es el `Disclosure`.
+
+### El exhorto: la oración sobre auxiliares
+
+>   por uno, y la pantalla lo explica en vez de dejarlo raro. Con el último
+>   párrafo del art. 10, **es uno de los dos únicos textos que nombran a los
+>   auxiliares en el exhorto**, y faltó en la transcripción hasta el 21/8.
+
+### Lo que las validaciones cubren de los textos
+
+> **Diecisiete comparan números, así que un texto que promete un porcentaje puede
+> mentir con todas en verde.** Pasó cuatro veces: los rótulos de los pasos el 5/8,
+> las descripciones de la cautelar el 6/8, un criterio de abogados puesto en la
+> sección de auxiliares el 19/8, y **el `textoLegal` del art. 19, que no era el
+> art. 19** y estuvo mal desde que el archivo existe, con todo en verde.
+>
+> **De esos cuatro, uno ya no puede volver a pasar.** `textosLegales.validation.ts`
+> —la 18— parte
+
+### La trampa del art. 19
+
+>   - **La variante que llegó al código y sobrevivió más de un año:** el cuadro
+>     explicativo del asistente clásico atribuye al art. 19 un texto que empieza
+>     «Cuando no fuere posible apreciar el valor pecuniario del asunto…», que **no
+>     está en la Ley 27.423**. `minimos-data.ts` lo había copiado y la pantalla lo
+>     mostraba en serif, que en esta app significa «esto es la norma». Corregido el
+>     9/9/2026.
+>   - **Por qué se repite y qué lo corta:** la advertencia existía, pero vivía en
+>     `herramientas-judiciales/docs/domain/07_GLOSARIO.md`, que **no se lee al
+>     trabajar en Honorio**. Por eso está acá ahora. Y al informar una corrección
+>     sobre este artículo conviene decir en la misma frase que las tablas de
+>     mínimos están en él: describirla como «el texto del art. 19 estaba mal» se
+>     lee, con razón, como si fuera otra vez el mismo error.
+
+---
+
 ## `ESTADO.md` se podó antes de que el techo lo obligara — el 15/9
 
 Con la entrada de `#directo` el archivo llegó a 1035 líneas de 1100 y el hook
