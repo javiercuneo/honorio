@@ -20,7 +20,7 @@
 // tiene que salir igual.
 // ---------------------------------------------------------------
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { Printer } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -63,9 +63,15 @@ function useImpresion(conFundamentos: boolean) {
   }, [])
 }
 
-export function BotonImprimir() {
+/**
+ * `referencias` es el editor de las referencias al expediente. Vive
+ * adentro de este menu y no en el resultado: es una decision sobre el
+ * papel, y la pantalla no tiene por que crecer para quien no la usa.
+ */
+export function BotonImprimir({ referencias }: { referencias?: ReactNode }) {
   const [conFundamentos, setConFundamentos] = useState(true)
   const [abierto, setAbierto] = useState(false)
+  const [conReferencias, setConReferencias] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
   useImpresion(conFundamentos)
@@ -96,7 +102,10 @@ export function BotonImprimir() {
       <Button
         variant="ghost"
         size="sm"
-        onClick={() => setAbierto((v) => !v)}
+        onClick={() => {
+          setConReferencias(false)
+          setAbierto((v) => !v)
+        }}
         aria-expanded={abierto}
         className="h-8 px-2.5 text-[13px] text-muted-foreground"
       >
@@ -105,7 +114,12 @@ export function BotonImprimir() {
       </Button>
 
       {abierto ? (
-        <div className="absolute right-0 top-10 z-50 w-72 rounded-lg border border-border bg-card p-4 shadow-[0_8px_24px_rgb(0_0_0/0.10)]">
+        <div
+          className={cn(
+            'absolute right-0 top-10 z-50 max-h-[calc(100vh-4rem)] overflow-y-auto rounded-lg border border-border bg-card p-4 shadow-[0_8px_24px_rgb(0_0_0/0.10)]',
+            conReferencias ? 'w-[26rem] max-w-[calc(100vw-2rem)]' : 'w-72',
+          )}
+        >
           <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-faint">
             Informe
           </p>
@@ -141,9 +155,30 @@ export function BotonImprimir() {
               : 'Solo los números y las reglas aplicadas, sin las explicaciones. Es el cálculo para adjuntar.'}
           </p>
 
-          <Button size="sm" onClick={imprimir} className="mt-4 h-8 w-full text-[13px]">
-            Imprimir
-          </Button>
+          {conReferencias ? (
+            <div className="mt-4 border-t border-hair pt-3">
+              <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-faint">
+                Referencias al expediente
+              </p>
+              <div className="mt-2">{referencias}</div>
+            </div>
+          ) : null}
+
+          <div className="mt-4 flex gap-2">
+            <Button size="sm" onClick={imprimir} className="h-8 flex-1 text-[13px]">
+              Imprimir
+            </Button>
+            {referencias && !conReferencias ? (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setConReferencias(true)}
+                className="h-8 flex-1 text-[13px]"
+              >
+                Con referencias…
+              </Button>
+            ) : null}
+          </div>
 
           <p className="mt-3 border-t border-hair pt-3 text-[12px] leading-relaxed text-faint">
             Para guardarlo como PDF, elegí «Guardar como PDF» en el destino

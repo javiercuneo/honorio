@@ -627,7 +627,8 @@ ningún `IMPORTRANGE` ni de Apps Script**: los valores están escritos adentro.
 - **El papel dice de quién son.** El cálculo lo respalda Honorio; las fojas las
   consigna quien presenta el informe. Sin ese rótulo la autoridad de la
   herramienta quedaría prestada a lo que afirme el usuario. **No crece hacia un
-  generador de escritos:** se frena en las citas. El cálculo directo no las
+  generador de escritos:** se frena en las citas. **Se cargan desde el menú de
+  Imprimir, no en el resultado**, que ya tiene bastante: decisión de Javier. El cálculo directo no las
   tiene: no hay respuestas que citar.
 - **La firma va sin matrícula.** Javier es abogado no matriculado y trabaja en
   el Poder Judicial; el rol dice «autor de Honorio», que es lo exacto.

@@ -10,7 +10,7 @@ import { Dashboard } from "@/components/dashboard/Dashboard"
 import { Firma } from "@/components/dashboard/Firma"
 import { BotonImprimir, HOJA_PROPS } from "@/components/dashboard/imprimir"
 import { BotonCompartir } from "@/components/dashboard/compartir"
-import { ReferenciasExpediente, type Referencias } from "@/components/dashboard/referencias"
+import { EditorReferencias, InformeReferencias, type Referencias } from "@/components/dashboard/referencias"
 import { PROCESO_LABEL, SENTENCIA_LABEL, EXCEPCIONES_LABEL } from "@/components/dashboard/format"
 import { SinIA } from "@/components/dashboard/primitives"
 import { AppTopbar } from "./app-topbar"
@@ -97,7 +97,18 @@ export function DashboardView({
           Minimos
         </Button>
         <BotonCompartir answers={wizard.answers} />
-        <BotonImprimir />
+        <BotonImprimir
+          referencias={
+            resultado ? (
+              <EditorReferencias
+                pasos={wizard.visibleSteps}
+                answers={wizard.answers}
+                referencias={referencias}
+                onChange={onReferencias}
+              />
+            ) : undefined
+          }
+        />
         <Button variant="outline" size="sm" onClick={onRestart} className="h-8 text-[13px]">
           <RotateCcw className="mr-1.5 h-3.5 w-3.5" />
           Nuevo cálculo
@@ -150,11 +161,10 @@ export function DashboardView({
         )}
 
         {resultado ? (
-          <ReferenciasExpediente
+          <InformeReferencias
             pasos={wizard.visibleSteps}
             answers={wizard.answers}
             referencias={referencias}
-            onChange={onReferencias}
           />
         ) : null}
 

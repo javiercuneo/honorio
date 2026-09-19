@@ -50,9 +50,11 @@ posible —cambió la UMA— que no se podía comprobar.
 PARCHE. **El motor no se tocó y ninguna cifra cambia.** Es un agregado al
 informe imprimible.
 
-- **Referencias al expediente.** Al pie del resultado, plegado, un campo por
-  cada respuesta del caso —«fs. 25», «sentencia del 3/4»— y uno optativo para
-  los autos. El caso de Honorio es abstracto a propósito; las referencias lo
+- **Referencias al expediente.** En el menú de Imprimir, el botón «Con
+  referencias…» abre un campo por cada respuesta del caso —«fs. 25»,
+  «sentencia del 3/4»— y uno optativo para los autos. **El resultado en
+  pantalla no crece:** es una decisión sobre el papel y vive donde se decide
+  qué va al papel. El caso de Honorio es abstracto a propósito; las referencias lo
   atan a una causa, y quien recibe el informe puede verificar que cada premisa
   consta donde se dice. Si se dan, el número vale ahí.
 - **Salen sólo en el papel, y rotuladas como de quien presenta el informe:**

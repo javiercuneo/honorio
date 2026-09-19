@@ -27,13 +27,16 @@
 //   Sin ese rotulo la autoridad de la herramienta quedaria prestada a
 //   lo que afirme el usuario.
 //
+//   No ocupan lugar en el resultado. Se cargan desde el menu de
+//   Imprimir, que es donde se decide que va al papel: la pantalla ya
+//   tiene bastante, y la mayoria nunca las va a usar.
+//
 // Si no se completa nada, el informe sale igual que antes.
 // ---------------------------------------------------------------
 
 import type { Answers } from '@/lib/legal/types'
 import { resumenPaso, type WizardStepDef } from '@/lib/wizard/wizard-schema'
-import { SOLO_PANTALLA } from './imprimir'
-import { Etiqueta, SeccionPlegable } from './primitives'
+import { Etiqueta } from './primitives'
 
 export interface Referencias {
   autos: string
@@ -67,75 +70,72 @@ function datosDelCaso(pasos: WizardStepDef[], answers: Answers): Dato[] {
 const CAMPO =
   'h-8 w-full rounded-md border border-border bg-background px-2.5 text-[13px] text-foreground placeholder:text-faint focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
 
-/** Donde se cargan. Solo pantalla, plegado: la mayoria no lo usa. */
-function EditorReferencias({
-  datos,
+interface PropsReferencias {
+  pasos: WizardStepDef[]
+  answers: Answers
+  referencias: Referencias
+}
+
+/** Donde se cargan: adentro del menu de Imprimir. */
+export function EditorReferencias({
+  pasos,
+  answers,
   referencias,
   onChange,
-}: {
-  datos: Dato[]
-  referencias: Referencias
-  onChange: (r: Referencias) => void
-}) {
+}: PropsReferencias & { onChange: (r: Referencias) => void }) {
+  const datos = datosDelCaso(pasos, answers)
   const setDato = (clave: string, texto: string) =>
     onChange({ ...referencias, porDato: { ...referencias.porDato, [clave]: texto } })
 
   return (
-    <div {...SOLO_PANTALLA} className="mt-10 border-t border-border pt-3">
-      <SeccionPlegable etiqueta="Referencias al expediente">
-        <p className="max-w-2xl text-[12px] leading-relaxed text-muted-foreground">
-          Para presentar este cálculo en una causa: indicá dónde consta cada
-          dato —«fs. 25», «sentencia del 3/4»— y quien lo reciba puede
-          verificar que el caso es el de su expediente. Salen en el informe
-          impreso, rotuladas como tuyas. No se guardan ni viajan en el
-          enlace: al recargar la página se pierden.
-        </p>
+    <div>
+      <p className="text-[12px] leading-relaxed text-faint">
+        Indicá dónde consta cada dato —«fs. 25», «sentencia del 3/4»— y
+        quien reciba el informe puede verificar que el caso es el de su
+        expediente. Mientras estén completadas salen en el informe,
+        rotuladas como tuyas. No se guardan ni viajan en el enlace: al
+        recargar la página se pierden.
+      </p>
 
-        <label className="mt-4 block max-w-2xl">
-          <Etiqueta>Autos / expediente</Etiqueta>
-          <input
-            type="text"
-            value={referencias.autos}
-            onChange={(e) => onChange({ ...referencias, autos: e.target.value })}
-            placeholder="Optativo"
-            className={CAMPO + ' mt-1'}
-          />
-        </label>
+      <label className="mt-3 block">
+        <Etiqueta>Autos / expediente</Etiqueta>
+        <input
+          type="text"
+          value={referencias.autos}
+          onChange={(e) => onChange({ ...referencias, autos: e.target.value })}
+          placeholder="Optativo"
+          className={CAMPO + ' mt-1'}
+        />
+      </label>
 
-        <ul className="mt-4 max-w-2xl divide-y divide-hair border-y border-hair">
-          {datos.map((d) => (
-            <li
-              key={d.clave}
-              className="grid grid-cols-1 items-center gap-x-4 gap-y-1.5 py-2 md:grid-cols-[1fr_12rem]"
-            >
-              <span className="min-w-0 text-[13px]">
-                <span className="text-muted-foreground">{d.rotulo}: </span>
-                <span className="text-foreground">{d.valor}</span>
-              </span>
-              <input
-                type="text"
-                aria-label={'Referencia de ' + d.rotulo}
-                value={referencias.porDato[d.clave] ?? ''}
-                onChange={(e) => setDato(d.clave, e.target.value)}
-                placeholder="fs. …"
-                className={CAMPO}
-              />
-            </li>
-          ))}
-        </ul>
-      </SeccionPlegable>
+      <ul className="mt-3 divide-y divide-hair border-y border-hair">
+        {datos.map((d) => (
+          <li
+            key={d.clave}
+            className="grid grid-cols-[1fr_8rem] items-center gap-x-3 py-1.5"
+          >
+            <span className="min-w-0 text-[12px] leading-snug">
+              <span className="text-muted-foreground">{d.rotulo}: </span>
+              <span className="text-foreground">{d.valor}</span>
+            </span>
+            <input
+              type="text"
+              aria-label={'Referencia de ' + d.rotulo}
+              value={referencias.porDato[d.clave] ?? ''}
+              onChange={(e) => setDato(d.clave, e.target.value)}
+              placeholder="fs. …"
+              className={CAMPO}
+            />
+          </li>
+        ))}
+      </ul>
     </div>
   )
 }
 
 /** Lo que sale en el papel. No existe en pantalla. */
-function InformeReferencias({
-  datos,
-  referencias,
-}: {
-  datos: Dato[]
-  referencias: Referencias
-}) {
+export function InformeReferencias({ pasos, answers, referencias }: PropsReferencias) {
+  const datos = datosDelCaso(pasos, answers)
   const autos = referencias.autos.trim()
   const citados = datos
     .map((d) => ({ ...d, ref: (referencias.porDato[d.clave] ?? '').trim() }))
@@ -166,27 +166,5 @@ function InformeReferencias({
         cada dato conste donde se indica.
       </p>
     </section>
-  )
-}
-
-export function ReferenciasExpediente({
-  pasos,
-  answers,
-  referencias,
-  onChange,
-}: {
-  pasos: WizardStepDef[]
-  answers: Answers
-  referencias: Referencias
-  onChange: (r: Referencias) => void
-}) {
-  const datos = datosDelCaso(pasos, answers)
-  if (datos.length === 0) return null
-
-  return (
-    <>
-      <EditorReferencias datos={datos} referencias={referencias} onChange={onChange} />
-      <InformeReferencias datos={datos} referencias={referencias} />
-    </>
   )
 }
