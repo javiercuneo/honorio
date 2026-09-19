@@ -281,8 +281,9 @@
       volver de la impresion no cambie nada de lo que el lector eligio.
    2. Los fundamentos se imprimen si el lector lo pidio. La app abre
       los <details> antes de imprimir y los vuelve a cerrar despues
-      (ver usarImpresion): asi el interruptor decide de verdad, en vez
-      de depender de cuales quedaron abiertos al leer.
+      (ver useImpresion): asi el selector decide de verdad, en vez de
+      depender de cuales quedaron abiertos al leer —salvo que se elija
+      justamente eso, «Abiertos»—.
    3. Nada se corta al medio. Cada tarjeta y cada fila del ledger son
       indivisibles.
    ------------------------------------------------------------------ */

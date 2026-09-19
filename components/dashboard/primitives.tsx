@@ -577,7 +577,7 @@ export function PlegadoEnCelular({
  * sigue arriba, entero y a la vista.
  *
  * Va en `<details>` y no en estado de React a proposito: asi el
- * interruptor «incluir los fundamentos» del imprimible lo gobierna,
+ * selector de fundamentos del imprimible lo gobierna,
  * como a todo lo demas que se pliega. Con `useState` el informe
  * saldria con lo que el lector hubiera abierto al leer.
  */

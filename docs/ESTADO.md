@@ -3,7 +3,7 @@
 Documento de continuidad entre sesiones. **Leer antes de empezar a trabajar.**
 Se actualiza en el mismo commit que el trabajo, para que nunca mienta.
 
-Última actualización: 2026-09-18 · rama `main`
+Última actualización: 2026-09-19 · rama `main`
 
 Lleva **sólo lo que sigue vivo**: dónde está el trabajo, qué está abierto, qué
 se sabe roto, qué decisiones no hay que contradecir sin saberlo y qué trampas
@@ -21,7 +21,7 @@ pregunta «¿por qué esto quedó así?».
 
 ## Dónde estamos
 
-Versión **3.5.3**, publicada en `honorio.ar`. Las **18 validaciones** de
+Versión **3.5.4**, publicada en `honorio.ar`. Las **18 validaciones** de
 `lib/legal/__tests__` están en verde y corren solas en CI. **No hay nada urgente
 ni bloqueante.**
 
@@ -613,6 +613,11 @@ ningún `IMPORTRANGE` ni de Apps Script**: los valores están escritos adentro.
   todos en `beforeprint` y se restaura el estado exacto en `afterprint`, **al
   evento y no al botón**, porque `Ctrl+P` tiene que dar el mismo informe. De ahí
   también que agregar desplegables no engorde el informe desnudo.
+- **Fundamentos: todos, ninguno o «Abiertos».** El tercero imprime lo que el
+  lector dejó abierto en pantalla, y no contradice lo anterior: el bug era
+  imprimir lo abierto *por casualidad*; elegido, es la forma de decidir qué
+  fundamento va, al lado de su número y no en una lista de títulos sueltos.
+  Alcanza también a las secciones plegadas. Las cifras salen siempre.
 - **La fecha se resuelve después del montaje**, a propósito: el sitio es un
   export estático y en el HTML sería la fecha del build.
 - **Las referencias al expediente viven en memoria y en ningún otro lado**
@@ -712,12 +717,12 @@ diagnóstico entero está en `HISTORIA.md`.
 - **`SeccionPlegable` no dice «por qué», y no puede.** El «por qué» es un signo
   único de la app y usarlo para plegar una sección entera sería inventar una
   variante. Dice «Ver» / «Ocultar».
-- **Va en `<details>` y no en estado de React**, para que el interruptor
-  «incluir los fundamentos» del imprimible lo gobierne. Con `useState` el
+- **Va en `<details>` y no en estado de React**, para que el selector de
+  fundamentos del imprimible lo gobierne. Con `useState` el
   informe saldría con lo que el lector hubiera abierto al leer, que es el bug
   que `imprimir.tsx` existe para evitar.
 - **La tabla de tramos y la barra del excedente viven en la zona 3, adentro de
-  un desplegable**, así que el interruptor del imprimible también las gobierna.
+  un desplegable**, así que el selector del imprimible también las gobierna.
 - **El sujeto del honorario es un cuarto eje de color y no se confunde con los
   tres del cálculo.** Los tres ejes dicen *qué parte de la cuenta* toca una
   regla; el sujeto dice *a quién* se le regula. `propio` reusa cobalto —que ya

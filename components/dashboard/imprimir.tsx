@@ -1,16 +1,17 @@
 'use client'
 
 // ---------------------------------------------------------------
-// Imprimir el calculo, con o sin los fundamentos.
+// Imprimir el calculo, con todos los fundamentos, sin ninguno, o con
+// los que el lector dejo abiertos.
 //
-// El interruptor existe porque son dos documentos distintos con el
-// mismo numero adentro: el calculo desnudo, para adjuntar, y el
-// calculo fundado, para quien tiene que sostenerlo.
+// El selector existe porque son documentos distintos con el mismo
+// numero adentro: el calculo desnudo, para adjuntar, el calculo
+// fundado, para quien tiene que sostenerlo, y el fundado a medida.
 //
 // La parte que no es obvia: los fundamentos viven en <details>, y un
 // <details> cerrado no imprime su contenido. Si no se hiciera nada,
 // el informe saldria con los fundamentos que el lector hubiera
-// abierto al leer —o sea, cualquier cosa— y el interruptor seria
+// abierto al leer —o sea, cualquier cosa— y el selector seria
 // decorativo. Asi que antes de imprimir se abren o se cierran todos
 // segun lo que se pidio, y despues se restaura exactamente el estado
 // que habia.
@@ -18,12 +19,20 @@
 // Se engancha en beforeprint/afterprint y no solo en el boton porque
 // el usuario tambien puede imprimir con Ctrl+P, y ahi el informe
 // tiene que salir igual.
+//
+// La tercera opcion, «los que tengo abiertos», parece contradecir lo
+// anterior y no lo hace. Lo que se evitaba era que el informe saliera
+// con lo abierto *por casualidad*. Elegido a proposito, es la forma de
+// decidir que fundamentos van: se abren al lado de su numero, que es
+// donde se entiende que es cada uno, y no en una lista de titulos
+// sueltos. Ninguna opcion toca las cifras: se eligen frases.
 // ---------------------------------------------------------------
 
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { Printer } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { Segmented } from './primitives'
 
 /** Marca el arbol que se imprime; el CSS lo ensancha a la hoja. */
 export const HOJA_PROPS = { 'data-imprimir': 'hoja' } as const
@@ -31,22 +40,41 @@ export const HOJA_PROPS = { 'data-imprimir': 'hoja' } as const
 /** Marca lo que no va al papel: botones, selectores, deslizadores. */
 export const SOLO_PANTALLA = { 'data-imprimir': 'no' } as const
 
-function useImpresion(conFundamentos: boolean) {
+type Fundamentos = 'todos' | 'ninguno' | 'abiertos'
+
+const FUNDAMENTOS_OPCIONES: { value: Fundamentos; label: string }[] = [
+  { value: 'todos', label: 'Todos' },
+  { value: 'ninguno', label: 'Ninguno' },
+  { value: 'abiertos', label: 'Abiertos' },
+]
+
+const FUNDAMENTOS_AYUDA: Record<Fundamentos, string> = {
+  todos:
+    'Cada regla sale con la norma y el criterio que la funda. Es el cálculo para sostener.',
+  ninguno:
+    'Solo los números y las reglas aplicadas, sin las explicaciones. Es el cálculo para adjuntar.',
+  abiertos:
+    'Sale como lo estás viendo. Cerrá este cuadro, abrí en el resultado los «por qué» que te sirven, cerrá los que no, y volvé a imprimir. Los números salen siempre.',
+}
+
+function useImpresion(fundamentos: Fundamentos) {
   // Se lee del ref y no del estado porque los manejadores de
   // beforeprint quedan registrados una sola vez y tienen que ver el
   // valor del momento, no el del render en que se engancharon.
-  const conFundamentosRef = useRef(conFundamentos)
-  conFundamentosRef.current = conFundamentos
+  const fundamentosRef = useRef(fundamentos)
+  fundamentosRef.current = fundamentos
 
   useEffect(() => {
     let previos: { el: HTMLDetailsElement; abierto: boolean }[] = []
 
     const antes = () => {
+      if (fundamentosRef.current === 'abiertos') return
       const todos = Array.from(
         document.querySelectorAll<HTMLDetailsElement>('details'),
       )
       previos = todos.map((el) => ({ el, abierto: el.open }))
-      for (const { el } of previos) el.open = conFundamentosRef.current
+      const abrir = fundamentosRef.current === 'todos'
+      for (const { el } of previos) el.open = abrir
     }
 
     const despues = () => {
@@ -69,12 +97,12 @@ function useImpresion(conFundamentos: boolean) {
  * papel, y la pantalla no tiene por que crecer para quien no la usa.
  */
 export function BotonImprimir({ referencias }: { referencias?: ReactNode }) {
-  const [conFundamentos, setConFundamentos] = useState(true)
+  const [fundamentos, setFundamentos] = useState<Fundamentos>('todos')
   const [abierto, setAbierto] = useState(false)
   const [conReferencias, setConReferencias] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
-  useImpresion(conFundamentos)
+  useImpresion(fundamentos)
 
   useEffect(() => {
     if (!abierto) return
@@ -124,35 +152,18 @@ export function BotonImprimir({ referencias }: { referencias?: ReactNode }) {
             Informe
           </p>
 
-          <button
-            type="button"
-            role="switch"
-            aria-checked={conFundamentos}
-            onClick={() => setConFundamentos((v) => !v)}
-            className="mt-2.5 flex w-full items-center justify-between gap-6 py-1.5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            <span className="text-[13px] text-foreground">
-              Incluir los fundamentos
-            </span>
-            <span
-              className={cn(
-                'relative h-4 w-7 shrink-0 rounded-full transition-colors',
-                conFundamentos ? 'bg-primary' : 'bg-border',
-              )}
-            >
-              <span
-                className={cn(
-                  'absolute top-0.5 h-3 w-3 rounded-full bg-card transition-transform',
-                  conFundamentos ? 'translate-x-3.5' : 'translate-x-0.5',
-                )}
-              />
-            </span>
-          </button>
+          <p className="mt-2.5 text-[13px] text-foreground">Fundamentos</p>
+          <div className="mt-1.5">
+            <Segmented
+              options={FUNDAMENTOS_OPCIONES}
+              value={fundamentos}
+              onChange={setFundamentos}
+              ariaLabel="Qué fundamentos imprimir"
+            />
+          </div>
 
           <p className="mt-2 text-[12px] leading-relaxed text-faint">
-            {conFundamentos
-              ? 'Cada regla sale con la norma y el criterio que la funda. Es el cálculo para sostener.'
-              : 'Solo los números y las reglas aplicadas, sin las explicaciones. Es el cálculo para adjuntar.'}
+            {FUNDAMENTOS_AYUDA[fundamentos]}
           </p>
 
           {conReferencias ? (

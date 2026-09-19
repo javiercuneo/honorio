@@ -45,6 +45,19 @@ posible —cambió la UMA— que no se podía comprobar.
 
 ---
 
+## 3.5.4 — 19 de septiembre de 2026
+
+PARCHE. **El motor no se tocó y ninguna cifra cambia.** Es una opción más del
+informe imprimible.
+
+- **Se puede elegir qué fundamentos imprimir.** El interruptor «Incluir los
+  fundamentos» pasa a ser un selector de tres: **Todos**, **Ninguno** y
+  **Abiertos**. El tercero imprime el resultado como se ve: se abren en
+  pantalla los «por qué» que sirven, al lado de su número, y se cierran los
+  que no. No todo fundamento sirve para cada escrito.
+- **Las cifras salen siempre**, con cualquiera de las tres: lo que se elige son
+  frases.
+
 ## 3.5.3 — 18 de septiembre de 2026
 
 PARCHE. **El motor no se tocó y ninguna cifra cambia.** Es un agregado al
