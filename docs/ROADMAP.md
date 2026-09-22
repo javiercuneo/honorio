@@ -45,17 +45,10 @@ escapen del motor hacia la interfaz. Mientras eso se sostenga, los cuatro
 son baratos. El día que un cálculo viva en un componente React, los cuatro
 se caen juntos.
 
-La licencia ya no bloquea esto: `honorio/` es AGPL-3.0-or-later desde
-1.0.0, que es la respuesta pensada justamente para el caso de publicar el
-motor como paquete o como API. Al abrir cualquiera de las cuatro formas hay
-que arrastrar el `LICENSE` y los encabezados SPDX, no solo el código.
-
-Un matiz honesto sobre el alcance: la cláusula de red de la AGPL (art. 13)
-muerde cuando alguien corre una versión modificada **en un servidor**. Como
-hoy Honorio es un sitio estático y el cálculo pasa en el navegador del
-lector, en ese uso el efecto principal de la AGPL es el copyleft sobre la
-distribución. Donde muerde de verdad es exactamente acá: el día que el motor
-esté detrás de una API.
+Licencia: el código es de todos los derechos reservados desde el 22/9/2026.
+Publicar el motor como paquete o API es una decisión de Javier sobre qué
+autoriza y a quién, no un paso técnico: se consulta antes de abrir cualquiera
+de las cuatro formas.
 
 ---
 

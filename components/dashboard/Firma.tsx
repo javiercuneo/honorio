@@ -39,7 +39,7 @@ import { Etiqueta } from './primitives'
 
 const VERSION = process.env.NEXT_PUBLIC_VERSION ?? '0.0.0'
 
-const AUTOR = 'L. Javier Cúneo Libarona'
+const AUTOR = 'Luis Javier Cúneo Libarona'
 
 function Enlace({ href, children }: { href: string; children: React.ReactNode }) {
   return (
@@ -107,7 +107,7 @@ export function Firma({ answers }: { answers?: Answers }) {
         <span aria-hidden="true">·</span>
         <Enlace href={REPOSITORIO}>código</Enlace>
         <span aria-hidden="true">·</span>
-        <Enlace href={LICENCIA}>AGPL-3.0</Enlace>
+        <Enlace href={LICENCIA}>© todos los derechos reservados</Enlace>
         <span aria-hidden="true">·</span>
         <Enlace href={'mailto:' + CONTACTO}>{CONTACTO}</Enlace>
       </p>

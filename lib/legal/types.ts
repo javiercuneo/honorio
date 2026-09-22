@@ -1,5 +1,5 @@
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Copyright (C) 2026 L. Javier Cuneo Libarona
+// Copyright (C) 2026 Luis Javier Cuneo Libarona. Todos los derechos reservados.
+// Codigo publicado para auditoria, sin licencia de uso: ver LICENSE.
 // ---------------------------------------------------------------
 // lib/legal/types.ts
 // Interfaces del motor juridico — Framework-agnostic

@@ -131,7 +131,8 @@ Invariantes que hay que sostener:
 - Una sección nueva del dashboard **declara de quién es el honorario** —`propio`
   o `otro`— y entra en una de las tres zonas. Las reglas, en
   [`docs/ESTADO.md`](docs/ESTADO.md), «Las tres zonas del dashboard».
-- Los archivos de `lib/legal/` llevan encabezado SPDX (AGPL). Uno nuevo también.
+- Los archivos de `lib/legal/` llevan el encabezado de copyright
+  («Todos los derechos reservados… ver LICENSE»). Uno nuevo también.
 
 Detalle de capas y contratos: [`docs/ARQUITECTURA.md`](docs/ARQUITECTURA.md).
 Lo que sigue en curso: [`docs/ROADMAP.md`](docs/ROADMAP.md).
@@ -167,10 +168,11 @@ compartido, se arregla allá —que es la fuente— y se propaga a propósito.
   con `git commit -F -`; en PowerShell, `@'...'@`. Lo que falla es mezclarlas:
   la de PowerShell adentro de Bash mete un `@` suelto como asunto del commit.
   `git commit -F <archivo>` anda en los dos.
-- **Licencia AGPL-3.0-or-later.** Si aparece un PR, lo primero que se mira es la
-  aceptación de [`CONTRIBUTING.md`](CONTRIBUTING.md): sin eso se pierde la
-  opción de licenciar comercialmente. El motivo está en el README y no hace
-  falta rediscutirlo.
+- **Todos los derechos reservados, código a la vista para auditar** (desde el
+  22/9/2026; antes fue AGPL). Si aparece un PR, lo primero que se mira es la
+  aceptación de [`CONTRIBUTING.md`](CONTRIBUTING.md): sin eso el aporte no
+  puede entrar. El motivo está en `docs/ESTADO.md` y no hace falta
+  rediscutirlo.
 - **El sitio se publica en `honorio.ar`** desde `public/CNAME`. El prefijo de
   publicación sale de `PAGES_BASE_PATH`, y acá el default vacío es el correcto.
 

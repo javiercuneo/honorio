@@ -45,6 +45,19 @@ posible —cambió la UMA— que no se podía comprobar.
 
 ---
 
+## 3.5.5 — 22 de septiembre de 2026
+
+PARCHE. **El motor no se tocó y ninguna cifra cambia.** Cambia la licencia del
+código.
+
+- **Honorio deja de ser AGPL: todos los derechos reservados.** El código sigue
+  público para que se pueda auditar, pero publicarlo no es licenciarlo: usarlo,
+  copiarlo, modificarlo o publicarlo —también en una red interna— requiere
+  autorización escrita, que se da caso por caso a quien explique para qué.
+  **Usar la calculadora en honorio.ar sigue siendo libre.**
+- El pie de la app nombra al autor completo y enlaza la licencia nueva; los
+  encabezados de `lib/legal/` pasan de SPDX-AGPL a copyright.
+
 ## 3.5.4 — 19 de septiembre de 2026
 
 PARCHE. **El motor no se tocó y ninguna cifra cambia.** Es una opción más del

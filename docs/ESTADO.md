@@ -21,7 +21,7 @@ pregunta «¿por qué esto quedó así?».
 
 ## Dónde estamos
 
-Versión **3.5.4**, publicada en `honorio.ar`. Las **18 validaciones** de
+Versión **3.5.5**, publicada en `honorio.ar`. Las **18 validaciones** de
 `lib/legal/__tests__` están en verde y corren solas en CI. **No hay nada urgente
 ni bloqueante.**
 
@@ -853,18 +853,21 @@ para esos el mismo art. 21 manda considerar que hay una sola parte.
 posterior.
 
 Los invariantes de capas —el motor no conoce React, `cadena.ts` no reimplementa
-fórmulas, el alias `@/*`, los encabezados SPDX— están en
+fórmulas, el alias `@/*`, el encabezado de copyright— están en
 [`AGENTS.md`](../AGENTS.md) y no se repiten acá.
 
 ### Licencia
 
-**AGPL-3.0-or-later** (`LICENSE`, texto verbatim de la FSF). Decidido por Javier
-el 31/7. El motivo, para no rediscutirlo: no quiere restringir el uso ni cobrar
-por la app, quiere que un tercero no pueda cerrar el motor —donde están los
-criterios— como producto propio. Lo que hay que sostener por eso —la aceptación
-de `CONTRIBUTING.md` en todo PR y los SPDX de `lib/legal/`— está en
-[`AGENTS.md`](../AGENTS.md). Lo que no está ahí: **al publicar el motor como
-paquete o API, arrastrar `LICENSE` y los SPDX.**
+**Copyright © 2026 Luis Javier Cúneo Libarona. Todos los derechos
+reservados**, con el código público para auditar (`LICENSE`). Decidido por
+Javier el 22/9; hasta ahí fue AGPL (ver `HISTORIA.md`). El motivo, para no
+rediscutirlo: el código se mira, no se reusa sin permiso; quien lo quiera para
+algo concreto escribe y se autoriza caso por caso. **El uso de honorio.ar sigue
+libre**: la reserva es sobre el código. Lo que hay que sostener —la aceptación
+de `CONTRIBUTING.md` en todo PR y el encabezado de copyright de `lib/legal/`—
+está en [`AGENTS.md`](../AGENTS.md). **No se vuelve a mencionar la AGPL en el
+sitio ni en la documentación viva**: lo anterior queda en `HISTORIA.md` y en
+los commits.
 
 ---
 

@@ -1,10 +1,10 @@
 {
   "name": "honorio",
-  "version": "3.5.4",
+  "version": "3.5.5",
   "private": true,
   "description": "Asistente para la regulación de honorarios (Ley 27.423)",
-  "license": "AGPL-3.0-or-later",
-  "author": "L. Javier Cúneo Libarona",
+  "license": "SEE LICENSE IN LICENSE",
+  "author": "Luis Javier Cúneo Libarona",
   "scripts": {
     "dev": "next dev",
     "prebuild": "node scripts/publicar-valores.mjs",

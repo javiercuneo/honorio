@@ -120,7 +120,7 @@ Por separado: `npm run typecheck`, `npm run validate`, `npm run build`.
 
 ## Autor
 
-Javier Cúneo Libarona.
+Luis Javier Cúneo Libarona.
 
 Los criterios interpretativos que aplica el motor no salieron de la lectura
 de la ley: salieron de resolver estos cálculos. Esa parte es el trabajo, no
@@ -128,29 +128,20 @@ el código que la ejecuta.
 
 ## Licencia
 
-Copyright © 2026 L. Javier Cúneo Libarona.
+**Copyright © 2026 Luis Javier Cúneo Libarona. Todos los derechos reservados.**
 
-Honorio se distribuye bajo la **GNU Affero General Public License, versión 3
-o posterior** ([LICENSE](LICENSE)). El resto del repositorio sigue bajo
-licencia MIT; esta carpeta es la excepción, y la excepción es deliberada.
+El código está publicado para que se pueda **auditar**: cualquiera puede
+leerlo y verificar cómo se obtiene cada número. Un cálculo que puede fundar
+una resolución judicial no tiene que ser una caja negra.
 
-Podés usarla, copiarla, estudiarla y modificarla libremente. Lo que la AGPL
-agrega sobre la MIT es una condición: **si la modificás y la ofrecés a
-terceros —distribuida o como servicio en red—, tenés que publicar tu versión
-bajo la misma licencia.** No prohíbe el uso comercial; impide que el trabajo
-vuelva cerrado.
+Publicarlo no es licenciarlo. Sin autorización previa y por escrito no se
+permite usar, copiar, modificar, distribuir ni publicar este código ni obras
+derivadas de él, tampoco en una red interna. El texto completo está en
+[LICENSE](LICENSE).
 
-La app es y va a seguir siendo gratuita. Si alguien necesita integrarla en un
-producto propio bajo términos distintos a los de la AGPL, se puede conversar:
-escribime.
+**Usar la calculadora en [honorio.ar](https://honorio.ar) es libre y gratuito.**
+La reserva alcanza al código, no al uso del sitio.
 
-### Por qué acá sí y en el resto no
-
-Las calculadoras de plazos son aritmética sobre reglas explícitas: cualquiera
-las reescribe en una tarde y no hay motivo para ponerles condiciones.
-
-Lo que hay en `lib/legal/` no es eso. Es el criterio para resolver los puntos
-donde la ley es ambigua, la jurisprudencia está dispersa y hay que decidir:
-años de regular honorarios, de sostener la coherencia entre casos y de
-corregir contra resultados reales. Esa parte se comparte con gusto y no se
-regala para que otro la cierre.
+Si querés usar el código para algo concreto, escribime a
+javier@javiercuneo.com.ar contando para qué. Las autorizaciones se dan caso
+por caso.

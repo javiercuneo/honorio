@@ -37,10 +37,11 @@ export const CALCULADORA_MEDIACION =
 /** Honorio, para que el informe impreso diga de donde salio. */
 export const HONORIO = 'https://honorio.ar'
 
-/** El codigo, que la AGPL obliga a poder mirar. */
+/** El codigo, publicado para que se pueda auditar. */
 export const REPOSITORIO = 'https://github.com/javiercuneo/honorio'
 
-export const LICENCIA = 'https://www.gnu.org/licenses/agpl-3.0.html'
+/** Todos los derechos reservados: el codigo se mira, no se reusa sin permiso. */
+export const LICENCIA = 'https://github.com/javiercuneo/honorio/blob/main/LICENSE'
 
 /** Para reportar un numero mal calculado. */
 export const CONTACTO = 'javier@javiercuneo.com.ar'

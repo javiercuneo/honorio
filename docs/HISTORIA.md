@@ -23,6 +23,31 @@ historia de `honorio/` viajó completa con `git subtree split`, así que
 calculadoras, el asistente clásico y la documentación de dominio.
 
 ---
+
+## De AGPL a todos los derechos reservados — el 22/9
+
+Del 31/7 al 21/9 Honorio se publicó bajo **AGPL-3.0-or-later** (versiones
+1.0.0 a 3.5.4). El 22/9 Javier la reemplazó por **copyright con todos los
+derechos reservados**, con el código público para auditar y autorización caso
+por caso a quien la pida explicando el uso.
+
+**Por qué:** Honorio apareció publicado en la intranet de un fuero con otra
+interfaz, los mismos criterios y textos, y un pie que atribuía el desarrollo a
+una oficina de sistemas, sin mencionar al autor. La AGPL permitía reusarlo
+siempre que se conservara la autoría; lo que Javier quiere de acá en adelante
+es decidir quién lo reusa y para qué.
+
+**Qué se decidió no escribir:** el `LICENSE` nuevo no aclara qué licencia
+tenían las versiones anteriores. Quien sostenga que tiene una copia bajo AGPL
+lo reconstruye desde los commits o prueba la copia que dice tener.
+
+Lo que se cambió: `LICENSE`, README, `CONTRIBUTING.md` (la cesión ahora es
+para incorporar el aporte bajo estos términos), `package.json`, los
+encabezados de `lib/legal/` y `lib/wizard/`, el pie de la app y la
+documentación viva. El nombre del titular pasó a ser el completo, Luis Javier
+Cúneo Libarona.
+
+---
 ## `ESTADO.md` pasó las mil líneas y se volvió a podar — el 19/9
 
 Con las referencias al expediente y el selector de fundamentos del imprimible

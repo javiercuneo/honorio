@@ -75,7 +75,7 @@ export const metadata: Metadata = {
   },
   description: DESCRIPCION,
   applicationName: 'Honorio',
-  authors: [{ name: 'L. Javier Cúneo Libarona' }],
+  authors: [{ name: 'Luis Javier Cúneo Libarona' }],
   alternates: {
     canonical: '/',
   },
