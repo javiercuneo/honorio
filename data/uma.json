@@ -1,5 +1,5 @@
 {
-  "actualizado": "2026-09-09",
+  "actualizado": "2026-09-24",
   "historia": [
     {
       "valor": 102076,
@@ -13,6 +13,13 @@
       "url": "https://www.csjn.gov.ar/documentos/descargar?ID=160993",
       "capturado": "2026-08-20",
       "vigencia": "2026-07-01"
+    },
+    {
+      "valor": 105991,
+      "fuente": "Res. SGA n° 2372/26",
+      "url": "https://www.csjn.gov.ar/documentos/descargar?ID=182351",
+      "vigencia": "2026-08-01",
+      "capturado": "2026-09-24"
     }
   ]
 }
