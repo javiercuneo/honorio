@@ -21,7 +21,7 @@ pregunta «¿por qué esto quedó así?».
 
 ## Dónde estamos
 
-Versión **3.6.0**, publicada en `honorio.ar`. Las **19 validaciones** de
+Versión **3.6.1**, publicada en `honorio.ar`. Las **19 validaciones** de
 `lib/legal/__tests__` están en verde y corren solas en CI. **No hay nada urgente
 ni bloqueante.**
 
@@ -620,6 +620,9 @@ ningún `IMPORTRANGE` ni de Apps Script**: los valores están escritos adentro.
   `SERIE_UMA` la completa con `data/uma.json` y la validación exige que donde
   las dos tienen la misma vigencia digan el mismo número. **Si el script frena
   porque un valor viejo cambió, es una persona la que mira el acto.**
+- **La fecha se escribe y se lee día primero** (`leerFecha()`, en
+  `aviso-uma.tsx`), nunca con `<input type="date">`, que la muestra en el
+  formato del idioma del navegador. Decisión de Javier del 29/10.
 - **`umaAl()` no adivina:** fecha que no es `AAAA-MM-DD`, o anterior al
   22/12/2017, da `null`. Para el último tramo la pantalla avisa que la Corte
   fija la UMA con demora y hacia atrás.
@@ -828,6 +831,19 @@ salió, en `HISTORIA.md`.
 
 **Y si vas a contar el caso del art. 22/25, copialo, no lo parafrasees**: el
 criterio nunca estuvo en duda. Dónde está la versión correcta, en `HISTORIA.md`.
+
+### La entrada: una pantalla y la UMA a la vista
+
+- **No hay portada.** `LandingView` sigue en el árbol pero no se monta
+  (`showLanding` arranca en `false`): repetía la presentación con otro
+  «Comenzar». Decisión de Javier del 29/10.
+- **La UMA se confirma en la presentación, no en un paso.** El paso `umaInicio`
+  existe igual —es el que abre «Cambiar», y el que guarda la respuesta que
+  viaja en los enlaces—, pero «Comenzar» lo saltea si ya hay UMA cargada, y
+  `back()` vuelve a la presentación desde la primera pregunta. **Lo que no se
+  negocia es que el valor y su norma estén a la vista antes de calcular.**
+- **«Información adicional» se abre con «Ver», no con «por qué»**: no fundamenta
+  ningún número.
 
 ### Los tres rótulos de un paso del wizard
 

@@ -442,7 +442,7 @@ export const LEGAL_STEPS: WizardStepDef[] = [
     kind: 'numeric',
     eyebrow: 'Inicio',
     pregunta: 'Valor de la UMA',
-    ayuda: 'Honorio carga la vigente. Si corresponde otra —la de la fecha del cierre de una planilla, por ejemplo—, escribila o buscala por fecha',
+    ayuda: 'Honorio carga la vigente. Si corresponde otra, escribila o buscala por fecha',
     resumenLabel: 'Valor UMA',
     // La procedencia va a la vista, no en una nota al pie: es lo que
     // hace que el numero se pueda defender, y es el mismo texto que

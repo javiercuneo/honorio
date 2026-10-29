@@ -28,6 +28,31 @@ function fechaCorta(iso: string): string {
   return Number(d) + '/' + Number(m) + '/' + a
 }
 
+/**
+ * Lee una fecha escrita a mano, **siempre dia primero**: 31/7/2023,
+ * 31-07-23, 31.7.2023. Tambien mes y anio solos (7/2023), que toma el
+ * dia 1: la UMA rige por mes. Devuelve AAAA-MM-DD, o `null` si no es una
+ * fecha que exista.
+ *
+ * Reemplaza al `<input type="date">`, que el navegador muestra en el
+ * formato de su idioma —mes/dia/anio en uno en ingles— y no en el que
+ * usa un expediente. El orden aca es uno solo y esta escrito en el
+ * campo.
+ */
+export function leerFecha(texto: string): string | null {
+  const partes = texto.trim().split(/[\/.\-\s]+/).filter(Boolean)
+  if (partes.length < 2 || partes.length > 3 || partes.some((p) => !/^\d+$/.test(p))) return null
+  const [d, m, a] = partes.length === 3 ? partes : ['1', ...partes]
+  let anio = Number(a)
+  if (a.length === 2) anio += 2000
+  else if (a.length !== 4) return null
+  const mes = Number(m)
+  const dia = Number(d)
+  const f = new Date(Date.UTC(anio, mes - 1, dia))
+  if (f.getUTCFullYear() !== anio || f.getUTCMonth() !== mes - 1 || f.getUTCDate() !== dia) return null
+  return anio + '-' + String(mes).padStart(2, '0') + '-' + String(dia).padStart(2, '0')
+}
+
 const VIGENTE = pesos(UMA_VIGENTE.valor, false)
 const ULTIMO_TRAMO = SERIE_UMA[SERIE_UMA.length - 1]
 
@@ -72,7 +97,8 @@ export function AvisoUma({
 }
 
 function UmaAUnaFecha({ onUsar, actual }: { onUsar: (v: number) => void; actual: number }) {
-  const [fecha, setFecha] = useState('')
+  const [texto, setTexto] = useState('')
+  const fecha = texto ? leerFecha(texto) : null
   const tramo = fecha ? umaAl(fecha) : null
   const esElUltimo = tramo !== null && tramo.vigencia === ULTIMO_TRAMO?.vigencia
 
@@ -88,13 +114,20 @@ function UmaAUnaFecha({ onUsar, actual }: { onUsar: (v: number) => void; actual:
         <label className="block">
           <Etiqueta>Fecha</Etiqueta>
           <input
-            type="date"
-            value={fecha}
-            min={PRIMERA_VIGENCIA}
-            onChange={(e) => setFecha(e.target.value)}
-            className="mt-1.5 rounded-md border border-border bg-background px-2.5 py-1.5 font-mono text-[14px] tabular-nums text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            type="text"
+            inputMode="numeric"
+            value={texto}
+            placeholder="dd/mm/aaaa"
+            onChange={(e) => setTexto(e.target.value)}
+            className="mt-1.5 w-40 rounded-md border border-border bg-background px-2.5 py-1.5 font-mono text-[14px] tabular-nums text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           />
         </label>
+
+        {texto.trim().length >= 6 && !fecha ? (
+          <p className="mt-3 text-[13px] leading-relaxed text-muted-foreground">
+            No la puedo leer como fecha. Escribila día, mes y año: 31/7/2023.
+          </p>
+        ) : null}
 
         {fecha && !tramo ? (
           <p className="mt-3 text-[13px] leading-relaxed text-muted-foreground">

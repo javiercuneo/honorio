@@ -45,6 +45,26 @@ posible —cambió la UMA— que no se podía comprobar.
 
 ---
 
+## 3.6.1 — 29 de octubre de 2026
+
+PARCHE. **El motor no se tocó y ninguna cifra cambia.** Es la entrada a la
+entrevista.
+
+- **Una sola pantalla antes de la primera pregunta.** La portada y la
+  presentación decían lo mismo con dos botones «Comenzar» seguidos; queda la
+  presentación, con el dibujo de Honorio.
+- **La UMA deja de ser un paso.** Se ve en la presentación con su norma —«Calcula
+  con la UMA de $108.005 · Res. SGA n° 2622/2026 · Cambiar»—, y «Comenzar» va
+  directo a la clase de proceso. «Cambiar» abre el campo de siempre, con el
+  aviso y la UMA de otra fecha. «Atrás» desde la primera pregunta vuelve a la
+  presentación, no a un paso que no se vio.
+- **La fecha de la UMA se escribe, día primero**: 31/7/2023, 31-07-23, o
+  7/2023 para el mes entero. El selector del navegador la mostraba en el
+  formato de su idioma, mes/día/año en uno en inglés.
+- Textos de la presentación: todo de vos y con tildes; el acceso a los mínimos
+  dice «Tabla de mínimos», y «Información adicional» se abre con «Ver», porque
+  «por qué» es el signo de un fundamento.
+
 ## 3.6.0 — 29 de octubre de 2026
 
 MENOR, **`MUEVE UN NÚMERO`** en un solo caso, y es el de un bug: la UMA que se

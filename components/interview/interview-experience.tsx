@@ -555,12 +555,13 @@ function IntroAside() {
       </p>
       <div className="mt-5 space-y-5">
         {[
-          { n: '01', t: 'Inicio', d: 'Ingresá el valor de la UMA' },
-          { n: '02', t: 'Seleccioná el tipo de proceso', d: 'Ejecutivo, Sucesión y demás' },
-          { n: '03', t: 'Indicá las opciones procesales que cambian el cálculo', d: 'El juicio terminó por sentencia, acuerdo, etc.' },
-          { n: '04', t: 'Elegí el objeto del juicio', d: 'Desalojo, Escrituración, u otros' },
-          { n: '05', t: 'Ingresá la base regulatoria', d: 'El monto del juicio' },
-          { n: '06', t: 'Obtené el cálculo', d: 'Según las variables elegidas' },
+          // La UMA ya no es un paso: se confirma o se cambia en esta
+          // misma pantalla, a la izquierda.
+          { n: '01', t: 'Seleccioná el tipo de proceso', d: 'Ejecutivo, Sucesión y demás' },
+          { n: '02', t: 'Indicá las opciones procesales que cambian el cálculo', d: 'El juicio terminó por sentencia, acuerdo, etc.' },
+          { n: '03', t: 'Elegí el objeto del juicio', d: 'Desalojo, Escrituración, u otros' },
+          { n: '04', t: 'Ingresá la base regulatoria', d: 'El monto del juicio' },
+          { n: '05', t: 'Obtené el cálculo', d: 'Según las variables elegidas' },
         ].map((item) => (
           <div key={item.n} className="flex gap-4">
             <span className="font-mono text-[12px] text-muted-foreground/70">{item.n}</span>

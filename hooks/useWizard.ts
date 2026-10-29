@@ -189,12 +189,16 @@ export function useWizard(allSteps: WizardStepDef[], initialValues?: Partial<Ans
       setIndex(visibleSteps.length - 1)
       return
     }
-    if (index > 0) {
+    // La UMA se confirma en la intro, y «Comenzar» salta su paso. Desde la
+    // primera pregunta, «Atras» vuelve a la intro —donde la UMA esta a la
+    // vista con «Cambiar»— y no a un paso que el usuario nunca vio.
+    const primeraPregunta = visibleSteps[0]?.id === 'umaInicio' ? 1 : 0
+    if (index > primeraPregunta) {
       setIndex((i) => i - 1)
     } else {
       setPhase('intro')
     }
-  }, [phase, index, visibleSteps.length])
+  }, [phase, index, visibleSteps])
 
   const jumpTo = useCallback((target: number) => {
     setError(null)
