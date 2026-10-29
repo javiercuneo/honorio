@@ -101,7 +101,7 @@ export function DashboardView({
           className="h-8 px-2.5 text-[13px] text-muted-foreground"
         >
           <FileSpreadsheet className="mr-1.5 h-3.5 w-3.5" />
-          Minimos
+          Mínimos
         </Button>
         <BotonCompartir answers={wizard.answers} />
         <BotonImprimir
