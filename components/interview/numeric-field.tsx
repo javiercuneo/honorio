@@ -10,10 +10,6 @@ type NumericFieldProps = {
   onChange: (value: string | string[] | number) => void
 }
 
-function clamp(v: number, min: number, max: number) {
-  return Math.min(max, Math.max(min, v))
-}
-
 /**
  * Lee un importe escrito o pegado, sin suponer de donde salio.
  *
@@ -89,10 +85,16 @@ export function NumericField({ step, value, onChange }: NumericFieldProps) {
   // numero y apretar "Calcular" para que el resultado saliera con el
   // valor anterior. El valor que se ve y el valor que entra al motor
   // ya no se pueden separar.
+  //
+  // **Y lo que se escribio es lo que entra, sin recortar.** Hasta el
+  // 29/10/2026 aca habia un clamp(min, max) por tecla: una UMA de 15.000
+  // entraba al motor como 50.000 y la pantalla, al salir del campo,
+  // mostraba 50.000 como si el usuario lo hubiera escrito. El rango
+  // ahora lo controla `fueraDeRango()` al avanzar, con un motivo.
   const escribir = (raw: string) => {
     setDraft(raw)
     const leido = parseImporte(raw)
-    if (leido !== null) onChange(clamp(leido, step.min, step.max))
+    if (leido !== null) onChange(leido)
   }
 
   return (

@@ -25,6 +25,7 @@
 
 import { useEffect, useState } from 'react'
 import { UMA_VIGENTE } from '@/lib/legal/uma'
+import { procedenciaDe } from '@/lib/legal/serie-uma'
 import type { Answers } from '@/lib/legal/types'
 import {
   CONTACTO,
@@ -40,6 +41,12 @@ import { Etiqueta } from './primitives'
 const VERSION = process.env.NEXT_PUBLIC_VERSION ?? '0.0.0'
 
 const AUTOR = 'Luis Javier Cúneo Libarona'
+
+/** AAAA-MM-DD a d/m/aaaa. */
+function fechaCorta(iso: string): string {
+  const [a, m, d] = iso.split('-')
+  return Number(d) + '/' + Number(m) + '/' + a
+}
 
 function Enlace({ href, children }: { href: string; children: React.ReactNode }) {
   return (
@@ -59,6 +66,12 @@ function Enlace({ href, children }: { href: string; children: React.ReactNode })
 // como volver a el.
 export function Firma({ answers }: { answers?: Answers }) {
   const [fecha, setFecha] = useState<string | null>(null)
+
+  // La UMA **con la que se calculo**, no la vigente. Citaba siempre la
+  // vigente, y con una UMA historica el papel decia una y el numero
+  // salia de otra.
+  const uma = typeof answers?.umaInicio === 'number' ? answers.umaInicio : UMA_VIGENTE.valor
+  const procedencia = procedenciaDe(uma)
 
   useEffect(() => {
     setFecha(
@@ -86,12 +99,18 @@ export function Firma({ answers }: { answers?: Answers }) {
       </p>
 
       <p className="mt-1">
-        UMA {pesos(UMA_VIGENTE.valor, false)}
-        {UMA_VIGENTE.fuente ? ' — ' + UMA_VIGENTE.fuente : ''}
-        {UMA_VIGENTE.url ? (
+        UMA {pesos(uma, false)}
+        {procedencia.norma ? ' — ' + procedencia.norma : ''}
+        {procedencia.tipo === 'historica' && procedencia.vigencia
+          ? ', vigente desde el ' + fechaCorta(procedencia.vigencia)
+          : ''}
+        {procedencia.tipo === 'manual'
+          ? ' — valor ingresado a mano, que no coincide con ninguna UMA fijada por la Corte'
+          : ''}
+        {procedencia.url ? (
           <>
             {' '}
-            <Enlace href={UMA_VIGENTE.url}>(norma)</Enlace>
+            <Enlace href={procedencia.url}>(norma)</Enlace>
           </>
         ) : null}
       </p>

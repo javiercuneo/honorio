@@ -11,7 +11,8 @@ import { Firma } from "@/components/dashboard/Firma"
 import { BotonImprimir, HOJA_PROPS } from "@/components/dashboard/imprimir"
 import { BotonCompartir } from "@/components/dashboard/compartir"
 import { EditorReferencias, InformeReferencias, type Referencias } from "@/components/dashboard/referencias"
-import { PROCESO_LABEL, SENTENCIA_LABEL, EXCEPCIONES_LABEL } from "@/components/dashboard/format"
+import { PROCESO_LABEL, SENTENCIA_LABEL, EXCEPCIONES_LABEL, pesos } from "@/components/dashboard/format"
+import { UMA_VIGENTE } from "@/lib/legal/uma"
 import { SinIA } from "@/components/dashboard/primitives"
 import { AppTopbar } from "./app-topbar"
 
@@ -70,6 +71,12 @@ export function DashboardView({
           ? EXCEPCIONES_LABEL[datos.tuvoExcepciones]
           : null,
         resultado.esProvisorio ? 'Provisorio' : null,
+        // Con la vigente no se dice nada: es lo esperado. Con otra, el
+        // numero de arriba sale de una UMA que el lector no puede
+        // suponer, y la unica otra mencion estaba en la firma, al pie.
+        resultado.valorUMA !== UMA_VIGENTE.valor
+          ? 'UMA ' + pesos(resultado.valorUMA, false)
+          : null,
       ]
         .filter(Boolean)
         .join(' · ')

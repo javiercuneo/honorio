@@ -45,6 +45,34 @@ posible —cambió la UMA— que no se podía comprobar.
 
 ---
 
+## 3.6.0 — 29 de octubre de 2026
+
+MENOR, **`MUEVE UN NÚMERO`** en un solo caso, y es el de un bug: la UMA que se
+escribía en el primer paso de la entrevista y caía fuera de $50.000-$200.000.
+**El motor no se tocó**: con la misma UMA, todo da lo mismo que ayer.
+
+- **Qué caso da distinto.** Una UMA menor a $50.000 o mayor a $200.000 escrita
+  en la entrevista se recortaba en silencio al borde: 15.000 calculaba con
+  50.000. Desde esta versión calcula con la escrita. Un resultado de la 3.5.5
+  con una UMA así en el resumen salió, en realidad, con 50.000 o 200.000. El
+  Cálculo directo nunca tuvo el recorte.
+- **La UMA acepta cualquier valor positivo** y, si no es la vigente, lo dice al
+  lado sin impedir el cálculo: desde cuándo rigió y qué norma la fijó, o que no
+  coincide con ninguna UMA de la Corte. Un cero no pasa, con el motivo.
+- **La UMA de otra fecha.** En la entrevista y en el Cálculo directo se puede
+  poner una fecha y usar la UMA que regía ese día, con su acordada o
+  resolución. Sale de la serie reconstruida de los actos de la CSJN.
+- **Un fallo nuevo:** CFed. Rosario, Sala A, 19/10/2026 —la base en UMA a la
+  fecha del cierre de la planilla de liquidación, no a la de la regulación—,
+  detrás del «por qué» de esa búsqueda. Honorio sigue proponiendo la vigente.
+- **El papel dice con qué UMA se calculó.** La firma del informe y la cita
+  citaban siempre la UMA vigente, también debajo de un cálculo hecho con otra;
+  ahora citan la del cálculo y su norma. El encabezado del resultado la muestra
+  cuando no es la vigente.
+- **La regulación redactada deja de decir «valor vigente» y «al día de la
+  fecha» de una UMA que no lo es.** Con la vigente, el texto es idéntico.
+- Una validación nueva, la 19: `umaHistorica.validation.ts`.
+
 ## 3.5.5 — 22 de septiembre de 2026
 
 PARCHE. **El motor no se tocó y ninguna cifra cambia.** Cambia la licencia del

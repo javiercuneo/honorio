@@ -45,6 +45,7 @@ import { calcularMediacion } from '@/lib/legal/mediacion'
 import { UHOM_VIGENTE } from '@/lib/legal/uhom'
 import type { Rango } from '@/lib/legal/types'
 import { pesos, pct, umaNum } from '@/components/dashboard/format'
+import { AvisoUma } from './aviso-uma'
 import { AppTopbar } from './app-topbar'
 import { parseImporte } from './numeric-field'
 
@@ -186,6 +187,9 @@ export function CalculoDirectoView({
                   className="mt-2 w-full rounded-md border border-border bg-card px-3 py-2 font-mono text-[15px] tabular-nums text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 />
               </label>
+              {/* El mismo aviso que el primer paso de la entrevista: de que
+                  norma sale la UMA escrita, y la de otra fecha. */}
+              <AvisoUma valor={uma ?? 0} onUsar={(v) => setUmaTexto(String(v))} />
             </div>
 
             <div className="md:border-l md:border-hair md:pl-9">

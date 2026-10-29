@@ -19,7 +19,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { Answers, WizardState } from '@/lib/legal/types'
 import type { WizardStepDef } from '@/lib/wizard/wizard-schema'
-import { PROCESS_STEP_MAP } from '@/lib/wizard/wizard-schema'
+import { PROCESS_STEP_MAP, fueraDeRango } from '@/lib/wizard/wizard-schema'
 import { pasosVisibles, podarInalcanzables } from '@/lib/wizard/reachability'
 import * as adapters from '@/lib/legal/adapters'
 
@@ -139,6 +139,9 @@ export function useWizard(allSteps: WizardStepDef[], initialValues?: Partial<Ans
           return 'Debe ingresar un monto válido para la base regulatoria.'
         }
       }
+      // El campo ya no recorta lo que se escribe: el rango se controla
+      // aca, con un motivo, y el valor no se cambia por otro.
+      if (typeof value === 'number') return fueraDeRango(currentStep, value)
       return null
     }
 

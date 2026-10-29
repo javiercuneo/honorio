@@ -69,17 +69,25 @@ jobs:
       - name: Traer los valores de la planilla
         run: node scripts/actualizar-uma.mjs
 
+      # La serie historica, para la UMA a una fecha. **No puede frenar lo
+      # de arriba**: si el sitio de herramientas no responde, la UMA
+      # vigente se publica igual, y lo que le falte a la copia lo completa
+      # data/uma.json. Ver scripts/actualizar-serie-uma.mjs.
+      - name: Traer la serie historica de la UMA
+        continue-on-error: true
+        run: node scripts/actualizar-serie-uma.mjs
+
       - name: Commitear si cambio
         id: commitear
         run: |
-          if git diff --quiet -- data/uma.json data/uhom.json; then
+          if git diff --quiet -- data/uma.json data/uhom.json data/serie-uma.json; then
             echo "Sin cambios."
             echo "cambio=no" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/uma.json data/uhom.json
+          git add data/uma.json data/uhom.json data/serie-uma.json
           git commit -m "chore: actualizar los valores de la UMA y el UHOM"
           git push
           echo "cambio=si" >> "$GITHUB_OUTPUT"

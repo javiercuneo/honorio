@@ -64,6 +64,8 @@ import type { CalculoResultado, Rango, Transformacion } from './types'
 import { TOPE_ITEM_G_UHOM } from './mediacion'
 import type { ResultadoMediacion } from './mediacion'
 import { IVA_NO_INCLUIDO, type Fallo } from './jurisprudencia'
+import { UMA_VIGENTE } from './uma'
+import { tramosConValor } from './serie-uma'
 
 // ---- Lo que se puede regular ----
 
@@ -145,6 +147,38 @@ const fmtPct = (n: number) =>
   n.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' %'
 
 const fmtUHOM = fmtUMA
+
+// ---- De que UMA se habla ----
+//
+// **La prosa no puede suponer que la UMA del calculo es la de hoy.**
+// Decia siempre "con el valor vigente de" y "equivalente al dia de la
+// fecha", y las dos frases eran falsas cuando el usuario escribia otra:
+// la UMA a la fecha del cierre de una planilla (UMA_CIERRE_PLANILLA en
+// jurisprudencia.ts) es justamente una que no rige hoy. Con la vigente
+// el texto no cambia una letra.
+
+const fmtFecha = (iso: string) => {
+  const [a, m, d] = iso.split('-')
+  return Number(d) + '/' + Number(m) + '/' + a
+}
+
+function esLaVigente(valorUMA: number): boolean {
+  return valorUMA === UMA_VIGENTE.valor
+}
+
+/** "con el valor vigente de $X", o lo que sea cierto si no es la vigente. */
+function conLaUMA(valorUMA: number): string {
+  if (esLaVigente(valorUMA)) return 'con el valor vigente de ' + fmtPesos(valorUMA)
+  const tramo = tramosConValor(valorUMA)[0]
+  return tramo
+    ? 'con el valor de ' + fmtPesos(valorUMA) + ', vigente desde el ' + fmtFecha(tramo.vigencia) + ' (' + tramo.norma + ')'
+    : 'con un valor de la UMA de ' + fmtPesos(valorUMA)
+}
+
+/** " al dia de la fecha" solo si la UMA es la de hoy. */
+function alDiaDeLaFecha(valorUMA: number): string {
+  return esLaVigente(valorUMA) ? ' al día de la fecha' : ''
+}
 
 /**
  * El criterio del 2 %-20 % de los incidentes. Sale de una ley
@@ -370,7 +404,7 @@ export function generarProsa(opciones: OpcionesProsa): TextoRegulacion {
   // que ninguna seccion generica sabe decir. Ver EXHORTO_MONTO_PAUTA.
   if (resultado.exhorto) {
     encabezado('Exhorto ley 22.172', ['art. 50 inc. ' + resultado.exhorto.inciso])
-    p.push(seccionExhorto(resultado.exhorto))
+    p.push(seccionExhorto(resultado.exhorto, resultado.valorUMA))
     p.push('')
   } else {
     const trBase = visibles(resultado, 'base')
@@ -456,7 +490,9 @@ export function generarProsa(opciones: OpcionesProsa): TextoRegulacion {
           banda.articulo +
           '): ' +
           fmtUMA(punto.uma) +
-          ' UMA, equivalente al día de la fecha a ' +
+          ' UMA, equivalente' +
+          alDiaDeLaFecha(resultado.valorUMA) +
+          ' a ' +
           fmtPesos(pesos) +
           '.',
       )
@@ -574,7 +610,7 @@ function articulosDe(trs: Transformacion[], extra?: string | null): string[] {
  * una referencia de pantalla para orientar la eleccion, y meterla en
  * la resolucion la haria pasar por fundamento de la cantidad.
  */
-function seccionExhorto(e: NonNullable<CalculoResultado['exhorto']>): string {
+function seccionExhorto(e: NonNullable<CalculoResultado['exhorto']>, valorUMA: number): string {
   const lineas: string[] = []
 
   lineas.push(
@@ -616,7 +652,9 @@ function seccionExhorto(e: NonNullable<CalculoResultado['exhorto']>): string {
         fmtPesos(e.referencia.montoPesos) +
         ', equivalente a ' +
         fmtUMA(e.referencia.montoUMA) +
-        ' UMA al día de la fecha. Pondero ese monto como pauta indiciaria y no ' +
+        ' UMA' +
+        alDiaDeLaFecha(valorUMA) +
+        '. Pondero ese monto como pauta indiciaria y no ' +
         'como base regulatoria, pues el proceso principal se encuentra en trámite ' +
         'y se desconoce su resultado (arts. 3° inc. 2 y 12 de la ley 22.172).',
     )
@@ -660,8 +698,8 @@ function seccionBase(r: CalculoResultado, reducciones: Transformacion[]): string
 
   if (r.escala) {
     lineas.push(
-      'Expresada en UMA, con el valor vigente de ' +
-        fmtPesos(r.valorUMA) +
+      'Expresada en UMA, ' +
+        conLaUMA(r.valorUMA) +
         ', la base es de ' +
         fmtUMA(r.escala.baseEnUMA) +
         ' UMA.',

@@ -26,6 +26,7 @@ import { ProgressRail } from './progress-rail'
 import { ContextPanel } from './context-panel'
 import { StepShell } from './step-shell'
 import { NumericField } from './numeric-field'
+import { AvisoUma, unidadDeUma } from './aviso-uma'
 import { CardsField } from './cards-field'
 import { LandingView } from './landing-view'
 import { IntroView } from './intro-view'
@@ -413,15 +414,26 @@ export function InterviewExperience() {
                       explanation={explicacionDe(currentStep, wizard.answers)}
                     >
                       {currentStep.kind === 'numeric' ? (
-                        <NumericField
-                          step={currentStep}
-                          value={
+                        (() => {
+                          const valor =
                             typeof wizard.answers[currentStep.id] === 'number'
                               ? (wizard.answers[currentStep.id] as number)
                               : currentStep.default
-                          }
-                          onChange={wizard.setAnswer}
-                        />
+                          // La UMA lleva debajo la norma **del valor
+                          // escrito**, no la de la vigente, y al lado el
+                          // aviso y la UMA de otra fecha. Ver aviso-uma.tsx.
+                          const esUma = currentStep.id === 'umaInicio'
+                          return (
+                            <>
+                              <NumericField
+                                step={esUma ? { ...currentStep, ...unidadDeUma(valor) } : currentStep}
+                                value={valor}
+                                onChange={wizard.setAnswer}
+                              />
+                              {esUma ? <AvisoUma valor={valor} onUsar={wizard.setAnswer} /> : null}
+                            </>
+                          )
+                        })()
                       ) : (
                         <CardsField
                           step={currentStep}

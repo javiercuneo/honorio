@@ -1,6 +1,6 @@
 {
   "name": "honorio",
-  "version": "3.5.5",
+  "version": "3.6.0",
   "private": true,
   "description": "Asistente para la regulación de honorarios (Ley 27.423)",
   "license": "SEE LICENSE IN LICENSE",
@@ -14,7 +14,8 @@
     "validate": "node scripts/validate.mjs",
     "check": "npm run typecheck && npm run validate",
     "uma": "node scripts/actualizar-uma.mjs",
-    "verificar": "node scripts/verificar-publicado.mjs"
+    "verificar": "node scripts/verificar-publicado.mjs",
+    "serie-uma": "node scripts/actualizar-serie-uma.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",

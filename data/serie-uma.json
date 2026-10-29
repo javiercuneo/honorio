@@ -1,0 +1,515 @@
+{
+  "_comentario": "Serie del valor de la Unidad de Medida Arancelaria (UMA) de la ley 27.423. NO esta copiada de ninguna tabla de terceros: cada valor se leyo del punto resolutivo de la acordada o resolucion de la CSJN que lo fija. El ultimo elemento de \"valores\" es el valor vigente.",
+  "_por_que_vigencia_y_acto_son_dos_cosas": "La resolucion dice desde cuando rige el valor, y casi siempre lleva fecha POSTERIOR a esa. De los valores con fecha de acto y demora computable, todos salieron despues del dia desde el que rigen. Guardar una sola fecha obliga a elegir cual, y las dos hacen falta: \"vigencia\" es la que decide que valor corresponde a una regulacion, \"acto\" es la que dice si ese valor existia el dia en que se regulo. Confundirlas fue el error que tuvo esta pagina el 24/8/2026: mostraba como vigencia la fecha en que el sincronizador vio el valor.",
+  "_como_se_leyo": "De los 50 PDF de la CSJN, 42 tienen capa de texto y se leyeron con pdftotext buscando el par importe/vigencia del resolutivo. Los otros 8 --acordadas 36/2020, 1/2021, 7/2021, 12/2021, 21/2021, 4/2022, 12/2022 y res. 2722/2023-- dibujan las letras como trazos y no tienen texto: se rasterizaron y se leyeron a ojo. Las acordadas de 2018 y 2019 llevan la fecha del acto escrita a mano en el original; el valor y la vigencia estan impresos y se leyeron del texto, la fecha la aporto el autor leyendola. Esas llevan \"fecha_leida_a_mano\".",
+  "_lo_que_estaba_mal_afuera": "Dos compilaciones publicas atribuyen a la Acordada 4/2022 el valor de $8.183 desde abril de 2022. La acordada dice $7.439 a partir del 1 de enero de 2022; $8.183 y $9.001 los fijo la 12/2022, para abril y mayo. Enero de 2022 no figura en ninguna de las dos. Por eso la serie se reconstruyo de los actos y no se copio.",
+  "fuente": "Acordadas y resoluciones SGA de la Corte Suprema de Justicia de la Nacion",
+  "actualizado": "2026-10-21",
+  "valores": [
+    {
+      "valor": 1350,
+      "vigencia": "2017-12-22",
+      "norma": "Acordada 27/2018",
+      "acto": "2018-09-04",
+      "leido": "texto",
+      "fecha_leida_a_mano": true,
+      "etiqueta": "hasta el 31/12/2017",
+      "sin_demora": "no es un \"a partir de\": es el valor que rigio desde la ley",
+      "nota": "La acordada 27/2018 lo expresa \"hasta el 31 de diciembre de 2017\". El 22/12/2017 es la publicacion en el B.O. de la ley 27.423."
+    },
+    {
+      "valor": 1417,
+      "vigencia": "2018-01-01",
+      "norma": "Acordada 27/2018",
+      "acto": "2018-09-04",
+      "leido": "texto",
+      "fecha_leida_a_mano": true,
+      "sin_demora": "la 27/2018 consolido valores fijados antes por las acordadas 3/2018, 11/2018 y 23/18"
+    },
+    {
+      "valor": 1559,
+      "vigencia": "2018-04-01",
+      "norma": "Acordada 27/2018",
+      "acto": "2018-09-04",
+      "leido": "texto",
+      "fecha_leida_a_mano": true,
+      "sin_demora": "la 27/2018 consolido valores fijados antes por las acordadas 3/2018, 11/2018 y 23/18"
+    },
+    {
+      "valor": 1715,
+      "vigencia": "2018-08-01",
+      "norma": "Acordada 27/2018",
+      "acto": "2018-09-04",
+      "leido": "texto",
+      "fecha_leida_a_mano": true,
+      "sin_demora": "la 27/2018 consolido valores fijados antes por las acordadas 3/2018, 11/2018 y 23/18"
+    },
+    {
+      "valor": 1887,
+      "vigencia": "2018-10-01",
+      "norma": "Acordada 3/2019",
+      "acto": "2019-02-19",
+      "leido": "texto",
+      "fecha_leida_a_mano": true
+    },
+    {
+      "valor": 2075,
+      "vigencia": "2019-03-01",
+      "norma": "Acordada 8/2019",
+      "acto": "2019-04-15",
+      "leido": "texto",
+      "fecha_leida_a_mano": true
+    },
+    {
+      "valor": 2231,
+      "vigencia": "2019-05-01",
+      "norma": "Acordada 20/2019",
+      "acto": "2019-07-16",
+      "leido": "texto",
+      "fecha_leida_a_mano": true
+    },
+    {
+      "valor": 2398,
+      "vigencia": "2019-06-01",
+      "norma": "Acordada 20/2019",
+      "acto": "2019-07-16",
+      "leido": "texto",
+      "fecha_leida_a_mano": true
+    },
+    {
+      "valor": 2638,
+      "vigencia": "2019-09-01",
+      "norma": "Acordada 28/2019",
+      "acto": "2019-10-29",
+      "leido": "texto",
+      "fecha_leida_a_mano": true
+    },
+    {
+      "valor": 2902,
+      "vigencia": "2019-11-01",
+      "norma": "Acordada 30/2019",
+      "acto": "2019-11-21",
+      "leido": "texto",
+      "fecha_leida_a_mano": true
+    },
+    {
+      "valor": 3192,
+      "vigencia": "2019-12-01",
+      "norma": "Acordada 2/2020",
+      "acto": "2020-03-03",
+      "leido": "texto",
+      "fecha_leida_a_mano": true
+    },
+    {
+      "valor": 3511,
+      "vigencia": "2020-10-01",
+      "norma": "Acordada 36/2020",
+      "acto": "2020-11-30",
+      "leido": "imagen"
+    },
+    {
+      "valor": 3862,
+      "vigencia": "2020-11-01",
+      "norma": "Acordada 1/2021",
+      "acto": "2021-02-23",
+      "leido": "imagen"
+    },
+    {
+      "valor": 4152,
+      "vigencia": "2020-12-01",
+      "norma": "Acordada 7/2021",
+      "acto": "2021-04-20",
+      "leido": "imagen"
+    },
+    {
+      "valor": 4567,
+      "vigencia": "2021-03-01",
+      "norma": "Acordada 12/2021",
+      "acto": "2021-07-13",
+      "leido": "imagen"
+    },
+    {
+      "valor": 4978,
+      "vigencia": "2021-06-01",
+      "norma": "Acordada 12/2021",
+      "acto": "2021-07-13",
+      "leido": "imagen"
+    },
+    {
+      "valor": 5476,
+      "vigencia": "2021-07-01",
+      "norma": "Acordada 21/2021",
+      "acto": "2021-10-01",
+      "leido": "imagen"
+    },
+    {
+      "valor": 6160,
+      "vigencia": "2021-09-01",
+      "norma": "Acordada 21/2021",
+      "acto": "2021-10-01",
+      "leido": "imagen"
+    },
+    {
+      "valor": 6468,
+      "vigencia": "2021-11-01",
+      "norma": "Acordada 28/2021",
+      "acto": "2021-12-09",
+      "leido": "texto",
+      "fecha_leida_a_mano": true
+    },
+    {
+      "valor": 7439,
+      "vigencia": "2022-01-01",
+      "norma": "Acordada 4/2022",
+      "acto": "2022-03-11",
+      "leido": "imagen"
+    },
+    {
+      "valor": 8183,
+      "vigencia": "2022-04-01",
+      "norma": "Acordada 12/2022",
+      "acto": "2022-05-23",
+      "leido": "imagen"
+    },
+    {
+      "valor": 9001,
+      "vigencia": "2022-05-01",
+      "norma": "Acordada 12/2022",
+      "acto": "2022-05-23",
+      "leido": "imagen"
+    },
+    {
+      "valor": 9811,
+      "vigencia": "2022-07-01",
+      "norma": "Acordada 25/2022",
+      "acto": "2022-09-08",
+      "leido": "texto"
+    },
+    {
+      "valor": 10400,
+      "vigencia": "2022-09-01",
+      "norma": "Acordada 25/2022",
+      "acto": "2022-09-08",
+      "leido": "texto"
+    },
+    {
+      "valor": 12479,
+      "vigencia": "2022-12-01",
+      "norma": "Acordada 3/2023",
+      "acto": "2023-02-24",
+      "leido": "texto"
+    },
+    {
+      "valor": 13228,
+      "vigencia": "2023-01-01",
+      "norma": "Acordada 9/2023",
+      "acto": "2023-04-04",
+      "leido": "texto"
+    },
+    {
+      "valor": 14154,
+      "vigencia": "2023-02-01",
+      "norma": "Acordada 9/2023",
+      "acto": "2023-04-04",
+      "leido": "texto"
+    },
+    {
+      "valor": 14933,
+      "vigencia": "2023-03-01",
+      "norma": "Acordada 9/2023",
+      "acto": "2023-04-04",
+      "leido": "texto"
+    },
+    {
+      "valor": 16277,
+      "vigencia": "2023-04-01",
+      "norma": "Acordada 19/2023",
+      "acto": "2023-06-14",
+      "leido": "texto"
+    },
+    {
+      "valor": 17741,
+      "vigencia": "2023-05-01",
+      "norma": "Acordada 19/2023",
+      "acto": "2023-06-14",
+      "leido": "texto"
+    },
+    {
+      "valor": 19338,
+      "vigencia": "2023-06-01",
+      "norma": "Acordada 19/2023",
+      "acto": "2023-06-14",
+      "leido": "texto"
+    },
+    {
+      "valor": 20595,
+      "vigencia": "2023-07-01",
+      "norma": "Acordada 29/2023",
+      "acto": "2023-09-22",
+      "leido": "texto"
+    },
+    {
+      "valor": 23067,
+      "vigencia": "2023-08-01",
+      "norma": "Res. SGA 2722/2023",
+      "acto": "2023-10-12",
+      "leido": "imagen"
+    },
+    {
+      "valor": 25373,
+      "vigencia": "2023-09-01",
+      "norma": "Res. SGA 2722/2023",
+      "acto": "2023-10-12",
+      "leido": "imagen"
+    },
+    {
+      "valor": 27784,
+      "vigencia": "2023-10-01",
+      "norma": "Res. SGA 3369/2023",
+      "acto": "2023-12-04",
+      "leido": "texto"
+    },
+    {
+      "valor": 30562,
+      "vigencia": "2023-11-01",
+      "norma": "Res. SGA 3369/2023",
+      "acto": "2023-12-04",
+      "leido": "texto"
+    },
+    {
+      "valor": 34382,
+      "vigencia": "2023-12-01",
+      "norma": "Res. SGA 12/2024",
+      "acto": "2024-02-01",
+      "leido": "texto"
+    },
+    {
+      "valor": 40571,
+      "vigencia": "2024-01-01",
+      "norma": "Res. SGA 176/2024",
+      "acto": "2024-02-21",
+      "leido": "texto"
+    },
+    {
+      "valor": 45440,
+      "vigencia": "2024-02-01",
+      "norma": "Res. SGA 626/2024",
+      "acto": "2024-04-04",
+      "leido": "texto"
+    },
+    {
+      "valor": 49075,
+      "vigencia": "2024-03-01",
+      "norma": "Res. SGA 925/2024",
+      "acto": "2024-04-30",
+      "leido": "texto"
+    },
+    {
+      "valor": 54716,
+      "vigencia": "2024-05-01",
+      "norma": "Res. SGA 1772/2024",
+      "acto": "2024-07-29",
+      "leido": "texto"
+    },
+    {
+      "valor": 57016,
+      "vigencia": "2024-06-01",
+      "norma": "Res. SGA 1772/2024",
+      "acto": "2024-07-29",
+      "leido": "texto"
+    },
+    {
+      "valor": 59009,
+      "vigencia": "2024-07-01",
+      "norma": "Res. SGA 2375/2024",
+      "acto": "2024-09-12",
+      "leido": "texto"
+    },
+    {
+      "valor": 60779,
+      "vigencia": "2024-08-01",
+      "norma": "Res. SGA 2375/2024",
+      "acto": "2024-09-12",
+      "leido": "texto"
+    },
+    {
+      "valor": 61995,
+      "vigencia": "2024-09-01",
+      "norma": "Res. SGA 2910/2024",
+      "acto": "2024-11-07",
+      "leido": "texto"
+    },
+    {
+      "valor": 63545,
+      "vigencia": "2024-10-01",
+      "norma": "Res. SGA 3495/2024",
+      "acto": "2024-12-19",
+      "leido": "texto"
+    },
+    {
+      "valor": 65133,
+      "vigencia": "2024-11-01",
+      "norma": "Res. SGA 3495/2024",
+      "acto": "2024-12-19",
+      "leido": "texto"
+    },
+    {
+      "valor": 66436,
+      "vigencia": "2024-12-01",
+      "norma": "Res. SGA 3495/2024",
+      "acto": "2024-12-19",
+      "leido": "texto"
+    },
+    {
+      "valor": 67632,
+      "vigencia": "2025-01-01",
+      "norma": "Res. SGA 237/2025",
+      "acto": "2025-03-18",
+      "leido": "texto"
+    },
+    {
+      "valor": 68985,
+      "vigencia": "2025-02-01",
+      "norma": "Res. SGA 580/2025",
+      "acto": "2025-04-25",
+      "leido": "texto"
+    },
+    {
+      "valor": 70709,
+      "vigencia": "2025-03-01",
+      "norma": "Res. SGA 936/2025",
+      "acto": "2025-05-22",
+      "leido": "texto"
+    },
+    {
+      "valor": 72265,
+      "vigencia": "2025-04-01",
+      "norma": "Res. SGA 1236/2025",
+      "acto": "2025-06-12",
+      "leido": "texto"
+    },
+    {
+      "valor": 73204,
+      "vigencia": "2025-05-01",
+      "norma": "Res. SGA 1432/2025",
+      "acto": "2025-07-03",
+      "leido": "texto"
+    },
+    {
+      "valor": 74376,
+      "vigencia": "2025-06-01",
+      "norma": "Res. SGA 1687/2025",
+      "acto": "2025-08-05",
+      "leido": "texto"
+    },
+    {
+      "valor": 75789,
+      "vigencia": "2025-07-01",
+      "norma": "Res. SGA 1860/2025",
+      "acto": "2025-08-22",
+      "leido": "texto"
+    },
+    {
+      "valor": 77229,
+      "vigencia": "2025-08-01",
+      "norma": "Res. SGA 2226/2025",
+      "acto": "2025-09-25",
+      "leido": "texto"
+    },
+    {
+      "valor": 78850,
+      "vigencia": "2025-09-01",
+      "norma": "Res. SGA 2533/2025",
+      "acto": "2025-10-30",
+      "leido": "texto"
+    },
+    {
+      "valor": 80664,
+      "vigencia": "2025-10-01",
+      "norma": "Res. SGA 2996/2025",
+      "acto": "2025-11-28",
+      "leido": "texto"
+    },
+    {
+      "valor": 84963,
+      "vigencia": "2025-11-01",
+      "norma": "Res. SGA 3160/2025",
+      "acto": "2025-12-16",
+      "leido": "texto"
+    },
+    {
+      "valor": 87342,
+      "vigencia": "2025-12-01",
+      "norma": "Res. SGA 36/2026",
+      "acto": "2026-02-11",
+      "leido": "texto"
+    },
+    {
+      "valor": 89875,
+      "vigencia": "2026-01-01",
+      "norma": "Res. SGA 235/2026",
+      "acto": "2026-03-05",
+      "leido": "texto"
+    },
+    {
+      "valor": 92482,
+      "vigencia": "2026-02-01",
+      "norma": "Res. SGA 538/2026",
+      "acto": "2026-03-31",
+      "leido": "texto"
+    },
+    {
+      "valor": 95626,
+      "vigencia": "2026-03-01",
+      "norma": "Res. SGA 1076/2026",
+      "acto": "2026-05-20",
+      "leido": "texto"
+    },
+    {
+      "valor": 98112,
+      "vigencia": "2026-04-01",
+      "norma": "Res. SGA 1352/2026",
+      "acto": "2026-06-09",
+      "leido": "texto"
+    },
+    {
+      "valor": 100173,
+      "vigencia": "2026-05-01",
+      "norma": "Res. SGA 1718/2026",
+      "acto": "2026-07-13",
+      "leido": "texto"
+    },
+    {
+      "valor": 102076,
+      "vigencia": "2026-06-01",
+      "norma": "Res. SGA 1785/2026",
+      "acto": "2026-08-03",
+      "leido": "texto",
+      "url": "https://www.csjn.gov.ar/documentos/descargar?ID=160573"
+    },
+    {
+      "valor": 104220,
+      "vigencia": "2026-07-01",
+      "norma": "Res. SGA 1930/2026",
+      "acto": "2026-08-20",
+      "leido": "texto",
+      "url": "https://www.csjn.gov.ar/documentos/descargar?ID=160993"
+    },
+    {
+      "valor": 105991,
+      "vigencia": "2026-08-01",
+      "norma": "Res. SGA 2372/2026",
+      "acto": "2026-09-24",
+      "leido": "texto",
+      "url": "https://www.csjn.gov.ar/documentos/descargar?ID=182351"
+    },
+    {
+      "valor": 108005,
+      "vigencia": "2026-09-01",
+      "norma": "Res. SGA 2622/2026",
+      "acto": "2026-10-21",
+      "leido": "texto",
+      "url": "https://www.csjn.gov.ar/documentos/descargar?ID=182918"
+    }
+  ]
+}

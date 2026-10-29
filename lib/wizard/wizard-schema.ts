@@ -66,6 +66,14 @@ export interface NumericStepDef extends BaseStepDef {
    * a un clic de ahi, no en una nota al pie de otra pantalla.
    */
   unidadHref?: string
+  /**
+   * El rango admitido. **Se controla al avanzar, no se recorta al
+   * escribir.** Hasta el 29/10/2026 el campo hacia `clamp(min, max)` en
+   * cada tecla, y la UMA tenia piso de 50.000: quien escribia una UMA
+   * historica —15.000, 700— calculaba con 50.000 sin ningun aviso. Un
+   * campo que corrige en silencio lo que se escribio separa el valor que
+   * se ve del que entra al motor. Ver `fueraDeRango()`.
+   */
   min: number
   max: number
   step: number
@@ -93,6 +101,22 @@ export function ayudaDe(paso: WizardStepDef, answers: Answers): string {
 
 export function explicacionDe(paso: WizardStepDef, answers: Answers): Explanation {
   return resolver(paso.explicacion, answers)
+}
+
+/**
+ * Por que un valor numerico no se puede aceptar, o `null` si se puede.
+ *
+ * Reemplaza al recorte que hacia el campo: el valor fuera de rango no se
+ * cambia por otro, se rechaza con un motivo, y el usuario decide.
+ */
+export function fueraDeRango(paso: NumericStepDef, valor: number): string | null {
+  if (valor >= paso.min && valor <= paso.max) return null
+  if (valor < paso.min && paso.min <= 1) {
+    return paso.resumenLabel + ': tiene que ser mayor que cero.'
+  }
+  return Number.isFinite(paso.max)
+    ? paso.resumenLabel + ': tiene que estar entre ' + paso.format(paso.min) + ' y ' + paso.format(paso.max) + '.'
+    : paso.resumenLabel + ': no puede ser menor que ' + paso.format(paso.min) + '.'
 }
 
 // ---- Helpers de formato ----
@@ -418,7 +442,7 @@ export const LEGAL_STEPS: WizardStepDef[] = [
     kind: 'numeric',
     eyebrow: 'Inicio',
     pregunta: 'Valor de la UMA',
-    ayuda: 'Ingrese el valor de la Unidad de Medida Arancelaria. La app carga el último valor, pero podés ajustarlo manualmente',
+    ayuda: 'Honorio carga la vigente. Si corresponde otra —la de la fecha del cierre de una planilla, por ejemplo—, escribila o buscala por fecha',
     resumenLabel: 'Valor UMA',
     // La procedencia va a la vista, no en una nota al pie: es lo que
     // hace que el numero se pueda defender, y es el mismo texto que
@@ -426,8 +450,14 @@ export const LEGAL_STEPS: WizardStepDef[] = [
     unidad: UMA_VIGENTE.fuente ?? 'Verificá en el sitio de la Corte',
     unidadHref: UMA_VIGENTE.url ?? undefined,
     prefix: '$',
-    min: 50000,
-    max: 200000,
+    // Cualquier valor positivo, y sin techo. El piso de 50.000 dejaba
+    // afuera toda UMA anterior a marzo de 2024 —que es la que corresponde
+    // cuando la base se expresa a la fecha del cierre de una planilla
+    // vieja—, y el techo de 200.000 la iba a dejar afuera a ella misma
+    // con la inflacion. Lo que el valor tiene de raro se avisa al lado
+    // del campo (aviso-uma.tsx), sin impedir el calculo.
+    min: 1,
+    max: Number.POSITIVE_INFINITY,
     step: 1,
     default: 0,
     format: pesos,

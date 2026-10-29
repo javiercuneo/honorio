@@ -799,3 +799,48 @@ export const EXHORTO_INCISO_A_TECHO: Criterio = {
       'El piso de 3 UMA correspondería a cada notificación o acto y no al exhorto considerado como una unidad, de modo que un exhorto con varios actos acumularía tantos pisos como actos comprenda.',
   },
 }
+
+/**
+ * La base expresada en UMA a la fecha del cierre de la planilla de
+ * liquidacion, y no a la de la regulacion.
+ *
+ * **No es un criterio que la app aplique: es el fundamento de una
+ * opcion.** Honorio sigue proponiendo la UMA vigente, y no la cambia
+ * sola. Lo que este fallo sostiene es que, cuando la planilla se cierra,
+ * se aprueba y se regula en momentos distintos, la base de pesos se
+ * convierte con la UMA de la fecha de corte de la planilla; para eso el
+ * primer paso de la entrevista deja buscar la UMA de una fecha
+ * (`umaAl()` en serie-uma.ts) y usarla.
+ *
+ * El caso, como lo cuenta la sentencia: planilla de $5.632.463,30 con
+ * corte a julio de 2023, aprobada en febrero de 2024 y regulada en
+ * marzo de 2024. La Sala toma la UMA de $20.595 de la Acordada 29/2023,
+ * que es la que `data/serie-uma.json` da vigente desde el 1/7/2023, y
+ * fija 28 UMA = $576.660. `serieUma.validation.ts` lo tiene como ancla:
+ * si la serie dejara de dar ese valor para esa fecha, falla contra una
+ * sentencia.
+ *
+ * Lo que **no** se carga, y por que:
+ * - Los precedentes que la sentencia cita en su considerando 1 (Tajan,
+ *   Gottig) y en el voto de la Dra. Andalaf Casiello (Bedini) no se
+ *   leyeron: la sentencia no dice que traten este punto, y una cita se
+ *   transcribe de la sentencia leida o no se escribe.
+ * - No hay `contraria`. La lectura opuesta —la UMA a la fecha de la
+ *   regulacion— es la del decreto que la Sala revoca, que no esta
+ *   publicado ni leido.
+ * - No hay `url`: la sentencia llego como PDF y no se encontro
+ *   publicada en linea. La copia de trabajo vive fuera del arbol.
+ */
+export const UMA_CIERRE_PLANILLA: Criterio = {
+  sostiene:
+    '[…] resulta ajustado a derecho determinar la base regulatoria […] en la proporción de UMAS que equivalgan a la fecha del cierre de la planilla y no a la de la regulación.',
+  fallos: [
+    {
+      tribunal: 'CFed. Rosario, Sala A',
+      expediente: 'expte. 14671/2018',
+      caratula:
+        'Incidente Nº 2 - ACTOR: DIEGUEZ MARTA NOEMI Y OTRO DEMANDADO: ANSES s/INC APELACION',
+      fecha: '19/10/2026',
+    },
+  ],
+}

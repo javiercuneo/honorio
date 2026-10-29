@@ -1,8 +1,8 @@
 // ---------------------------------------------------------------
 // Validacion del texto de la regulacion en prosa.
 //
-// **Esta es la validacion mas importante de las dieciocho, y no
-// porque cubra mas.** Las otras dieciseis comparan numeros, y hasta
+// **Esta es la validacion mas importante de las diecinueve, y no
+// porque cubra mas.** Las otras diecisiete comparan numeros, y hasta
 // ahora eso alcanzaba porque todo lo que el motor producia era un
 // numero. La prosa no: produce un documento con forma de resolucion
 // judicial, que alguien va a pegar en un expediente, y **ninguna de
@@ -42,6 +42,7 @@ import { buildGeneral, buildCalculationResult } from '../calculate'
 import { calcularMediacion } from '../mediacion'
 import type { ValorUHOM } from '../uhom'
 import type { WizardState, CalculoResultado } from '../types'
+import { UMA_VIGENTE } from '../uma'
 
 let totales = 0
 let fallos = 0
@@ -336,7 +337,7 @@ const ESPERADO = `AUTOS Y VISTOS:
 
 a) Base regulatoria:
 Tomo como base regulatoria la suma de $50.000.000,00.
-Expresada en UMA, con el valor vigente de $102.076,00, la base es de 489,83 UMA.
+Expresada en UMA, con el valor de $102.076,00, vigente desde el 1/6/2026 (Res. SGA 1785/2026), la base es de 489,83 UMA.
 
 b) Escala aplicable (art. 21):
 Aplico la 6ª escala (451-750 UMA): 13% a 17% (art. 21).
@@ -344,7 +345,7 @@ Tengo en consideración el factor de correlación, en cuanto a que los honorario
 
 c) Regulación (art. 16):
 En función del monto del asunto referenciado, la complejidad del procedimiento, el resultado obtenido, el mérito de la labor profesional, la calidad, eficacia y extensión del trabajo realizado y lo dispuesto por el art. 16 de la ley 27.423, regulo los honorarios del siguiente modo:
-- Dra. Prueba, letrado/a patrocinante (art. 21): 96,77 UMA, equivalente al día de la fecha a $9.878.026,00.
+- Dra. Prueba, letrado/a patrocinante (art. 21): 96,77 UMA, equivalente a $9.878.026,00.
 
 d) IVA y plazo (art. 54):
 La regulación de honorarios no contiene la alícuota que establece ese impuesto. En consecuencia el beneficiario que se encuentre inscripto deberá acreditar su condición y el obligado al pago adicionarle el monto correspondiente (conf. CSJN, 16/06/1993, “Recurso de hecho deducido por Arístides Horacio M. Corti en la causa Compañía General de Combustibles S.A. s/ recurso de apelación”, Fallos 316:1533).
@@ -367,6 +368,31 @@ Notifíquese.
     console.log('  ---- fin ----\n')
   }
   ok('el texto es identico al congelado', salida.texto === ESPERADO)
+}
+
+// La UMA del caso congelado no es la vigente, y desde el 29/10/2026 la
+// prosa lo dice: antes afirmaba "valor vigente" y "al dia de la fecha"
+// para cualquier UMA. Con la vigente las dos frases tienen que seguir
+// estando, y con una que no esta en ninguna norma no se inventa una.
+{
+  const redactar = (uma: number) => {
+    const r = buildGeneral({ ...estado({}), valorUMA: uma })!
+    return generarProsa({
+      resultado: r,
+      puntos: [{ banda: 'patrocinante', uma: r.honorarios.patrocinante.rango.maxUMA, profesional: 'Dra. Prueba' }],
+    }).texto
+  }
+  const vigente = redactar(UMA_VIGENTE.valor)
+  ok('con la UMA vigente dice "valor vigente"', vigente.includes('con el valor vigente de $'))
+  ok('con la UMA vigente dice "al día de la fecha"', vigente.includes('equivalente al día de la fecha a $'))
+
+  const historica = redactar(20_595)
+  ok('con una UMA histórica cita su norma y su vigencia', historica.includes('con el valor de $20.595,00, vigente desde el 1/7/2023 (Acordada 29/2023)'))
+  ok('con una UMA histórica no dice "al día de la fecha"', !historica.includes('al día de la fecha'))
+
+  const aMano = redactar(45_000)
+  ok('con una UMA que no fijó nadie no inventa norma', aMano.includes('con un valor de la UMA de $45.000,00, la base'))
+  ok('con una UMA que no fijó nadie no dice "vigente"', !aMano.includes('vigente'))
 }
 
 // ================================================================

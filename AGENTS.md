@@ -65,7 +65,7 @@ Orden de prioridades cuando entran en conflicto:
 Un solo comando, y es el mismo que corre CI:
 
 ```bash
-npm run check      # tipos + las 18 validaciones
+npm run check      # tipos + las 19 validaciones
 ```
 
 Por separado, si necesitás aislar:
@@ -81,7 +81,7 @@ Las validaciones de `lib/legal/__tests__/*.validation.ts` son scripts sueltos
 contra casos conocidos y salen con código distinto de cero si algo no coincide.
 `scripts/validate.mjs` las corre todas y junta los resultados.
 
-**Diecisiete comparan números. Una, no:** `textosLegales.validation.ts` compara
+**Dieciocho comparan números. Una, no:** `textosLegales.validation.ts` compara
 cada `textoLegal` de `minimos-data.ts` contra `data/ley-27423.md`, oración por
 oración. Existe porque un texto que dice ser una transcripción es la única clase
 de string que tiene una fuente contra la cual compararse, y porque ya pasó que

@@ -24,6 +24,44 @@ calculadoras, el asistente clásico y la documentación de dominio.
 
 ---
 
+## La UMA dejó de recortarse, y la del cierre de la planilla — el 29/10
+
+**El bug llegó por correo**, de un usuario de Santa Fe: no podía cargar una UMA
+menor a $50.000. El primer paso de la entrevista tenía `min: 50000` y
+`max: 200000`, y `numeric-field.tsx` hacía `clamp(min, max)` en cada tecla.
+Escribir 15.000 dejaba al motor calculando con 50.000 y, al salir del campo, la
+pantalla mostraba 50.000 como si eso se hubiera escrito. Toda UMA vigente antes
+de mayo de 2024 quedaba afuera, y el techo iba a dejar afuera a la vigente con la
+inflación. **El Cálculo directo no lo tenía**: lee la UMA con `parseImporte` y
+no recorta.
+
+**Con el correo vino un fallo**, y es el que justifica el caso de uso: CFed.
+Rosario, Sala A, 19/10/2026, expresa la base en UMA a la fecha del cierre de la
+planilla y no a la de la regulación (`UMA_CIERRE_PLANILLA`). El usuario lo
+describió como del Juzgado Federal Nº 1 de Santa Fe y dijo que también lo
+aplicaba la CFSS; el PDF es de Rosario y se cargó sólo lo que dice el PDF.
+
+Lo que se hizo, y por qué cada cosa:
+
+- **El rango dejó de ser un recorte y pasó a ser un control** (`fueraDeRango()`,
+  al avanzar, con motivo). La UMA acepta desde 1 y sin techo. No se eliminó
+  ninguna validación: `exhortoActos` y `base` conservan su rango, ahora dicho.
+- **La serie histórica entró a Honorio** (`data/serie-uma.json`, copia de la del
+  sitio de herramientas), para buscar la UMA de una fecha y para decir de qué
+  norma sale un valor escrito a mano.
+- **Al tirar del hilo aparecieron tres textos que mentían con una UMA que no es
+  la vigente**, y venían de antes del bug —una UMA de 120.000 ya los disparaba—:
+  la firma del informe y la cita citaban siempre la UMA vigente; la prosa decía
+  «con el valor vigente de» y «equivalente al día de la fecha». El texto
+  congelado de la prosa cambió por eso: su caso de prueba usa $102.076, que no
+  es la vigente desde julio.
+- **El caso del fallo cierra contra el motor.** Base $5.632.463,30 a $20.595 =
+  273,49 UMA. Una ejecución con excepciones da 25,76-28,85 UMA, y la Sala fijó
+  28; sin excepciones da 23,19-25,96. La sentencia no dice si hubo excepciones,
+  así que **no** se cargó como ancla: el ancla es la UMA de julio de 2023.
+
+---
+
 ## De AGPL a todos los derechos reservados — el 22/9
 
 Del 31/7 al 21/9 Honorio se publicó bajo **AGPL-3.0-or-later** (versiones

@@ -3,7 +3,7 @@
 Documento de continuidad entre sesiones. **Leer antes de empezar a trabajar.**
 Se actualiza en el mismo commit que el trabajo, para que nunca mienta.
 
-Última actualización: 2026-09-19 · rama `main`
+Última actualización: 2026-10-29 · rama `main`
 
 Lleva **sólo lo que sigue vivo**: dónde está el trabajo, qué está abierto, qué
 se sabe roto, qué decisiones no hay que contradecir sin saberlo y qué trampas
@@ -21,7 +21,7 @@ pregunta «¿por qué esto quedó así?».
 
 ## Dónde estamos
 
-Versión **3.5.5**, publicada en `honorio.ar`. Las **18 validaciones** de
+Versión **3.6.0**, publicada en `honorio.ar`. Las **19 validaciones** de
 `lib/legal/__tests__` están en verde y corren solas en CI. **No hay nada urgente
 ni bloqueante.**
 
@@ -95,6 +95,16 @@ alguno consigue jurisprudencia, entra a `jurisprudencia.ts`.
 - El **art. 61 bis contra el 5 %-10 % del art. 21**, que no fue derogado. Hasta
   que haya jurisprudencia, conviven.
 
+### La UMA histórica: dos cosas que quedaron sin resolver
+
+- **El mediador sigue con el UHOM de hoy aunque la UMA sea de otra fecha.**
+  Con la UMA del cierre de una planilla de 2023, el resultado mezcla una unidad
+  de 2023 con otra de 2026. No se tocó: no hay fallo que diga a qué fecha va el
+  UHOM en ese caso, y no es lo que se pidió.
+- **El fallo de `UMA_CIERRE_PLANILLA` es de la CFed. Rosario.** Quien lo mandó
+  habló de un Juzgado Federal de Santa Fe y de la CFSS: si aparecen esas
+  sentencias, entran al mismo `Criterio`.
+
 ### Pendiente con fecha: el certificado, hacia mediados de noviembre de 2026
 
 **Es lo único que puede romper el sitio, y llega solo.** El certificado de
@@ -136,7 +146,7 @@ son unas horas y no importa.
 - **`lib/compartir.ts` no tiene validación permanente.** Se probó con trece
   casos contra los módulos reales, pero `scripts/validate.mjs` corre
   `lib/legal/__tests__/*.validation.ts` y meter ahí algo que no es el motor
-  diluiría lo que significa «las 18 validaciones del motor». Si el módulo crece,
+  diluiría lo que significa «las 19 validaciones del motor». Si el módulo crece,
   merece su propio corredor.
 
 ### Pendiente de diseño y contenido
@@ -173,7 +183,7 @@ son unas horas y no importa.
 
 ### Lo que las validaciones cubren de los textos, y lo que no
 
-**Diecisiete comparan números, así que un texto que promete un porcentaje puede
+**Dieciocho comparan números, así que un texto que promete un porcentaje puede
 mentir con todas en verde.** Pasó cuatro veces entre el 5/8 y el 9/9; la lista,
 en `HISTORIA.md`. **Una de esas clases ya no puede volver a pasar:**
 `textosLegales.validation.ts` —la 18— parte cada `textoLegal` en oraciones y exige que cada una aparezca
@@ -308,6 +318,12 @@ está la regla y su razón, que es lo que hay que saber antes de tocar el archiv
   cierra contra el motor hasta el centésimo y **está cargado como ancla externa**
   en `calculoDirecto.validation.ts`: si alguien «arregla» el factor de
   correlación, falla contra una sentencia y no contra una opinión nuestra.
+- **`UMA_CIERRE_PLANILLA` funda una opción, no un criterio adoptado.** Honorio
+  sigue proponiendo la UMA vigente; el fallo va detrás del «por qué» de la
+  búsqueda por fecha. Sin `contraria` y sin `url`, y los precedentes que la
+  sentencia nombra no se cargaron porque no se leyeron. El PDF vive en
+  `herramientas-judiciales/docs/modelos/jurisprudencia/dieguez.pdf`, fuera del
+  árbol de este repositorio.
 - **`Doctrina` es un tipo aparte de `Fallo`, y la pantalla los separa.** Un
   fallo dice lo que un tribunal resolvió; un autor dice lo que le parece.
 - **`fallos: []` es un estado válido y se declara.** Donde no hay ninguno, la
@@ -562,8 +578,9 @@ ningún `IMPORTRANGE` ni de Apps Script**: los valores están escritos adentro.
   que el cron vio el valor; `vigencia`, el día desde el que rige, y hoy están a
   cincuenta días de distancia. `vigencia` es opcional porque las entradas
   anteriores al 9/9 no la tienen y no se puede inventar. **Todavía no se muestra
-  en ningún lado**, que es lo que sigue abierto de esto: cuando se muestre, la
-  frase es «rige desde» y sale de `vigencia`, nunca de `capturado`.
+  en ningún lado** para la vigente, que es lo que sigue abierto de esto: cuando
+  se muestre, la frase es «rige desde» y sale de `vigencia`, nunca de
+  `capturado`. Para las históricas ya se muestra, y sale de la serie.
 - **`public/legacy/core.js` conserva su `cargarUMA()` y no se toca.** Es copia
   del asistente clásico, que se mantiene en el otro repositorio y todavía la
   usa. Simplemente no se la llama: `adapters.setUMA()` pisa `window.valorUMA`.
@@ -583,6 +600,30 @@ ningún `IMPORTRANGE` ni de Apps Script**: los valores están escritos adentro.
   regla de forma no, porque la autoridad que fija el valor puede apartarse de
   ella y ya se apartó una vez.
 
+#### La UMA que no es la de hoy
+
+- **Se acepta como se escribe.** El paso tiene `min: 1` y ningún techo, y el
+  rango de cualquier paso numérico se controla al avanzar (`fueraDeRango()`),
+  nunca recortando al escribir. El clamp convertía una UMA de 15.000 en 50.000
+  sin aviso; `umaHistorica.validation.ts` falla si vuelve un piso.
+- **Avisa y no bloquea** (`aviso-uma.tsx`, en la entrevista y en el Cálculo
+  directo): si el valor rigió en otra fecha dice desde cuándo y por qué norma;
+  si no lo fijó nadie, lo dice en rojo y deja calcular.
+- **Todo lo que nombra la UMA nombra la del cálculo**, no la vigente: el rótulo
+  del campo, el encabezado del resultado, la firma, la cita y la prosa. Antes
+  la firma citaba la vigente debajo de un número hecho con otra, y la prosa
+  decía «valor vigente» y «al día de la fecha» de cualquier UMA. **Con la
+  vigente, la prosa no cambió una letra.**
+- **`data/serie-uma.json` es copia byte a byte** de la del sitio de
+  herramientas, reconstruida de los actos. La trae `npm run serie-uma`, y el
+  cron la corre **con `continue-on-error`**: no puede frenar la UMA vigente.
+  `SERIE_UMA` la completa con `data/uma.json` y la validación exige que donde
+  las dos tienen la misma vigencia digan el mismo número. **Si el script frena
+  porque un valor viejo cambió, es una persona la que mira el acto.**
+- **`umaAl()` no adivina:** fecha que no es `AAAA-MM-DD`, o anterior al
+  22/12/2017, da `null`. Para el último tramo la pantalla avisa que la Corte
+  fija la UMA con demora y hacia atrás.
+
 ### El campo numérico de la base
 
 - **El último separador con una o dos cifras detrás es el decimal; cualquier
@@ -591,6 +632,7 @@ ningún `IMPORTRANGE` ni de Apps Script**: los valores están escritos adentro.
 - **El script de la UMA usa la misma función, copiada a mano** porque es `.mjs`
   y no puede importar TS. **Si una cambia, la otra también**: mostrar un número
   y calcular con otro es el peor resultado posible acá.
+- **El campo no recorta lo que se escribe.** Ver «La UMA que no es la de hoy».
 - **Invariante: el valor que se ve y el valor que entra al motor no se pueden
   separar.** Se confirma en `onChange`, no en `onBlur`. Si algún día se agrega
   otro campo de entrada, va igual.
@@ -966,7 +1008,7 @@ los commits.
 ## Cómo verificar un cambio
 
 ```bash
-npm run check    # tipos + las 18 validaciones. Es lo que corre CI.
+npm run check    # tipos + las 19 validaciones. Es lo que corre CI.
 npm run build    # el export estatico, que es lo que se publica
 npm run uma      # trae el valor de la UMA de la planilla, si cambio
 npm run verificar # controla que honorio.ar calcule con el valor de la planilla

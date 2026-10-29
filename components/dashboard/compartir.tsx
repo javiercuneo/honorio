@@ -110,7 +110,8 @@ export function BloqueCita({ answers }: { answers: Answers }) {
     VERSION +
     (fecha ? ', cálculo del ' + fecha : '') +
     ', UMA ' +
-    pesos(UMA_VIGENTE.valor, false) +
+    // La del calculo, no la vigente: ver Firma.tsx.
+    pesos(typeof answers.umaInicio === 'number' ? answers.umaInicio : UMA_VIGENTE.valor, false) +
     (enlace ? ' — ' + enlace : '')
 
   const reporte =
