@@ -44,7 +44,9 @@ const transition = { duration: 0.4, ease: [0.22, 1, 0.36, 1] as const }
 const FRAGMENTO_DIRECTO = '#directo'
 
 export function InterviewExperience() {
-  const [showLanding, setShowLanding] = useState(true)
+  // PROPUESTA UX: la portada y la intro decian lo mismo con dos botones
+  // «Comenzar» seguidos. Se entra directo a la intro.
+  const [showLanding, setShowLanding] = useState(false)
   const [showMinimos, setShowMinimos] = useState(false)
   const [showDirecto, setShowDirecto] = useState(false)
   const { ready, error: legacyError, umaValorCargado } = useLegacyReady()
@@ -405,7 +407,16 @@ export function InterviewExperience() {
                   transition={transition}
                 >
                   {wizard.phase === 'intro' ? (
-                    <IntroView onStart={() => go(1, () => wizard.jumpTo(0))} onShowMinimos={() => setShowMinimos(true)} onShowDirecto={() => setShowDirecto(true)} />
+                    <IntroView
+                      // PROPUESTA UX: la UMA se confirma en la intro y la
+                      // entrevista arranca en la primera pregunta real. Si
+                      // todavia no hay UMA cargada, arranca en su paso.
+                      umaValor={typeof wizard.answers.umaInicio === 'number' ? (wizard.answers.umaInicio as number) : null}
+                      onStart={() => go(1, () => wizard.jumpTo(typeof wizard.answers.umaInicio === 'number' ? 1 : 0))}
+                      onCambiarUma={() => go(1, () => wizard.jumpTo(0))}
+                      onShowMinimos={() => setShowMinimos(true)}
+                      onShowDirecto={() => setShowDirecto(true)}
+                    />
                   ) : currentStep ? (
                     <StepShell
                       eyebrow={currentStep.eyebrow}

@@ -11,6 +11,9 @@ import { Button } from '@/components/ui/button'
 // del dia que cambie el dominio tiene que ser la lectura de un
 // archivo y no del repositorio entero.
 import { CALCULADORA_MEDIACION, DOCUMENTACION } from '@/lib/enlaces'
+import { Ilustracion } from '@/components/brand'
+import { pesos } from '@/components/dashboard/format'
+import { procedenciaDe } from '@/lib/legal/serie-uma'
 
 // Cuantas validaciones corren antes de publicar. No se escribe a mano:
 // lo cuenta next.config.mjs al compilar, porque escrito aca quedo en 17
@@ -27,18 +30,24 @@ const notes = [
 ]
 
 export function IntroView({
+  umaValor,
   onStart,
+  onCambiarUma,
   onShowMinimos,
   onShowDirecto,
 }: {
+  umaValor: number | null
   onStart: () => void
+  onCambiarUma: () => void
   onShowMinimos: () => void
   onShowDirecto: () => void
 }) {
+  const procedencia = umaValor ? procedenciaDe(umaValor) : null
   const [open, setOpen] = useState(false)
 
   return (
     <div className="max-w-lg">
+      <Ilustracion className="mb-6 w-20 text-foreground" />
       <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
         <span className="h-1.5 w-1.5 rounded-full bg-chart-1" aria-hidden="true" />
         Cálculo de honorarios
@@ -64,10 +73,29 @@ export function IntroView({
         ))}
       </div>
 
+      {/* PROPUESTA UX: la UMA deja de ser un paso entero. Se ve, con su
+          norma, y se cambia con un clic: lo que importaba del paso era que
+          el valor estuviera a la vista, no que hubiera que apretar
+          «Continuar» sobre el. */}
+      {umaValor ? (
+        <p className="mt-8 flex flex-wrap items-baseline gap-x-2 gap-y-1 border-l-2 border-hair pl-3 text-[13px] text-muted-foreground">
+          <span>Calcula con la UMA de</span>
+          <span className="font-meter text-[16px] tabular-nums text-foreground">{pesos(umaValor, false)}</span>
+          {procedencia?.norma ? <span className="font-mono text-[11px] uppercase tracking-wider text-faint">{procedencia.norma}</span> : null}
+          <button
+            type="button"
+            onClick={onCambiarUma}
+            className="underline underline-offset-2 hover:text-foreground"
+          >
+            Cambiar
+          </button>
+        </p>
+      ) : null}
+
       <Button
         size="lg"
         onClick={onStart}
-        className="group mt-9 h-12 px-6 text-[15px]"
+        className="group mt-6 h-12 px-6 text-[15px]"
       >
         Comenzar
         <ArrowRight className="ml-1 h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
@@ -79,7 +107,7 @@ export function IntroView({
           onClick={onShowMinimos}
           className="ml-2 underline underline-offset-2 hover:text-foreground"
         >
-          Ver
+          Tabla de mínimos
         </button>
       </p>
 
@@ -108,7 +136,7 @@ export function IntroView({
             Información adicional
           </span>
           <span className="shrink-0 font-mono text-[11px] uppercase tracking-wider text-accent-foreground">
-            {open ? 'Cerrar' : 'por qué'}
+            {open ? 'Cerrar' : 'Ver'}
           </span>
         </button>
 
@@ -137,16 +165,16 @@ export function IntroView({
                   <ul className="mt-2 list-disc space-y-1.5 pl-4 text-[13px] leading-relaxed text-muted-foreground">
                     <li>Vigencia: La ley 27423 se publicó en el BO el 22/12/17.</li>
                     <li>Te sirve si seguís el criterio de aplicación inmediata a todos los juicios en trámite, incluidos los iniciados antes de su entrada en vigencia</li>
-                    <li>Si seguís el precedente <a href="https://sjconsulta.csjn.gov.ar/sjconsulta/documentos/verDocumentoByIdLinksJSP.html?idDocumento=7473801&cache=1551129603472" target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-foreground">"Establecimiento Las Marías" (CSJN, 04/09/2018)</a> podes usarlo para las etapas con principio de ejecución bajo la nueva ley.</li>                  </ul>
+                    <li>Si seguís el precedente <a href="https://sjconsulta.csjn.gov.ar/sjconsulta/documentos/verDocumentoByIdLinksJSP.html?idDocumento=7473801&cache=1551129603472" target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-foreground">"Establecimiento Las Marías" (CSJN, 04/09/2018)</a> podés usarlo para las etapas con principio de ejecución bajo la nueva ley.</li>                  </ul>
                 </div>
                 <div>
                   <h4 className="text-[13px] font-medium text-foreground/85">Restricciones y exclusiones del cálculo</h4>
                   <ul className="mt-2 list-disc space-y-1.5 pl-4 text-[13px] leading-relaxed text-muted-foreground">
-                    <li>Mínimos arancelarios: El asistente no aplica automáticamente los mínimos de los arts. 58, 61, etc. Si el resultado es menor a dichos mínimos y los consideras aplicables, desestimá el cálculo o hace clic en "ver mínimos"</li>
+                    <li>Mínimos arancelarios: El asistente no aplica automáticamente los mínimos de los arts. 58, 61, etc. Si el resultado es menor a dichos mínimos y los considerás aplicables, desestimá el cálculo o hacé clic en «Tabla de mínimos»</li>
                     <li>Reducciones y topes: no se contemplan las limitaciones por prorrateo (art. 730 CCyCN), reajuste de precio (art. 1255 CCyCN), ejecución hipotecaria especial (art. 60 <a href="https://servicios.infoleg.gob.ar/infolegInternet/anexos/0-4999/812/texact.htm
 " target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-foreground"> Ley 24.441 </a>) o régimen de vivienda (art. 254 CCyCN / art. 48 Ley 14.394).</li>
                     <li>Materias excluidas: la herramienta no está pensada para juicios penales. Solo menciona algunos mínimos para referencia</li>
-                    <li>Asuntos no susceptibles de apreciación pecuniaria: para algunos casos sin monto determinado (por ejemplo convocatoria de asamblea), no es posible un cálculo matemático; debes recurrir a las pautas del art. 16. Si haces clic en "ver mínimos" podes ver algunos valores para referencia</li>
+                    <li>Asuntos no susceptibles de apreciación pecuniaria: para algunos casos sin monto determinado (por ejemplo convocatoria de asamblea), no es posible un cálculo matemático; tenés que recurrir a las pautas del art. 16. En la «Tabla de mínimos» hay algunos valores de referencia</li>
                   </ul>
                 </div>
                 <div>
@@ -155,7 +183,7 @@ export function IntroView({
                     <li>Leyes especiales: no se incluyen las pautas de las leyes especiales que reglamenten cada actividad profesional (art. 1, 2° párrafo de la ley 27423)</li>
                     <li><strong className="font-medium text-foreground/85">Ley 27.802 (Modernización Laboral).</strong> Sí están los pisos que fijó: sustituyó los <a href="https://servicios.infoleg.gob.ar/infolegInternet/anexos/420000-424999/423680/norma.htm" target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-foreground">arts. 60 y 61</a> e incorporó el 61 bis, todos con un mínimo de 2 UMA para los peritos. Lo que <strong className="font-medium text-foreground/85">no está resuelto —porque no lo resolvió la ley—</strong> es si el art. 61 bis, al decir que los honorarios del perito no se vinculan a la cuantía del juicio, desplaza el 5 % al 10 % del art. 21, que no fue derogado; ni qué queda de la remisión del art. 61 al art. 32, que regula administradores e interventores con escalas sobre utilidades. Honorio muestra las dos reglas y no elige</li>
                     <li>Excluidos: no contempla los cálculos de los honorarios de los administradores judiciales, interventores o veedores, interventores recaudadores, liquidadores judiciales, árbitros, mediadores o amigables componedores (art. 32).</li>
-                    <li>Mediadores: tienen normativa propia (<a href="http://servicios.infoleg.gob.ar/infolegInternet/anexos/165000-169999/166999/texact.htm" target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-foreground"> Ley 26.589</a> y Decretos <a href="http://servicios.infoleg.gob.ar/infolegInternet/anexos/255000-259999/255741/norma.htm" target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-foreground"> 2536/15 </a>y <a href="https://servicios.infoleg.gob.ar/infolegInternet/anexos/415000-419999/418049/norma.htm" target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-foreground">696/2025</a>). Puede utilizar nuestra <a href={CALCULADORA_MEDIACION} target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-foreground">calculadora</a>.</li>
+                    <li>Mediadores: tienen normativa propia (<a href="http://servicios.infoleg.gob.ar/infolegInternet/anexos/165000-169999/166999/texact.htm" target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-foreground"> Ley 26.589</a> y Decretos <a href="http://servicios.infoleg.gob.ar/infolegInternet/anexos/255000-259999/255741/norma.htm" target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-foreground"> 2536/15 </a>y <a href="https://servicios.infoleg.gob.ar/infolegInternet/anexos/415000-419999/418049/norma.htm" target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-foreground">696/2025</a>). Podés usar la <a href={CALCULADORA_MEDIACION} target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-foreground">calculadora</a>.</li>
                   </ul>
                 </div>
                 {/* La medicion va escrita al lado de la promesa que
@@ -176,7 +204,7 @@ export function IntroView({
                 <div>
                   <h4 className="text-[13px] font-medium text-foreground/85">Reconvención y acumulación de acciones</h4>
                   <p className="mt-2 text-[13px] leading-relaxed text-muted-foreground">
-                    Art. 28: en estos supuestos, los honorarios se regulan por separado para cada acción. Le sugerimos reiniciar el asistente para cada una de las pretensiones según sus particularidades.
+                    Art. 28: en estos supuestos, los honorarios se regulan por separado para cada acción. Conviene reiniciar el asistente para cada una de las pretensiones según sus particularidades.
                   </p>
                 </div>
               </div>
