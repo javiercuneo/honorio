@@ -4,7 +4,7 @@
   "_como_se_leyo": "De los 50 PDF de la CSJN, 42 tienen capa de texto y se leyeron con pdftotext buscando el par importe/vigencia del resolutivo. Los otros 8 --acordadas 36/2020, 1/2021, 7/2021, 12/2021, 21/2021, 4/2022, 12/2022 y res. 2722/2023-- dibujan las letras como trazos y no tienen texto: se rasterizaron y se leyeron a ojo. Las acordadas de 2018 y 2019 llevan la fecha del acto escrita a mano en el original; el valor y la vigencia estan impresos y se leyeron del texto, la fecha la aporto el autor leyendola. Esas llevan \"fecha_leida_a_mano\".",
   "_lo_que_estaba_mal_afuera": "Dos compilaciones publicas atribuyen a la Acordada 4/2022 el valor de $8.183 desde abril de 2022. La acordada dice $7.439 a partir del 1 de enero de 2022; $8.183 y $9.001 los fijo la 12/2022, para abril y mayo. Enero de 2022 no figura en ninguna de las dos. Por eso la serie se reconstruyo de los actos y no se copio.",
   "fuente": "Acordadas y resoluciones SGA de la Corte Suprema de Justicia de la Nacion",
-  "actualizado": "2026-10-21",
+  "actualizado": "2026-11-20",
   "valores": [
     {
       "valor": 1350,
@@ -510,6 +510,14 @@
       "acto": "2026-10-21",
       "leido": "texto",
       "url": "https://www.csjn.gov.ar/documentos/descargar?ID=182918"
+    },
+    {
+      "valor": 110381,
+      "vigencia": "2026-10-01",
+      "norma": "Res. SGA 3006/2026",
+      "acto": "2026-11-20",
+      "leido": "texto",
+      "url": "https://www.csjn.gov.ar/documentos/descargar?ID=183642"
     }
   ]
 }
